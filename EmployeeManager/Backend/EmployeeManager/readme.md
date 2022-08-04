@@ -55,7 +55,7 @@ segítségével az alkalmazásból Docker image készíthető.
 ---
 
 ## Virtual network creation
-`docker network create --driver bridge employeeapp-net`
+`docker network create --driver bridge employeesapp-net`
 
 ## MariaDb in Docker
 `docker run -d -e MYSQL_DATABASE=employees -e MYSQL_USER=employees -e MYSQL_PASSWORD=employees -e MYSQL_ALLOW_EMPTY_PASSWORD=yes --network employeesapp-net -p 3306:3306 --name employees-mariadb mariadb`
@@ -66,4 +66,4 @@ segítségével az alkalmazásból Docker image készíthető.
 `docker build -t employeesapp .` 
 
 ## Run the application in dockerwith MariaDB
-`docker run -d -e SPRING_DATASOURCE_URL=jdbc:mariadb://employees-mariadb/traintickets --network employeesapp-net -p 8080:8080 --name employeesapp employeesapp`
+`docker run -d -e SPRING_DATASOURCE_URL=jdbc:mariadb://employees-mariadb/employees --network employeesapp-net -p 8080:8080 --name employeesapp employeesapp`
