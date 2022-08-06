@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ValidationToken {
+public class VerificationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +27,10 @@ public class ValidationToken {
     private User user;
 
     private LocalDateTime expiryDate;
+
+    public VerificationToken(String token, User user, LocalDateTime expiryDate) {
+        this.token = token;
+        this.user = user;
+        this.expiryDate = expiryDate;
+    }
 }

@@ -37,4 +37,12 @@ public class User {
     private LocalDateTime createdDate;
 
     private boolean enabled;
+
+    public User(String userName, String password, String email, LocalDateTime createdDate, boolean enabled) {
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
+        this.createdDate = createdDate;
+        this.enabled = enabled;
+    }
 }
