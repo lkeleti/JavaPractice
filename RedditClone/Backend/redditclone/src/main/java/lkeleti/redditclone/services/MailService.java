@@ -2,7 +2,6 @@ package lkeleti.redditclone.services;
 
 import lkeleti.redditclone.exceptions.EmailNotSentException;
 import lkeleti.redditclone.models.NotificationEmail;
-import lkeleti.redditclone.repositories.VerificationTokenRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
