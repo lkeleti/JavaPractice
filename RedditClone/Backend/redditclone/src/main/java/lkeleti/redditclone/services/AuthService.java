@@ -1,6 +1,8 @@
 package lkeleti.redditclone.services;
 
+import lkeleti.redditclone.dtos.MessageDto;
 import lkeleti.redditclone.dtos.RegisterRequestCommand;
+import lkeleti.redditclone.exceptions.InvalidTokenException;
 import lkeleti.redditclone.models.NotificationEmail;
 import lkeleti.redditclone.models.User;
 import lkeleti.redditclone.models.VerificationToken;
@@ -54,5 +56,17 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    @Transactional
+    public MessageDto verifyAccount(String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).orElseThrow(
+                InvalidTokenException::new
+        );
+
+        User user = verificationToken.getUser();
+
+        user.setEnabled(true);
+        return new MessageDto("Account activated successfully!");
     }
 }

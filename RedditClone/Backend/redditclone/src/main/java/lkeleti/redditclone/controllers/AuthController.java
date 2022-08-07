@@ -22,4 +22,10 @@ public class AuthController {
         return new MessageDto("User registration successful");
     }
 
+    @GetMapping("/accountVerification/{token}")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageDto verifyAccount(@PathVariable(required = true) String token) {
+        return authService.verifyAccount(token);
+    }
+
 }
