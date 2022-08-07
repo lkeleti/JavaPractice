@@ -1,5 +1,7 @@
 package lkeleti.redditclone.controllers;
 
+import lkeleti.redditclone.dtos.AuthenticationResponse;
+import lkeleti.redditclone.dtos.LoginRequestCommand;
 import lkeleti.redditclone.dtos.MessageDto;
 import lkeleti.redditclone.dtos.RegisterRequestCommand;
 import lkeleti.redditclone.services.AuthService;
@@ -26,6 +28,12 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public MessageDto verifyAccount(@PathVariable(required = true) String token) {
         return authService.verifyAccount(token);
+    }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public AuthenticationResponse login(@Valid @RequestBody LoginRequestCommand loginRequestCommand) {
+        return authService.login(loginRequestCommand);
     }
 
 }

@@ -1,5 +1,8 @@
 package lkeleti.redditclone.services;
 
+import io.jsonwebtoken.Jwts;
+import lkeleti.redditclone.dtos.AuthenticationResponse;
+import lkeleti.redditclone.dtos.LoginRequestCommand;
 import lkeleti.redditclone.dtos.MessageDto;
 import lkeleti.redditclone.dtos.RegisterRequestCommand;
 import lkeleti.redditclone.exceptions.InvalidTokenException;
@@ -8,7 +11,12 @@ import lkeleti.redditclone.models.User;
 import lkeleti.redditclone.models.VerificationToken;
 import lkeleti.redditclone.repositories.UserRepository;
 import lkeleti.redditclone.repositories.VerificationTokenRepository;
+import lkeleti.redditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +32,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
-
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
     @Transactional
     public void signUp(RegisterRequestCommand registerRequestCommand) {
         User user = new User(
@@ -68,5 +77,12 @@ public class AuthService {
 
         user.setEnabled(true);
         return new MessageDto("Account activated successfully!");
+    }
+
+    public AuthenticationResponse login(LoginRequestCommand loginRequestCommand) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestCommand.getUserName(), loginRequestCommand.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtProvider.generateToken(authentication);
+        return new AuthenticationResponse(token, loginRequestCommand.getUserName());
     }
 }
