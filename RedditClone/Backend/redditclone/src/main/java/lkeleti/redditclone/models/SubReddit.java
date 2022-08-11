@@ -39,4 +39,9 @@ public class SubReddit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public SubReddit(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
