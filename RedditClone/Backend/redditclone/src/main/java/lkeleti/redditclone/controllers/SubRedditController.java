@@ -28,4 +28,10 @@ public class SubRedditController {
     public List<SubRedditDto> getAllSubReddits() {
         return subRedditService.getAllSubReddits();
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public SubRedditDto findSubRedditById(@PathVariable long id) {
+        return subRedditService.findSubRedditById(id);
+    }
 }
