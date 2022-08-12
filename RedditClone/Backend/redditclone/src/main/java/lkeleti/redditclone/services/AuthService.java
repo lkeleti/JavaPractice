@@ -85,4 +85,9 @@ public class AuthService {
         String token = jwtProvider.generateToken(authentication);
         return new AuthenticationResponse(token, loginRequestCommand.getUserName());
     }
+
+    public User getCurrentUser() {
+        //TODo not implemented!
+        return null;
+    }
 }

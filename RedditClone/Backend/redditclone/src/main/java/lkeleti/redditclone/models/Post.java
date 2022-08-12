@@ -47,4 +47,12 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subreddit_id")
     private SubReddit subreddit;
+
+    public Post(String postName, @Nullable String url, @Nullable String description, Integer voteCount, LocalDateTime createdDate) {
+        this.postName = postName;
+        this.url = url;
+        this.description = description;
+        this.voteCount = voteCount;
+        this.createdDate = createdDate;
+    }
 }
