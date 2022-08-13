@@ -1,5 +1,7 @@
 package lkeleti.redditclone.dtos;
 
+import lkeleti.redditclone.models.Post;
+import lkeleti.redditclone.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,8 @@ import java.time.LocalDateTime;
 @Setter
 public class CommentDto {
     private Long id;
-
     private String text;
-
     private LocalDateTime createdDate;
+    private User user;
+    private Post post;
 }

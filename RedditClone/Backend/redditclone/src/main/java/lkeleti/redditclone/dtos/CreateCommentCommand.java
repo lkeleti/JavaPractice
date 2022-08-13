@@ -10,5 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateCommentCommand {
+    private Long postId;
     private String text;
 }

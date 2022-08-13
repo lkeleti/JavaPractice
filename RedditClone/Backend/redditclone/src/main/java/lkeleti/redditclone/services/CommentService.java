@@ -4,6 +4,7 @@ import lkeleti.redditclone.dtos.CommentDto;
 import lkeleti.redditclone.dtos.CreateCommentCommand;
 import lkeleti.redditclone.exceptions.PostNotFoundException;
 import lkeleti.redditclone.models.Comment;
+import lkeleti.redditclone.models.NotificationEmail;
 import lkeleti.redditclone.models.Post;
 import lkeleti.redditclone.models.User;
 import lkeleti.redditclone.repositories.CommentRepository;
@@ -27,15 +28,30 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final AuthService authService;
+    private final MailContentBuilder mailContentBuilder;
+    private final MailService mailService;
 
     public CommentDto createComment(CreateCommentCommand createCommentCommand) {
         Comment comment = new Comment(
                 createCommentCommand.getText(),
                 LocalDateTime.now()
         );
-        //ToDo Post and user
 
+        User user = authService.getCurrentUser();
+        comment.setUser(user);
+        Long postId = createCommentCommand.getPostId();
+        Post post = postRepository.findById(postId).orElseThrow(
+                ()->new PostNotFoundException(postId)
+        );
+        comment.setPost(post);
+        String message = mailContentBuilder.build(post.getUser().getUserName() + " posted a comment on your post.");
+        sendCommentNotification(message,post.getUser());
         return modelMapper.map(commentRepository.save(comment), CommentDto.class);
+    }
+
+    private void sendCommentNotification(String message, User user) {
+        mailService.sendMail(new NotificationEmail(user.getUserName() + " commented on your post", user.getEmail(), message));
     }
 
     public List<CommentDto> getAllCommentsForPost(long postId) {
