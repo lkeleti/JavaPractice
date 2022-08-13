@@ -34,4 +34,9 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Comment(String text, LocalDateTime createdDate) {
+        this.text = text;
+        this.createdDate = createdDate;
+    }
 }
