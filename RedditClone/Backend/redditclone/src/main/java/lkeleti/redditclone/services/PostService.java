@@ -1,22 +1,20 @@
 package lkeleti.redditclone.services;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import lkeleti.redditclone.dtos.CreatePostCommand;
 import lkeleti.redditclone.dtos.PostDto;
 import lkeleti.redditclone.exceptions.PostNotFoundException;
 import lkeleti.redditclone.exceptions.SubRedditNameNotFoundException;
 import lkeleti.redditclone.exceptions.SubRedditNotFoundException;
-import lkeleti.redditclone.models.Post;
-import lkeleti.redditclone.models.SubReddit;
-import lkeleti.redditclone.models.User;
-import lkeleti.redditclone.repositories.PostRepository;
-import lkeleti.redditclone.repositories.SubRedditRepository;
-import lkeleti.redditclone.repositories.UserRepository;
+import lkeleti.redditclone.models.*;
+import lkeleti.redditclone.repositories.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -26,7 +24,10 @@ public class PostService {
     private final PostRepository postRepository;
     private final SubRedditRepository subRedditRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final VoteRepository voteRepository;
     private final AuthService authService;
+    private final ModelMapper modelMapper;
 
     public PostDto createPost(CreatePostCommand createPostCommand) {
         Post post = new Post(
@@ -55,7 +56,7 @@ public class PostService {
 
     public List<PostDto> getAllPosts() {
         return postRepository.findAll().stream()
-                .map(PostService::mapToDto)
+                .map(this::mapToDto)
                 .toList();
     }
 
@@ -64,7 +65,7 @@ public class PostService {
                 ()-> new SubRedditNotFoundException(id)
         ).getPosts();
         return posts.stream()
-                .map(PostService::mapToDto)
+                .map(this::mapToDto)
                 .toList();
     }
 
@@ -73,16 +74,25 @@ public class PostService {
                 ()-> new UsernameNotFoundException(username)
         );
         return postRepository.findByUser(user).stream()
-                .map(PostService::mapToDto)
+                .map(this::mapToDto)
                 .toList();
     }
 
-    private static PostDto mapToDto(Post post) {
-        ModelMapper modelMapper = new ModelMapper();
+    private PostDto mapToDto(Post post) {
         PostDto postDto = modelMapper.map(post, PostDto.class);
+
         postDto.setSubRedditName(post.getSubreddit().getName());
         postDto.setUserName(post.getUser().getUserName());
+        List<Vote> votes = voteRepository.findAllByPost(post);
+        int voteCount = 0;
+        for (Vote vote : votes) {
+            voteCount += vote.getVoteType().getDirection();
+        }
+        postDto.setVoteCount(voteCount);
+
+        int commentCount = commentRepository.findAllByPost(post).size();
+        postDto.setCommentCount(commentCount);
+        postDto.setDuration(TimeAgo.using(post.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
         return postDto;
     }
-
 }

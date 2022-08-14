@@ -31,4 +31,10 @@ public class Vote {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Vote(VoteType voteType, Post post, User user) {
+        this.voteType = voteType;
+        this.post = post;
+        this.user = user;
+    }
 }
