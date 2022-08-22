@@ -12,6 +12,7 @@ import lkeleti.redditclone.repositories.UserRepository;
 import lkeleti.redditclone.repositories.VerificationTokenRepository;
 import lkeleti.redditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
@@ -40,9 +42,13 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     @Transactional
     public void signUp(RegisterRequestCommand registerRequestCommand) {
+        String password = registerRequestCommand.getPassword();
+        String encodedPassword = passwordEncoder.encode(password);
+        log.error(password);
+        log.error(encodedPassword);
         User user = new User(
                 registerRequestCommand.getUserName(),
-                passwordEncoder.encode(registerRequestCommand.getPassword()),
+                encodedPassword,
                 registerRequestCommand.getEmail(),
                 LocalDateTime.now(),
                 false

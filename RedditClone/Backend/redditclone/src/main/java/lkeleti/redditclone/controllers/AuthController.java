@@ -26,7 +26,7 @@ public class AuthController {
 
     @GetMapping("/accountVerification/{token}")
     @ResponseStatus(HttpStatus.OK)
-    public MessageDto verifyAccount(@PathVariable(required = true) String token) {
+    public MessageDto verifyAccount(@PathVariable String token) {
         return authService.verifyAccount(token);
     }
 
@@ -35,5 +35,4 @@ public class AuthController {
     public AuthenticationResponse login(@Valid @RequestBody LoginRequestCommand loginRequestCommand) {
         return authService.login(loginRequestCommand);
     }
-
 }
