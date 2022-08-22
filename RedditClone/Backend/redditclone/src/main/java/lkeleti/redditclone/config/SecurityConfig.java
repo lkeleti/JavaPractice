@@ -1,25 +1,57 @@
 package lkeleti.redditclone.config;
 
+import lkeleti.redditclone.models.User;
+import lkeleti.redditclone.repositories.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Collection;
+
+import static java.util.Collections.singletonList;
+
 @EnableWebSecurity
 @AllArgsConstructor
-public class SecurityConfig{
+@Slf4j
+public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
+    @Bean
+    public AuthenticationManager createAuthenticationManager() {
+        return new AuthenticationManager() {
+            @Override
+            public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+                String username = authentication.getName();
+                String password = authentication.getCredentials().toString();
+                User user = userRepository.findByUserName(username).orElseThrow(
+                        ()->new UsernameNotFoundException(username)
+                );
 
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf().disable()
+                //ToDo check password
+                return new UsernamePasswordAuthenticationToken(username,password, getAuthorities("USER"));
+            }
+        };
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
+        return singletonList(new SimpleGrantedAuthority(role));
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**")
                 .permitAll()
@@ -28,12 +60,8 @@ public class SecurityConfig{
         return httpSecurity.build();
     }
 
-    public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

@@ -13,36 +13,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 @Service
-@AllArgsConstructor
 public class JwtProvider {
     private KeyStore keyStore;
 
-    @PostConstruct
-    public void init() {
-        try {
-            keyStore = KeyStore.getInstance("JKS");
-            InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
-            keyStore.load(resourceAsStream, "secret".toCharArray());
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-            throw new IllegalStateException("Exception occurred while loading keystore");
-        }
-
-    }
     public String generateToken(Authentication authentication) {
-        User principal = (User)authentication.getPrincipal();
+        String username = authentication.getPrincipal().toString();
         return Jwts.builder()
-                .setSubject(principal.getUsername())
+                .setSubject(username)
                 .signWith(getPrivateKey())
                 .compact();
     }
 
     private PrivateKey getPrivateKey() {
-        try{
-            return (PrivateKey) keyStore.getKey("springBlog", "secret".toCharArray());
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new IllegalStateException("Exception occured while retrieving public key from keystore");
+        try {
+            keyStore = KeyStore.getInstance("JKS");
+            char[] pass = ("secret").toCharArray();
+
+            InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("springblog.jks");
+            if (resourceAsStream == null) {
+                throw new IllegalArgumentException("Keyfile not found!");
+            }
+
+            keyStore.load(resourceAsStream, pass);
+            PrivateKey key = (PrivateKey) keyStore.getKey("1", pass);
+
+            return key;
+
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableKeyException e) {
+            throw new IllegalStateException("Exception occurred while loading keystore");
         }
     }
 }

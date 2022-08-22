@@ -1,6 +1,5 @@
 package lkeleti.redditclone.services;
 
-import io.jsonwebtoken.Jwts;
 import lkeleti.redditclone.dtos.AuthenticationResponse;
 import lkeleti.redditclone.dtos.LoginRequestCommand;
 import lkeleti.redditclone.dtos.MessageDto;
@@ -13,8 +12,11 @@ import lkeleti.redditclone.repositories.UserRepository;
 import lkeleti.redditclone.repositories.VerificationTokenRepository;
 import lkeleti.redditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +34,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
-    private final AuthenticationManager authenticationManager;
+    private final MailContentBuilder mailContentBuilder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     @Transactional
     public void signUp(RegisterRequestCommand registerRequestCommand) {
@@ -46,13 +50,12 @@ public class AuthService {
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
+        String message = mailContentBuilder.build("Thank you for signing up to Spring Reddit, please click on the below url to activate your account : "
+                + "http://localhost:8080/api/auth/accountVerification/" + token);
+
         mailService.sendMail(new NotificationEmail(
                 "Please activate your RedditClone account!",
-                user.getEmail(),
-                "Thank you for signing up to RedditClone, " +
-                        "please click on the below url to activate your account: " +
-                        "http://localhost:8080/api/auth/accountVerification/" + token
-                ));
+                user.getEmail(), message));
     }
 
     private String generateVerificationToken(User user) {
@@ -90,4 +93,5 @@ public class AuthService {
         //TODo not implemented!
         return null;
     }
+
 }
