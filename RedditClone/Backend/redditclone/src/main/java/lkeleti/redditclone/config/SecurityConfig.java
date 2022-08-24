@@ -2,6 +2,7 @@ package lkeleti.redditclone.config;
 
 import lkeleti.redditclone.models.User;
 import lkeleti.redditclone.repositories.UserRepository;
+import lkeleti.redditclone.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collection;
 
@@ -32,6 +34,8 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
     private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public AuthenticationManager createAuthenticationManager() {
         return authentication -> {
@@ -63,6 +67,7 @@ public class SecurityConfig {
                 .authenticated()
                 .and()
                 .httpBasic();
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

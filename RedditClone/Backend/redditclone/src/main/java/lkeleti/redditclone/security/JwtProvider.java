@@ -1,6 +1,7 @@
 package lkeleti.redditclone.security;
 
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 
@@ -46,5 +47,25 @@ public class JwtProvider {
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableKeyException e) {
             throw new IllegalStateException("Exception occurred while loading keystore");
         }
+    }
+
+    public boolean validateToken(String jwt) {
+        Jwts.parserBuilder().setSigningKey(getPublickey()).requireSubject(jwt);
+        return true;
+    }
+
+    private PublicKey getPublickey() {
+        try {
+            return keyStore.getCertificate("1").getPublicKey();
+        } catch (KeyStoreException e) {
+            throw new IllegalArgumentException("Exception occured while retrieving public key from keystore");
+        }
+    }
+
+    public String getUsernameFromJWT(String token) {
+        String username = Jwts.parserBuilder()
+                .setSigningKey(getPublickey())
+                .requireSubject(token).toString();
+        return username;
     }
 }
