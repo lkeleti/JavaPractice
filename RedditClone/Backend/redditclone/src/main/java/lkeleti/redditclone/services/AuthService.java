@@ -37,7 +37,6 @@ public class AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
     private final MailContentBuilder mailContentBuilder;
-    @Autowired
     private AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     @Transactional

@@ -18,4 +18,5 @@ public class RedditCloneApplication {
 	public ModelMapper createModelMapper() {
 		return new ModelMapper();
 	}
+
 }
