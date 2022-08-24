@@ -13,11 +13,8 @@ import lkeleti.redditclone.repositories.VerificationTokenRepository;
 import lkeleti.redditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -88,10 +85,11 @@ public class AuthService {
     }
 
     public AuthenticationResponse login(LoginRequestCommand loginRequestCommand) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestCommand.getUserName(), loginRequestCommand.getPassword()));
+        String username = loginRequestCommand.getUserName();
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, loginRequestCommand.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.generateToken(authentication);
-        return new AuthenticationResponse(token, loginRequestCommand.getUserName());
+        return new AuthenticationResponse(token, username);
     }
 
     public User getCurrentUser() {

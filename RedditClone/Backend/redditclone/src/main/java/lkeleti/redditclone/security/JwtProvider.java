@@ -3,19 +3,16 @@ package lkeleti.redditclone.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.AllArgsConstructor;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
+
+import static io.jsonwebtoken.Jwts.parserBuilder;
 
 @Service
 public class JwtProvider {
@@ -50,22 +47,36 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String jwt) {
-        Jwts.parserBuilder().setSigningKey(getPublickey()).requireSubject(jwt);
+        parserBuilder().setSigningKey(getPublickey()).build().parseClaimsJws(jwt);
         return true;
     }
 
     private PublicKey getPublickey() {
         try {
-            return keyStore.getCertificate("1").getPublicKey();
-        } catch (KeyStoreException e) {
+
+            keyStore = KeyStore.getInstance("JKS");
+            char[] pass = ("secret").toCharArray();
+
+            InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("springblog.jks");
+            if (resourceAsStream == null) {
+                throw new IllegalArgumentException("Keyfile not found!");
+            }
+
+            keyStore.load(resourceAsStream, pass);
+            PublicKey publicKey = keyStore.getCertificate("1").getPublicKey();
+
+            return publicKey;
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
             throw new IllegalArgumentException("Exception occured while retrieving public key from keystore");
         }
     }
 
     public String getUsernameFromJWT(String token) {
-        String username = Jwts.parserBuilder()
+        Claims claims = parserBuilder()
                 .setSigningKey(getPublickey())
-                .requireSubject(token).toString();
-        return username;
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 }
