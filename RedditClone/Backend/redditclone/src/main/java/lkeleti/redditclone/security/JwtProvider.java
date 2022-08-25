@@ -47,11 +47,11 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String jwt) {
-        parserBuilder().setSigningKey(getPublickey()).build().parseClaimsJws(jwt);
+        parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(jwt);
         return true;
     }
 
-    private PublicKey getPublickey() {
+    private PublicKey getPublicKey() {
         try {
 
             keyStore = KeyStore.getInstance("JKS");
@@ -73,7 +73,7 @@ public class JwtProvider {
 
     public String getUsernameFromJWT(String token) {
         Claims claims = parserBuilder()
-                .setSigningKey(getPublickey())
+                .setSigningKey(getPublicKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
