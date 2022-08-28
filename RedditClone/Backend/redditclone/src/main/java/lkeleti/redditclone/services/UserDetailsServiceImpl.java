@@ -1,6 +1,6 @@
 package lkeleti.redditclone.services;
 
-import lkeleti.redditclone.exceptions.UseerNameNotFoundException;
+import lkeleti.redditclone.exceptions.UserNameNotFoundException;
 import lkeleti.redditclone.models.User;
 import lkeleti.redditclone.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUserName(username).orElseThrow(
-                ()-> new UseerNameNotFoundException(username)
+                ()-> new UserNameNotFoundException(username)
         );
 
         return new org.springframework.security

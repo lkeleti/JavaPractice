@@ -1,6 +1,5 @@
 package lkeleti.redditclone;
 
-import lkeleti.redditclone.security.JwtAuthenticationFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,8 +19,4 @@ public class RedditCloneApplication {
 		return new ModelMapper();
 	}
 
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter();
-	}
 }
