@@ -1,9 +1,6 @@
 package lkeleti.redditclone.services;
 
-import lkeleti.redditclone.dtos.AuthenticationResponse;
-import lkeleti.redditclone.dtos.LoginRequestCommand;
-import lkeleti.redditclone.dtos.MessageDto;
-import lkeleti.redditclone.dtos.RegisterRequestCommand;
+import lkeleti.redditclone.dtos.*;
 import lkeleti.redditclone.exceptions.InvalidTokenException;
 import lkeleti.redditclone.models.NotificationEmail;
 import lkeleti.redditclone.models.User;
@@ -22,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -37,6 +35,8 @@ public class AuthService {
     private final MailContentBuilder mailContentBuilder;
     private AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+
+    private final RefreshTokenService refreshTokenService;
     @Transactional
     public void signUp(RegisterRequestCommand registerRequestCommand) {
         String password = registerRequestCommand.getPassword();
@@ -90,7 +90,7 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, loginRequestCommand.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.generateToken(authentication);
-        return new AuthenticationResponse(token, username);
+        return new AuthenticationResponse(token, "", Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()), username);
     }
 
     public User getCurrentUser() {
@@ -100,4 +100,9 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
     }
 
+    public AuthenticationResponse refreshTokens(RefreshTokenCommand refreshTokenCommand) {
+        refreshTokenService.validateRefreshToken(refreshTokenCommand.getRefreshToken());
+        String token = jwtProvider.generateTokenWithUserName(refreshTokenCommand.getUsername());
+        return new AuthenticationResponse(token, refreshTokenCommand.getRefreshToken(), Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()), refreshTokenCommand.getUsername());
+    }
 }

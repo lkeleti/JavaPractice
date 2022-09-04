@@ -1,9 +1,6 @@
 package lkeleti.redditclone.controllers;
 
-import lkeleti.redditclone.dtos.AuthenticationResponse;
-import lkeleti.redditclone.dtos.LoginRequestCommand;
-import lkeleti.redditclone.dtos.MessageDto;
-import lkeleti.redditclone.dtos.RegisterRequestCommand;
+import lkeleti.redditclone.dtos.*;
 import lkeleti.redditclone.services.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,5 +31,11 @@ public class AuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public AuthenticationResponse login(@Valid @RequestBody LoginRequestCommand loginRequestCommand) {
         return authService.login(loginRequestCommand);
+    }
+
+    @PostMapping("/refresh/token")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public AuthenticationResponse refreshTokens(@Valid @RequestBody RefreshTokenCommand refreshTokenCommand) {
+        return authService.refreshTokens(refreshTokenCommand);
     }
 }

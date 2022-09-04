@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
+import javax.validation.constraints.NotBlank;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class AuthenticationResponse {
-    private String authenticationToken;
+public class RefreshTokenCommand {
+
+    @NotBlank
     private String refreshToken;
-    private Instant expiresAt;
     private String username;
 }
