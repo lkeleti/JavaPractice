@@ -61,3 +61,6 @@ segítségével az alkalmazásból Docker image készíthető.
 
 ## Az alkalmazás futtatása dockerben MariaDB-vel
 `docker run -d -e SPRING_DATASOURCE_URL=jdbc:mariadb://redditclone-mariadb/redditclone --network redditclone-net -p 8080:8080 --name redditcloneb redditcloneb`
+
+openssl genpkey -out springblog.key -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in springblog.key -out springblog.crt
