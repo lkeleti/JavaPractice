@@ -15,7 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.PostConstruct;
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -37,12 +37,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf( csrf-> csrf.disable())
+                .csrf().disable()
                 .authorizeRequests(
                         auth -> auth
                                 .antMatchers("/api/home").permitAll()
-                                .antMatchers("/api/user").hasRole("USER")
-                                .antMatchers("/api/admin").hasRole("ADMIN")
+                                .antMatchers("/api/user").hasAuthority("USER")
+                                .antMatchers("/api/admin").hasAuthority("ADMIN")
                 )
                 .httpBasic(Customizer.withDefaults())
                 .build();
