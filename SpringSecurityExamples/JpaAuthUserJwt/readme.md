@@ -1,0 +1,9 @@
+Create certs:
+
+openssl genrsa -out keypair.pem 2048
+
+Get the public key:
+openssl rsa -in keypair.pem -pubout -out public.pem
+
+Get private key:
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out private.pem
