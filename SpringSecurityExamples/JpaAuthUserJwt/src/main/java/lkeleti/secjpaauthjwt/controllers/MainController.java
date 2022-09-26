@@ -12,9 +12,16 @@ import java.security.Principal;
 @RequestMapping("/api")
 public class MainController {
 
+
     @GetMapping("/home")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String getHome(Principal principal) {
+        return "Hello anybody!";
+    }
+
+    @GetMapping("/admin")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String getAdmin(Principal principal) {
         return "Hello " + principal.getName() + '!';
     }
 }

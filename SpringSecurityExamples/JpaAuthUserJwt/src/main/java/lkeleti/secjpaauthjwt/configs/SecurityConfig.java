@@ -54,7 +54,8 @@ public class SecurityConfig {
         return http
                 .csrf(csrf->csrf.disable())
                 .authorizeRequests(auth->auth
-                        .anyRequest().authenticated()
+                        .antMatchers("/api/home").permitAll()
+                        .antMatchers("/api/admin").authenticated()
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
