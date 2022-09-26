@@ -83,23 +83,15 @@ public class SecurityConfig {
         http.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers("/api/auth/**")
-                        .permitAll()
-                        .antMatchers(HttpMethod.GET, "/api/subreddit")
-                        .permitAll()
-                        //.antMatchers(HttpMethod.GET, "/api/posts/")
-                        //.permitAll()
-                        .antMatchers(HttpMethod.GET, "/api/posts/**")
-                        .permitAll()
+                        .antMatchers("/api/auth/**").permitAll()
+                        .antMatchers(HttpMethod.GET, "/api/subreddit").permitAll()
                         .antMatchers("/v2/api-docs",
                                 "/configuration/ui",
                                 "/swagger-resources/**",
                                 "/configuration/security",
                                 "/swagger-ui.html",
-                                "/webjars/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                                "/webjars/**").permitAll()
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
