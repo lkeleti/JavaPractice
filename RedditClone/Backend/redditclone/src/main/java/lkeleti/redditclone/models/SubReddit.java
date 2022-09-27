@@ -29,14 +29,14 @@ public class SubReddit {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
     private List<Post> posts = new ArrayList<>();
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
