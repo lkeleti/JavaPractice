@@ -89,8 +89,9 @@ public class SecurityConfig {
                                 "/configuration/ui",
                                 "/swagger-resources/**",
                                 "/configuration/security",
-                                "/swagger-ui.html",
-                                "/webjars/**").permitAll()
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/redditclone-openapi/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
