@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.zalando.problem.AbstractThrowableProblem;
 
 
 import java.util.List;
@@ -35,8 +36,8 @@ class AuthControllerIT {
                 )
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(RuntimeException.class)
-                .value(p->assertThat(p.getMessage()).isEqualTo("Username not found: " + username));
+                .expectBody(AbstractThrowableProblem.class)
+                .value(p->assertThat(p.getDetail()).isEqualTo("Username not found: " + username));
     }
 
     @Test
@@ -51,8 +52,8 @@ class AuthControllerIT {
                 )
                 .exchange()
                 .expectStatus().is5xxServerError()
-                .expectBody(RuntimeException.class)
-                .value(p->assertThat(p.getMessage()).isEqualTo("Username not found: " + username));
+                .expectBody(AbstractThrowableProblem.class)
+                .value(p->assertThat(p.getDetail()).isEqualTo("Invalid password!"));
     }
 
     @Test
