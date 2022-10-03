@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .authorizeRequests(
                         auth -> auth
                                 .antMatchers("/h2-console/**").permitAll()
-                                .antMatchers("/swagger-ui/**").permitAll()
+                                .antMatchers("/swagger-ui/**", "/jpaauthuserh2-openapi/**").permitAll()
                                 .mvcMatchers("/api/posts").permitAll()
                                 .anyRequest().authenticated()
                 )
