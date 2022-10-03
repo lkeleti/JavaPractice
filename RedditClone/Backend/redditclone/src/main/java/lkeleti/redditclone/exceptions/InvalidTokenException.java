@@ -1,15 +1,19 @@
 package lkeleti.redditclone.exceptions;
 
-public class InvalidTokenException extends RuntimeException {
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
+
+import java.net.URI;
+
+public class InvalidTokenException extends AbstractThrowableProblem {
 
     public InvalidTokenException() {
-        /*super(
+        super(
                 URI.create("/api/invalid-token"),
                 "Invalid token!",
                 Status.BAD_REQUEST,
                 "Invalid token!"
-        );*/
-        super("Invalid token!");
+        );
     }
 
 }

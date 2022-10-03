@@ -1,13 +1,17 @@
 package lkeleti.redditclone.exceptions;
 
-public class RefreshTokenNotFoundException extends RuntimeException {
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
+
+import java.net.URI;
+
+public class RefreshTokenNotFoundException extends AbstractThrowableProblem {
     public RefreshTokenNotFoundException(String token) {
-        /*super(
+        super(
                 URI.create("/api/refreshtoken-not-found"),
                 "Invalid refresh token.",
                 Status.NOT_FOUND,
                 String.format("Invalid refresh token: %s.", token)
-        );*/
-        super(String.format("Invalid refresh token: %s.", token));
+        );
     }
 }

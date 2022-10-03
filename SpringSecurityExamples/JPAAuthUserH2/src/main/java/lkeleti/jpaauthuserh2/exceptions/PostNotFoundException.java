@@ -1,4 +1,4 @@
-package lkeleti.redditclone.exceptions;
+package lkeleti.jpaauthuserh2.exceptions;
 
 import org.zalando.problem.AbstractThrowableProblem;
 import org.zalando.problem.Status;
@@ -6,12 +6,12 @@ import org.zalando.problem.Status;
 import java.net.URI;
 
 public class PostNotFoundException extends AbstractThrowableProblem {
-    public PostNotFoundException(long id) {
+    public PostNotFoundException(Long id) {
         super(
-                URI.create("/api/post-not-found"),
-                "Post not found",
+                URI.create("/api/posts/not-found"),
+                "Post by id not found!",
                 Status.NOT_FOUND,
-                String.format("Post not found by: %d id.", id)
+                String.format("Post by id: %s not found!", id)
         );
     }
 }

@@ -1,5 +1,6 @@
 package lkeleti.jpaauthuserh2.services;
 
+import lkeleti.jpaauthuserh2.exceptions.PostNotFoundException;
 import lkeleti.jpaauthuserh2.models.Post;
 import lkeleti.jpaauthuserh2.models.PostDto;
 import lkeleti.jpaauthuserh2.repositories.PostRepository;
@@ -25,7 +26,7 @@ public class PostService {
 
     public PostDto findById(long id) {
         Post post = postRepository.findById(id).orElseThrow(
-                ()-> new IllegalArgumentException(String.format("Post by id: %s not found!", id))
+                ()-> new PostNotFoundException(id)
         );
         return modelMapper.map(post, PostDto.class);
     }
