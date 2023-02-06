@@ -15,9 +15,10 @@ export const useAuthStore = defineStore({
             const response = await fetch('http://localhost:8080/api/auth/token', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic ' + btoa(username + ":" + password)
                 },
-                body: JSON.stringify({ username, password })
+                //body: JSON.stringify({ username, password })
             });
 
             if (response.status === 200) {
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore({
                 localStorage.setItem('token', JSON.stringify(token));
                 this.user = username;
                 this.token = token;
+                console.log(token);
                 router.push(this.returnUrl || '/');
             } else {
                 throw new Error('Invalid credentials');
