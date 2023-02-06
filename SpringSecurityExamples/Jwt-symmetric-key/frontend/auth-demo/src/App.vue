@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+const store = useAuthStore();
+function logout() {
+  store.logout();
+}
 </script>
 
 <template>
-
   <div class="min-h-screen bg-gray-100">
     <header class="p-8">
       <nav class="flex flex-row list-none">
@@ -17,7 +21,4 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterView />
     </main>
   </div>
-
 </template>
-
-

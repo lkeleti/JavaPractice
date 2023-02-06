@@ -5,7 +5,7 @@ const store = useAuthStore();
 const token = store.token;
 const data = ref('');
 onMounted(async () => {
-    const response = await fetch('http://localhost:8080/api/dashboard', {
+    const response = await fetch('http://localhost:8080', {
         headers: {
             Authorization: `Bearer ${token}`,
         },
