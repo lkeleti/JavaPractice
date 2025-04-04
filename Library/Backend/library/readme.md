@@ -1,0 +1,2 @@
+## MariaDb indítása Dockerben (fejlesztéshez)
+`docker run -d -e MYSQL_DATABASE=library -e MYSQL_USER=library -e MYSQL_PASSWORD=library -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -p 3306:3306 --name library-mariadb mariadb`
