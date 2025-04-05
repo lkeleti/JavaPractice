@@ -29,6 +29,8 @@ A 'Book' entitás a következő attribútumokkal rendelkezik:
 * 'publicationYear' (Integer): A kiadási év. Csak pozitív szám lehet (@Positive). Az adatbázisban lehet NULL.
 * 'author' (Author): A könyv szerzője. Kötelező kapcsolat (nullable = false). ManyToOne kapcsolat az Author entitással.
 
+A következő végpontokon érheted el az entitáshoz tartozó műveleteket:
+
 | HTTP metódus | Végpont              | Leírás                                             | HTTP Response státusz |
 |--------------|----------------------|----------------------------------------------------|:---------------------:|
 | GET	       | "/api/books"	      | Lekérdezi az összes könyvet	                        |        200 OK         |
@@ -39,6 +41,29 @@ A 'Book' entitás a következő attribútumokkal rendelkezik:
 
 A Book entitás adatai az adatbázisban a books táblában tárolódnak.
 
+### Loan
+
+A 'Loan' entitás egy könyv kölcsönzését reprezentálja a következő attribútumokkal:
+
+* 'id' (Long): A kölcsönzés egyedi azonosítója (automatikus generált).
+* 'book' (BookDto): A kölcsönzött könyv adatai (DTO formában). A kapcsolat a Book entitással kötelező (ManyToOne).
+* 'borrowerName' (String): A kölcsönző neve. Megadása kötelező a kölcsönzéskor (@NotBlank). Legfeljebb 255 karakter.
+* 'loanDate' (LocalDate): A kölcsönzés dátuma. Automatikusan beállítódik a létrehozáskor. Kötelező (@NotNull).
+* 'dueDate' (LocalDate): A visszahozatali határidő. Automatikusan számítódik a létrehozáskor (pl. 14 nappal későbbre). Kötelező (@NotNull).
+* 'returnDate' (LocalDate): A tényleges visszahozatal dátuma. NULL, amíg a könyv ki van kölcsönözve. Akkor állítódik be, amikor a könyvet visszahozzák.
+
+A következő végpontokon érheted el a kölcsönzésekkel kapcsolatos műveleteket:
+
+| HTTP metódus | Végpont                           | Leírás                                        | HTTP Response státusz |
+|--------------|-----------------------------------|-----------------------------------------------|:---------------------:|
+| POST         | "/api/loans"	                    | Új kölcsönzés indítása (könyv kikölcsönzése)	|     201 Created       |
+| PUT	        | "/api/loans/book/{bookId}/return"	| Könyv visszahozatala (bookId alapján)	        |        200 OK         |
+| GET	        | "/api/loans"	                    | Lekérdezi az összes kölcsönzést	            |        200 OK         |
+| GET	        | "/api/loans/active"	            | Lekérdezi az összes aktív kölcsönzést	        |        200 OK         |
+| GET	        | "/api/loans/overdue"	            | Lekérdezi az összes lejárt kölcsönzést	    |        200 OK         |
+| GET	        | "/api/loans/history/{bookId}"	    | Lekérdezi egy könyv kölcsönzési előzményeit	|        200 OK         |
+
+A Loan entitás adatai az adatbázisban a loans táblában tárolódnak.
 
 ## MariaDb indítása Dockerben (fejlesztéshez)
 `docker run -d -e MYSQL_DATABASE=library -e MYSQL_USER=library -e MYSQL_PASSWORD=library -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -p 3306:3306 --name library-mariadb mariadb`

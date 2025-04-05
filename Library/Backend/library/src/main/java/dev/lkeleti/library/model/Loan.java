@@ -42,4 +42,11 @@ public class Loan {
     @JoinColumn(name = "book_id", nullable = false)
     @NotNull
     private Book book;
+
+    public Loan(String borrowerName, LocalDate loanDate, LocalDate dueDate, Book book) {
+        this.borrowerName = borrowerName;
+        this.loanDate = loanDate;
+        this.dueDate = dueDate;
+        this.book = book;
+    }
 }
