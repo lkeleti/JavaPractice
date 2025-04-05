@@ -36,4 +36,10 @@ public class Author {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books = new ArrayList<>();
+
+    public Author(String name, Integer birthYear, String nationality) {
+        this.name = name;
+        this.birthYear = birthYear;
+        this.nationality = nationality;
+    }
 }
