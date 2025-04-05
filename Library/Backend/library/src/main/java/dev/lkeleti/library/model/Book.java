@@ -32,4 +32,11 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
+
+    public Book(String isbn, String title, Integer publicationYear, Author author) {
+        this.isbn = isbn;
+        this.title = title;
+        this.publicationYear = publicationYear;
+        this.author = author;
+    }
 }
