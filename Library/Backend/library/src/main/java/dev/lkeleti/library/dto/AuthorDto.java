@@ -1,5 +1,6 @@
 package dev.lkeleti.library.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,15 @@ import java.util.List;
 @Getter
 @Setter
 public class AuthorDto {
+
+    @Schema(description="Szerző azonosítója", example = "1")
     private Long id;
+    @Schema(description="Szerző neve", example = "John Doe")
     private String name;
+    @Schema(description="Szerző születési éve", example = "1975")
     private Integer birthYear;
+    @Schema(description="Szerző nemzetisége", example = "Magyar")
     private String nationality;
+    @Schema(description="Szerző által írt könyvek listája")
     private List<BookDto> books = new ArrayList<>();
 }

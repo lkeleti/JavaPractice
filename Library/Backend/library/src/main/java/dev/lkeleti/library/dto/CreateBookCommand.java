@@ -1,5 +1,6 @@
 package dev.lkeleti.library.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,15 +14,20 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateBookCommand {
+
+    @Schema(description="Könyv ISBN száma", example = "1111111111111111111")
     @NotBlank(message = "Book ISBN cannot be blank")
     private String isbn;
 
+    @Schema(description="Könyv címe", example = "Egri Csillagok")
     @NotBlank(message = "Book title cannot be blank")
     private String title;
 
+    @Schema(description="Könyv kiadásának éve", example = "2000")
     @Positive(message = "Publication year cannot be negative")
     private Integer publicationYear;
 
+    @Schema(description="Szerző azonosítója", example = "1")
     @NotNull(message = "Author ID cannot be blank")
     private Long authorId;
 }
