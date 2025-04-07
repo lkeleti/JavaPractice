@@ -6,6 +6,7 @@ import dev.lkeleti.library.dto.CreateAuthorCommand;
 import dev.lkeleti.library.dto.UpdateAuthorCommand;
 import dev.lkeleti.library.service.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,7 +41,7 @@ public class AuthorController {
             description = "Visszaadja a megadott azonosítójú szerző adatait.")
     @ApiResponse(responseCode = "200", description = "Szerző sikeresen lekérdezve")
     @ApiResponse(responseCode = "404", description = "Szerző nem található")
-    public AuthorDto findAuthorById(@PathVariable long id) {
+    public AuthorDto findAuthorById(@Parameter(description = "A keresett szerző egyedi azonosítója (ID)", required = true, example = "1") @PathVariable long id) {
         return authorService.findAuthorById(id);
     }
 
@@ -75,7 +76,7 @@ public class AuthorController {
     @ApiResponse(responseCode = "200", description = "Szerző sikeresen frissítve")
     @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben (validációs hiba)")
     @ApiResponse(responseCode = "404", description = "Módosítandó szerző nem található")
-    public AuthorDto updateAuthor(@PathVariable Long id, @Valid @RequestBody UpdateAuthorCommand updateAuthorCommand) {
+    public AuthorDto updateAuthor(@Parameter(description = "A módosítandó szerző egyedi azonosítója (ID)", required = true, example = "1") @PathVariable Long id, @Valid @RequestBody UpdateAuthorCommand updateAuthorCommand) {
         return authorService.updateAuthor(id, updateAuthorCommand);
     }
 
@@ -87,7 +88,7 @@ public class AuthorController {
     )
     @ApiResponse(responseCode = "204", description = "Szerző sikeresen törölve")
     @ApiResponse(responseCode = "404", description = "Törlendő szerző nem található")
-    public void deleteAuthor(@PathVariable Long id) {
+    public void deleteAuthor(@Parameter(description = "A törlendő szerző egyedi azonosítója (ID)", required = true, example = "1") @PathVariable Long id) {
         authorService.deleteAuthor(id);
     }
 }
