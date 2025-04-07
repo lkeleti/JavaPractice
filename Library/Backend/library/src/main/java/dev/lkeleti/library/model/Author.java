@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "authors")
@@ -41,5 +42,17 @@ public class Author {
         this.name = name;
         this.birthYear = birthYear;
         this.nationality = nationality;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(id, author.id) && Objects.equals(name, author.name) && Objects.equals(birthYear, author.birthYear) && Objects.equals(nationality, author.nationality);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, birthYear, nationality);
     }
 }
