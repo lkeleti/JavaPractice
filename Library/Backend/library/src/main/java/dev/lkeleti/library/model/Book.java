@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.Id;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "books")
 @AllArgsConstructor
@@ -38,5 +40,16 @@ public class Book {
         this.title = title;
         this.publicationYear = publicationYear;
         this.author = author;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Book book)) return false;
+        return Objects.equals(getId(), book.getId()) && Objects.equals(getIsbn(), book.getIsbn()) && Objects.equals(getTitle(), book.getTitle()) && Objects.equals(getPublicationYear(), book.getPublicationYear()) && Objects.equals(getAuthor(), book.getAuthor());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getIsbn(), getTitle(), getPublicationYear(), getAuthor());
     }
 }
