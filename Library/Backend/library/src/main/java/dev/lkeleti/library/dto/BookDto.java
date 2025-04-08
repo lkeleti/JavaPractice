@@ -1,5 +1,6 @@
 package dev.lkeleti.library.dto;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class BookDto {
     private String title;
     @Schema(description="Könyv kiadásának éve", example = "2000")
     private Integer publicationYear;
+    @JsonBackReference
     @Schema(description="Könyv szerzője", example = "John Doe")
     private AuthorDto author;
 }

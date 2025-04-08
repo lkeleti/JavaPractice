@@ -23,7 +23,6 @@ public class CreateAuthorCommand {
     @Schema(description="Szerző születési éve", example = "1975")
     @NotNull(message = "Birth year must be provided")
     @Positive
-    @PastOrPresent
     private Integer birthYear;
 
     @Schema(description="Szerző nemzetisége", example = "Magyar")

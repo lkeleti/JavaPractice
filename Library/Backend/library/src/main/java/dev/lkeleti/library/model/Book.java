@@ -2,6 +2,7 @@ package dev.lkeleti.library.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,8 +32,9 @@ public class Book {
     @Column(name = "publication_year")
     private Integer publicationYear;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
+    @NotNull
     private Author author;
 
     public Book(String isbn, String title, Integer publicationYear, Author author) {

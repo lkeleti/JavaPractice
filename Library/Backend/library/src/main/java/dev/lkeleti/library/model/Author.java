@@ -27,7 +27,6 @@ public class Author {
     @NotBlank
     private String name;
 
-    @NotBlank
     @Positive
     @Column(name = "birth_year")
     private Integer birthYear;
