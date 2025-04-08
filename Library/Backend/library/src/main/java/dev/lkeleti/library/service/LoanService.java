@@ -42,8 +42,7 @@ public class LoanService {
                 LocalDate.now().plusDays(14),
                 book
         );
-        loanRepository.save(loan);
-        return modelMapper.map(loan, LoanDto.class);
+        return modelMapper.map(loanRepository.save(loan), LoanDto.class);
     }
 
     @Transactional
