@@ -2,11 +2,11 @@ package dev.lkeleti.library.service;
 
 import dev.lkeleti.library.dto.CheckoutRequestDto;
 import dev.lkeleti.library.dto.LoanDto;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Book;
 import dev.lkeleti.library.model.Loan;
 import dev.lkeleti.library.repository.BookRepository;
 import dev.lkeleti.library.repository.LoanRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -28,7 +28,7 @@ public class LoanService {
     @Transactional
     public LoanDto checkoutBook(CheckoutRequestDto checkoutRequest) {
         Book book = bookRepository.findById(checkoutRequest.getBookId()).orElseThrow(
-                ()-> new EntityNotFoundException("Cannot find book")
+                ()-> new ResourceNotFoundException("Cannot find book")
         );
 
         Optional<Loan> existingLoanOpt = loanRepository.findByBookIdAndReturnDateIsNull(checkoutRequest.getBookId());
@@ -48,11 +48,11 @@ public class LoanService {
     @Transactional
     public LoanDto returnBook(Long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(
-                ()-> new EntityNotFoundException("Cannot find book")
+                ()-> new ResourceNotFoundException("Cannot find book")
         );
 
         Loan loan = loanRepository.findByBookIdAndReturnDateIsNull(book.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Cannot find loan")
+                () -> new ResourceNotFoundException("Cannot find loan")
         );
 
         loan.setReturnDate(LocalDate.now());
@@ -80,7 +80,7 @@ public class LoanService {
     @Transactional(readOnly = true)
     public List<LoanDto> getLoanHistoryForBook(Long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(
-                ()-> new EntityNotFoundException("Cannot find book")
+                ()-> new ResourceNotFoundException("Cannot find book")
         );
 
         Type targetListType = new TypeToken<List<LoanDto>>(){}.getType();

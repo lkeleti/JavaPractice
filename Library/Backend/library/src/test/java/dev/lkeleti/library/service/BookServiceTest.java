@@ -1,11 +1,11 @@
 package dev.lkeleti.library.service;
 
 import dev.lkeleti.library.dto.*;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.model.Book;
 import dev.lkeleti.library.repository.AuthorRepository;
 import dev.lkeleti.library.repository.BookRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,7 +166,7 @@ class BookServiceTest {
 
         when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             bookService.findBookById(NON_EXISTENT_ID);
         });
 
@@ -230,7 +230,7 @@ class BookServiceTest {
 
         when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             bookService.updateBook(NON_EXISTENT_ID, updateCommand);
         });
 
@@ -247,7 +247,7 @@ class BookServiceTest {
         when(authorRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
         when(bookRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existingBook));
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             bookService.updateBook(EXISTING_ID, updateNoAuthorCommand);
         });
 

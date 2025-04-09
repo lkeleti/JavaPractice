@@ -3,9 +3,9 @@ package dev.lkeleti.library.service;
 import dev.lkeleti.library.dto.AuthorDto;
 import dev.lkeleti.library.dto.CreateAuthorCommand;
 import dev.lkeleti.library.dto.UpdateAuthorCommand;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.repository.AuthorRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,7 +112,7 @@ class AuthorServiceTest {
 
         when(authorRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             authorService.updateAuthor(NON_EXISTENT_ID, updateCommand);
         });
 
@@ -150,7 +150,7 @@ class AuthorServiceTest {
         when(authorRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             authorService.findAuthorById(NON_EXISTENT_ID);
         });
 

@@ -3,9 +3,9 @@ package dev.lkeleti.library.service;
 import dev.lkeleti.library.dto.AuthorDto;
 import dev.lkeleti.library.dto.CreateAuthorCommand;
 import dev.lkeleti.library.dto.UpdateAuthorCommand;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.repository.AuthorRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -40,7 +40,7 @@ public class AuthorService {
     @Transactional(readOnly = true)
     public AuthorDto findAuthorById(Long id) {
         Author author = authorRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Can't find author")
+                () -> new ResourceNotFoundException("Can't find author")
         );
         return modelMapper.map(author,AuthorDto.class);
     }
@@ -48,7 +48,7 @@ public class AuthorService {
     @Transactional
     public AuthorDto updateAuthor(Long id, UpdateAuthorCommand updateAuthorCommand) {
         Author author = authorRepository.findById(id).orElseThrow(
-                ()-> new EntityNotFoundException("Can't find author")
+                ()-> new ResourceNotFoundException("Can't find author")
         );
 
         author.setName(updateAuthorCommand.getName());

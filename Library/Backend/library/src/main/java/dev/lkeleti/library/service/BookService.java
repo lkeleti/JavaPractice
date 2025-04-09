@@ -3,11 +3,11 @@ package dev.lkeleti.library.service;
 import dev.lkeleti.library.dto.BookDto;
 import dev.lkeleti.library.dto.CreateBookCommand;
 import dev.lkeleti.library.dto.UpdateBookCommand;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.model.Book;
 import dev.lkeleti.library.repository.AuthorRepository;
 import dev.lkeleti.library.repository.BookRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -25,7 +25,7 @@ public class BookService {    private ModelMapper modelMapper;
     @Transactional
     public BookDto createBook(CreateBookCommand createBookCommand) {
         Author author = authorRepository.findById(createBookCommand.getAuthorId()).orElseThrow(
-                ()-> new EntityNotFoundException("Cannot find author")
+                ()-> new ResourceNotFoundException("Cannot find author")
         );
 
         Book book = new Book(
@@ -46,7 +46,7 @@ public class BookService {    private ModelMapper modelMapper;
     @Transactional(readOnly = true)
     public BookDto findBookById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Can't find book")
+                () -> new ResourceNotFoundException("Can't find book")
         );
         return modelMapper.map(book,BookDto.class);
     }
@@ -54,11 +54,11 @@ public class BookService {    private ModelMapper modelMapper;
     @Transactional
     public BookDto updateBook(Long id, UpdateBookCommand updateBookCommand) {
         Book book = bookRepository.findById(id).orElseThrow(
-                ()-> new EntityNotFoundException("Can't find book")
+                ()-> new ResourceNotFoundException("Can't find book")
         );
 
         Author author = authorRepository.findById(updateBookCommand.getAuthorId()).orElseThrow(
-                ()-> new EntityNotFoundException("Cannot find author")
+                ()-> new ResourceNotFoundException("Cannot find author")
         );
 
         book.setIsbn(updateBookCommand.getIsbn());

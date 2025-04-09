@@ -19,7 +19,6 @@ public class UpdateAuthorCommand {
     private String name;
 
     @Schema(description="Szerző születési éve", example = "1975")
-    @NotBlank
     @Positive
     private Integer birthYear;
 

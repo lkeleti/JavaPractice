@@ -4,12 +4,12 @@ import dev.lkeleti.library.dto.AuthorDto;
 import dev.lkeleti.library.dto.BookDto;
 import dev.lkeleti.library.dto.CheckoutRequestDto;
 import dev.lkeleti.library.dto.LoanDto;
+import dev.lkeleti.library.exception.ResourceNotFoundException;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.model.Book;
 import dev.lkeleti.library.model.Loan;
 import dev.lkeleti.library.repository.BookRepository;
 import dev.lkeleti.library.repository.LoanRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
-import javax.swing.text.html.Option;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ class LoanServiceTest {
     void testCheckoutBook_NotExists() {
         when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             loanService.checkoutBook(checkoutNonExistsRequest);
         });
 
@@ -161,7 +160,7 @@ class LoanServiceTest {
 
         when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             loanService.returnBook(NON_EXISTENT_ID);
         });
 
@@ -180,7 +179,7 @@ class LoanServiceTest {
         when(bookRepository.findById(EXISTING_ID)).thenReturn(Optional.of(book));
         when(loanRepository.findByBookIdAndReturnDateIsNull(EXISTING_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             loanService.returnBook(EXISTING_ID);
         });
 
@@ -382,7 +381,7 @@ class LoanServiceTest {
     void testListLoanHistoryForBook_BookNotFound() {
         when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             loanService.getLoanHistoryForBook(NON_EXISTENT_ID);
         });
 
