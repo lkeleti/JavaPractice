@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class LoanDto {
+    @Schema(description="Kölcsönzés azonosítója", example = "1")
+    private Long id;
     @Schema(description="Kölcsönző neve", example = "John Doe")
     private String borrowerName;
     @Schema(description="Kölcsönzés dátuma", example = "2025.04.06")

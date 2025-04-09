@@ -18,9 +18,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 
+import javax.swing.text.html.Option;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,7 +70,7 @@ class LoanServiceTest {
         book = new Book(EXISTING_ID, "1111" , "Harry Potter", 1999, author);
         bookDto = new BookDto(EXISTING_ID, "1111" , "Harry Potter", 1999, authorDto);
         savedLoan = new Loan("Borrower Fred", LocalDate.of(2025,4,8), LocalDate.of(2025,4,8).plusDays(14), bookToCheckout);
-        loanDto = new LoanDto("Borrower Fred", LocalDate.of(2025,4,8), LocalDate.of(2025,4,8).plusDays(14),null,  bookDto);
+        loanDto = new LoanDto(1l, "Borrower Fred", LocalDate.of(2025,4,8), LocalDate.of(2025,4,8).plusDays(14),null,  bookDto);
 
         checkoutRequest = new CheckoutRequestDto(EXISTING_ID, "Borrower Fred");
         checkoutNonExistsRequest = new CheckoutRequestDto(NON_EXISTENT_ID, "Borrower Fred");
@@ -119,6 +124,7 @@ class LoanServiceTest {
 
         LocalDate expectedReturnDate = LocalDate.now();
         LoanDto expectedReturnedLoanDto = new LoanDto(
+                activeLoan.getId(),
                 activeLoan.getBorrowerName(),
                 activeLoan.getLoanDate(),
                 activeLoan.getDueDate(),
@@ -183,5 +189,206 @@ class LoanServiceTest {
         verify(bookRepository, times(1)).findById(EXISTING_ID);
         verify(loanRepository, times(1)).findByBookIdAndReturnDateIsNull(EXISTING_ID);
         verify(modelMapper, never()).map(any(), eq(LoanDto.class));
+    }
+
+    @Test
+    @DisplayName("List all loans successfully")
+    void testListLoans_Success() {
+        List<Loan> mockLoanList = Arrays.asList(
+                new Loan(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),LocalDate.of(2024,4,9).plusDays(7),book),
+                new Loan(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,book)
+        );
+
+        List<LoanDto> expectedDtoList = Arrays.asList(
+                new LoanDto(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),LocalDate.of(2024,4,9).plusDays(7),bookDto),
+                new LoanDto(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,bookDto)
+        );
+
+        when(loanRepository.findAll()).thenReturn(mockLoanList);
+
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+        when(modelMapper.map(mockLoanList, listType)).thenReturn(expectedDtoList);
+
+
+        List<LoanDto> result = loanService.listLoans();
+
+        assertNotNull(result);
+        assertEquals(expectedDtoList.size(), result.size());
+
+        assertEquals(expectedDtoList.get(0).getId(), result.get(0).getId());
+        assertEquals(expectedDtoList.get(1).getId(), result.get(1).getId());
+
+        verify(loanRepository, times(1)).findAll();
+        verify(modelMapper, times(1)).map(mockLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List all loans returns empty list when no loans exist")
+    void testListLoans_Empty() {
+
+        List<Loan> emptyLoanList = new ArrayList<>();
+        List<LoanDto> emptyDtoList = new ArrayList<>();
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+
+        when(loanRepository.findAll()).thenReturn(emptyLoanList);
+        when(modelMapper.map(emptyLoanList, listType)).thenReturn(emptyDtoList);
+
+        List<LoanDto> result = loanService.listLoans();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(loanRepository, times(1)).findAll();
+        verify(modelMapper, times(1)).map(emptyLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List all active loans successfully")
+    void testListActiveLoans_Success() {
+        List<Loan> mockActiveLoanList = Arrays.asList(
+                new Loan(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),null,book),
+                new Loan(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,book)
+        );
+
+        List<LoanDto> expectedDtoList = Arrays.asList(
+                new LoanDto(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),null,bookDto),
+                new LoanDto(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,bookDto)
+        );
+
+        when(loanRepository.findByReturnDateIsNull()).thenReturn(mockActiveLoanList);
+
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+        when(modelMapper.map(mockActiveLoanList, listType)).thenReturn(expectedDtoList);
+
+
+        List<LoanDto> result = loanService.listActiveLoans();
+
+        assertNotNull(result);
+        assertEquals(expectedDtoList.size(), result.size());
+
+        assertEquals(expectedDtoList.get(0).getId(), result.get(0).getId());
+        assertEquals(expectedDtoList.get(1).getId(), result.get(1).getId());
+
+        verify(loanRepository, times(1)).findByReturnDateIsNull();
+        verify(modelMapper, times(1)).map(mockActiveLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List all active loans returns empty list when no active loans exist")
+    void testListActiveLoans_Empty() {
+
+        List<Loan> emptyLoanList = new ArrayList<>();
+        List<LoanDto> emptyDtoList = new ArrayList<>();
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+
+        when(loanRepository.findByReturnDateIsNull()).thenReturn(emptyLoanList);
+        when(modelMapper.map(emptyLoanList, listType)).thenReturn(emptyDtoList);
+
+        List<LoanDto> result = loanService.listActiveLoans();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(loanRepository, times(1)).findByReturnDateIsNull();
+        verify(modelMapper, times(1)).map(emptyLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List all overdue loans successfully")
+    void testListOverdueLoans_Success() {
+        List<Loan> mockOverdueLoanList = Arrays.asList(
+                new Loan(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),null,book),
+                new Loan(2L, "Person Two", LocalDate.of(2024,5,9), LocalDate.of(2024,5,9).plusDays(14),null,book)
+        );
+
+        List<LoanDto> expectedDtoList = Arrays.asList(
+                new LoanDto(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),null,bookDto),
+                new LoanDto(2L, "Person Two", LocalDate.of(2024,5,9), LocalDate.of(2024,5,9).plusDays(14),null,bookDto)
+        );
+
+        when(loanRepository.findByReturnDateIsNullAndDueDateBefore(LocalDate.now())).thenReturn(mockOverdueLoanList);
+
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+        when(modelMapper.map(mockOverdueLoanList, listType)).thenReturn(expectedDtoList);
+
+
+        List<LoanDto> result = loanService.listOverdueLoans();
+
+        assertNotNull(result);
+        assertEquals(expectedDtoList.size(), result.size());
+
+        assertEquals(expectedDtoList.get(0).getId(), result.get(0).getId());
+        assertEquals(expectedDtoList.get(1).getId(), result.get(1).getId());
+
+        verify(loanRepository, times(1)).findByReturnDateIsNullAndDueDateBefore(LocalDate.now());
+        verify(modelMapper, times(1)).map(mockOverdueLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List all overdue loans returns empty list when no active loans exist")
+    void testListOverdueLoans_Empty() {
+
+        List<Loan> emptyLoanList = new ArrayList<>();
+        List<LoanDto> emptyDtoList = new ArrayList<>();
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+
+        when(loanRepository.findByReturnDateIsNullAndDueDateBefore(LocalDate.now())).thenReturn(emptyLoanList);
+        when(modelMapper.map(emptyLoanList, listType)).thenReturn(emptyDtoList);
+
+        List<LoanDto> result = loanService.listOverdueLoans();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(loanRepository, times(1)).findByReturnDateIsNullAndDueDateBefore(LocalDate.now());
+        verify(modelMapper, times(1)).map(emptyLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List loan history of book successfully")
+    void testListLoanHistoryForBook_Success() {
+        List<Loan> mockLoanList = Arrays.asList(
+                new Loan(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),LocalDate.of(2024,4,9).plusDays(7),book),
+                new Loan(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,book)
+        );
+
+        List<LoanDto> expectedDtoList = Arrays.asList(
+                new LoanDto(1L, "Person One", LocalDate.of(2024,4,9), LocalDate.of(2024,4,9).plusDays(14),LocalDate.of(2024,4,9).plusDays(7),bookDto),
+                new LoanDto(2L, "Person Two", LocalDate.of(2025,4,9), LocalDate.of(2025,4,9).plusDays(14),null,bookDto)
+        );
+
+        when(bookRepository.findById(EXISTING_ID)).thenReturn(Optional.of(book));
+        when(loanRepository.findByBookId(EXISTING_ID)).thenReturn(mockLoanList);
+
+        Type listType = new TypeToken<List<LoanDto>>() {}.getType();
+        when(modelMapper.map(mockLoanList, listType)).thenReturn(expectedDtoList);
+
+
+        List<LoanDto> result = loanService.getLoanHistoryForBook(EXISTING_ID);
+
+        assertNotNull(result);
+        assertEquals(expectedDtoList.size(), result.size());
+
+        assertEquals(expectedDtoList.get(0).getId(), result.get(0).getId());
+        assertEquals(expectedDtoList.get(1).getId(), result.get(1).getId());
+
+        verify(bookRepository, times(1)).findById(EXISTING_ID);
+        verify(loanRepository, times(1)).findByBookId(EXISTING_ID);
+        verify(modelMapper, times(1)).map(mockLoanList, listType);
+    }
+
+    @Test
+    @DisplayName("List loan history of book when no book exist")
+    void testListLoanHistoryForBook_BookNotFound() {
+        when(bookRepository.findById(NON_EXISTENT_ID)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            loanService.getLoanHistoryForBook(NON_EXISTENT_ID);
+        });
+
+        assertTrue(exception.getMessage().contains("Cannot find book"));
+
+        verify(bookRepository, times(1)).findById(NON_EXISTENT_ID);
+        verify(loanRepository, never()).findByBookId(anyLong());
     }
 }
