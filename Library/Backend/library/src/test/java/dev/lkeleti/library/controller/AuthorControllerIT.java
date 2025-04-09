@@ -168,7 +168,7 @@ class AuthorControllerIT {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.status").isEqualTo(404)
-                .jsonPath("$.error").isEqualTo("Bad Request");
+                .jsonPath("$.error").isEqualTo("Not Found");
     }
 
     @Test
