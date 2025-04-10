@@ -9,7 +9,17 @@
   </div>
 </div>
 
-<table class="table table-striped table-hover mt-3">
+<div *ngIf="errorMessage" class="alert alert-danger">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<table *ngIf="!isLoading && !errorMessage" class="table table-striped table-hover mt-3">
   <thead>
     <tr>
       <th>ISBN</th>
@@ -20,8 +30,22 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td colspan="5" class="text-center">Loading books...</td>
-    </tr>
+    <ng-container *ngIf="books.length > 0; else noBooks">
+      <tr *ngFor="let book of books">
+        <td>{{ book.isbn }}</td>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author.name }}</td> <td>{{ book.publicationYear }}</td>
+        <td>
+          <button class="btn btn-sm btn-warning me-1">Edit</button>
+          <button class="btn btn-sm btn-danger me-1">Delete</button>
+          <button class="btn btn-sm btn-success">Checkout</button>
+          </td>
+      </tr>
+    </ng-container>
+    <ng-template #noBooks>
+      <tr>
+        <td colspan="5" class="text-center">No books found.</td>
+      </tr>
+    </ng-template>
   </tbody>
 </table>
