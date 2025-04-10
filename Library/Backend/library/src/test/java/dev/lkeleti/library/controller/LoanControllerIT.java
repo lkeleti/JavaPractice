@@ -3,6 +3,7 @@ package dev.lkeleti.library.controller;
 
 import dev.lkeleti.library.dto.AuthorDto;
 import dev.lkeleti.library.dto.BookDto;
+import dev.lkeleti.library.dto.CheckoutRequestDto;
 import dev.lkeleti.library.dto.LoanDto;
 import dev.lkeleti.library.model.Author;
 import dev.lkeleti.library.model.Book;
@@ -43,6 +44,7 @@ class LoanControllerIT {
 
     BookDto bookOneDto;
     BookDto bookTwoDto;
+    BookDto bookThreeDto;
 
     AuthorDto authorOneDto;
     AuthorDto authorTwoDto;
@@ -58,12 +60,14 @@ class LoanControllerIT {
 
         Book bookOne = bookRepository.save(new Book("1111","Game Of Trones", 2000, authorOne));
         Book bookTwo = bookRepository.save(new Book("2222","Harry Potter", 1998, authorTwo));
+        Book bookThree = bookRepository.save(new Book("3333","Lord of the rings", 1990, authorTwo));
 
         authorOneDto = new AuthorDto(authorOne.getId(), authorOne.getName(), authorOne.getBirthYear(), authorOne.getNationality(), new ArrayList<>());
         authorTwoDto = new AuthorDto(authorTwo.getId(), authorTwo.getName(), authorTwo.getBirthYear(), authorTwo.getNationality(), new ArrayList<>());
 
         bookOneDto = new BookDto(bookOne.getId(), bookOne.getIsbn(), bookOne.getTitle(), bookOne.getPublicationYear(), authorOneDto);
         bookTwoDto = new BookDto(bookTwo.getId(), bookTwo.getIsbn(), bookTwo.getTitle(), bookTwo.getPublicationYear(), authorTwoDto);
+        bookThreeDto = new BookDto(bookThree.getId(), bookThree.getIsbn(), bookThree.getTitle(), bookThree.getPublicationYear(), authorTwoDto);
 
         Loan loanEntity = loanRepository.save(new Loan("Borrower One", LocalDate.of(2024,1,1), LocalDate.of(2024,1,1).plusDays(14),bookOne));
         loanEntity.setReturnDate(LocalDate.of(2024,1,14));
@@ -182,6 +186,112 @@ class LoanControllerIT {
     void testGetLoanHistoryForBook_BookNotFound() {
         webTestClient.get()
                 .uri("/api/loans/history/{id}", -1)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.error").isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("Checkout book")
+    void testCheckoutBook() {
+        CheckoutRequestDto command = new CheckoutRequestDto(bookThreeDto.getId(), "Borrower New");
+        webTestClient.post()
+                .uri("/api/loans")
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(LoanDto.class)
+                .value(t-> {
+                    assertThat(t.getBorrowerName()).isEqualTo(command.getBorrowerName());
+                    assertThat(t.getLoanDate()).isEqualTo(LocalDate.now());
+                });
+
+        webTestClient.get()
+                .uri("/api/loans")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(LoanDto.class)
+                .hasSize(4);
+    }
+
+    @Test
+    @DisplayName("Checkout book borrower name empty")
+    void testCheckoutBook_BorrowerEmpty() {
+        CheckoutRequestDto command = new CheckoutRequestDto(bookThreeDto.getId(), "");
+        webTestClient.post()
+                .uri("/api/loans")
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(400)
+                .jsonPath("$.error").isEqualTo("Bad Request");
+    }
+
+    @Test
+    @DisplayName("Checkout book missing book")
+    void testCheckoutBook_BookError() {
+        CheckoutRequestDto command = new CheckoutRequestDto(-1L, "Borrower New");
+        webTestClient.post()
+                .uri("/api/loans")
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.error").isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("Checkout book already loaned")
+    void testCheckoutBook_LoanError() {
+        CheckoutRequestDto command = new CheckoutRequestDto(bookTwoDto.getId(), "Borrower New");
+        webTestClient.post()
+                .uri("/api/loans")
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(409)
+                .jsonPath("$.error").isEqualTo("Conflict");
+    }
+
+    @Test
+    @DisplayName("Return book")
+    void testReturnBook() {
+         webTestClient.put()
+                .uri("/api/loans/book/{bookId}/return", bookTwoDto.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(LoanDto.class)
+                .value(t-> {
+                    assertThat(t.getReturnDate()).isEqualTo(LocalDate.now());
+                });
+    }
+
+    @Test
+    @DisplayName("Return non exists book")
+    void testReturnBook_BookIdError() {
+        webTestClient.put()
+                .uri("/api/loans/book/{bookId}/return", -1L)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.error").isEqualTo("Not Found");
+    }
+
+    @Test
+    @DisplayName("Return book but no loan")
+    void testReturnBook_NoLoanError() {
+        Loan entity = loanRepository.findByBookIdAndReturnDateIsNull(bookTwoDto.getId()).get();
+        entity.setReturnDate(LocalDate.now().minusDays(1));
+        loanRepository.saveAndFlush(entity);
+
+        webTestClient.put()
+                .uri("/api/loans/book/{bookId}/return", bookTwoDto.getId())
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
