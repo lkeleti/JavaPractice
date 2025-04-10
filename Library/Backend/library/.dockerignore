@@ -1,0 +1,11 @@
+# .dockerignore
+
+.git
+.gitignore
+.idea/
+.vscode/
+mvnw
+mvnw.cmd
+*.iml
+pom.xml
+src/
