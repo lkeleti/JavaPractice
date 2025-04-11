@@ -51,8 +51,8 @@ class BookControllerIT {
         Book bookOne = bookRepository.save(new Book("1111","Game Of Trones", 2000, authorOne));
         Book bookTwo = bookRepository.save(new Book("2222","Harry Potter", 1998, authorTwo));
 
-        authorOneDto = new AuthorDto(authorOne.getId(), authorOne.getName(), authorOne.getBirthYear(), authorOne.getNationality(), new ArrayList<>());
-        authorTwoDto = new AuthorDto(authorTwo.getId(), authorTwo.getName(), authorTwo.getBirthYear(), authorTwo.getNationality(), new ArrayList<>());
+        authorOneDto = new AuthorDto(authorOne.getId(), authorOne.getName(), authorOne.getBirthYear(), authorOne.getNationality());
+        authorTwoDto = new AuthorDto(authorTwo.getId(), authorTwo.getName(), authorTwo.getBirthYear(), authorTwo.getNationality());
 
         bookOneDto = new BookDto(bookOne.getId(), bookOne.getIsbn(), bookOne.getTitle(), bookOne.getPublicationYear(), authorOneDto);
         bookTwoDto = new BookDto(bookTwo.getId(), bookTwo.getIsbn(), bookTwo.getTitle(), bookTwo.getPublicationYear(), authorTwoDto);

@@ -64,7 +64,7 @@ class LoanServiceTest {
     @BeforeEach
     void setUp() {
         author = new Author(EXISTING_ID, "John Doe", 1980, "British", new ArrayList<>());
-        authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1980, "British", new ArrayList<>());
+        authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1980, "British");
         bookToCheckout = new Book("1111" , "Harry Potter", 1999, author);
         book = new Book(EXISTING_ID, "1111" , "Harry Potter", 1999, author);
         bookDto = new BookDto(EXISTING_ID, "1111" , "Harry Potter", 1999, authorDto);

@@ -32,7 +32,7 @@ public class Book {
     @Column(name = "publication_year")
     private Integer publicationYear;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
     @NotNull
     private Author author;

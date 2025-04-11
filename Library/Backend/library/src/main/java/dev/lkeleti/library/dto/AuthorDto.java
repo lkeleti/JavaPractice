@@ -24,7 +24,7 @@ public class AuthorDto {
     private Integer birthYear;
     @Schema(description="Szerző nemzetisége", example = "Magyar")
     private String nationality;
-    @JsonManagedReference
-    @Schema(description="Szerző által írt könyvek listája")
-    private List<BookDto> books = new ArrayList<>();
+
+    //@Schema(description="Szerző által írt könyvek listája")
+    //private List<BookDto> books = new ArrayList<>();
 }

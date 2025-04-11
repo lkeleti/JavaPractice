@@ -53,7 +53,7 @@ class BookServiceTest {
     private final Long NON_EXISTENT_ID = 99L;
 
     private Author author = new Author("John Doe", 1975, "Hungarian");
-    private AuthorDto authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1975, "Hungarian", new ArrayList<>());
+    private AuthorDto authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1975, "Hungarian");
 
     @BeforeEach
     void setUp() {

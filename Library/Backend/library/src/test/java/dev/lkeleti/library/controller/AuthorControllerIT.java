@@ -38,8 +38,8 @@ class AuthorControllerIT {
         Author authorOne = authorRepository.save(new Author("John Doe",1970,"Magyar"));
         Author authorTwo = authorRepository.save(new Author("Jack Doe",1980,"Német"));
 
-        authorOneDto = new AuthorDto(authorOne.getId(), authorOne.getName(), authorOne.getBirthYear(), authorOne.getNationality(), new ArrayList<>());
-        authorTwoDto = new AuthorDto(authorTwo.getId(), authorTwo.getName(), authorTwo.getBirthYear(), authorTwo.getNationality(), new ArrayList<>());
+        authorOneDto = new AuthorDto(authorOne.getId(), authorOne.getName(), authorOne.getBirthYear(), authorOne.getNationality());
+        authorTwoDto = new AuthorDto(authorTwo.getId(), authorTwo.getName(), authorTwo.getBirthYear(), authorTwo.getNationality());
     }
 
     @Test

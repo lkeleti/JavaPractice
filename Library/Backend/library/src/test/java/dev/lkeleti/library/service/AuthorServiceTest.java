@@ -53,11 +53,11 @@ class AuthorServiceTest {
         createCommand = new CreateAuthorCommand("John Doe", 1975, "Hungarian");
         authorToSave = new Author("John Doe", 1975, "Hungarian");
         savedAuthor = new Author(EXISTING_ID, "John Doe", 1975, "Hungarian", new ArrayList<>());
-        authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1975, "Hungarian", new ArrayList<>());
+        authorDto = new AuthorDto(EXISTING_ID, "John Doe", 1975, "Hungarian");
 
         existingAuthor = new Author(EXISTING_ID, "Old Name", 1970, "Old Nationality", new ArrayList<>());
         updateCommand = new UpdateAuthorCommand("New Name", 1980, "New Nationality");
-        updatedAuthorDto = new AuthorDto(EXISTING_ID, "New Name", 1980, "New Nationality", new ArrayList<>());
+        updatedAuthorDto = new AuthorDto(EXISTING_ID, "New Name", 1980, "New Nationality");
     }
 
     @Test
@@ -195,8 +195,8 @@ class AuthorServiceTest {
         );
 
         List<AuthorDto> expectedDtoList = Arrays.asList(
-                new AuthorDto(1L, "Author One", 1980, "Nationality A", new ArrayList<>()),
-                new AuthorDto(2L, "Author Two", 1990, "Nationality B", new ArrayList<>())
+                new AuthorDto(1L, "Author One", 1980, "Nationality A"),
+                new AuthorDto(2L, "Author Two", 1990, "Nationality B")
         );
 
         when(authorRepository.findAll()).thenReturn(mockAuthorList);

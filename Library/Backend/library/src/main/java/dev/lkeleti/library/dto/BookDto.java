@@ -21,7 +21,6 @@ public class BookDto {
     private String title;
     @Schema(description="Könyv kiadásának éve", example = "2000")
     private Integer publicationYear;
-    @JsonBackReference
     @Schema(description="Könyv szerzője", example = "John Doe")
     private AuthorDto author;
 }
