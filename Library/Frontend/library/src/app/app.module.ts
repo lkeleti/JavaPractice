@@ -6,12 +6,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { BookListComponent } from './components/book-list/book-list.component';
+import { AuthorListComponent } from './components/author-list/author-list.component';
+import { LoanListComponent } from './components/loan-list/loan-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    BookListComponent
+    BookListComponent,
+    AuthorListComponent,
+    LoanListComponent
   ],
   imports: [
     BrowserModule,
