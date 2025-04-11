@@ -1,0 +1,62 @@
+<h1>Add New Book</h1>
+
+<div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+</div>
+
+<form [formGroup]="bookForm" (ngSubmit)="onSubmit()" novalidate class="mt-4">
+
+    <div class="mb-3">
+        <label for="isbn" class="form-label">ISBN</label>
+        <input type="text" id="isbn" class="form-control" formControlName="isbn"
+            [class.is-invalid]="isbn?.invalid && (isbn?.dirty || isbn?.touched)">
+        <div *ngIf="isbn?.invalid && (isbn?.dirty || isbn?.touched)" class="invalid-feedback">
+            <div *ngIf="isbn?.errors?.['required']">ISBN is required.</div>
+            <div *ngIf="isbn?.errors?.['maxlength']">ISBN cannot be longer than 20 characters.</div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" id="title" class="form-control" formControlName="title"
+            [class.is-invalid]="title?.invalid && (title?.dirty || title?.touched)">
+        <div *ngIf="title?.invalid && (title?.dirty || title?.touched)" class="invalid-feedback">
+            <div *ngIf="title?.errors?.['required']">Title is required.</div>
+            <div *ngIf="title?.errors?.['maxlength']">Title cannot be longer than 255 characters.</div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="publicationYear" class="form-label">Publication Year</label>
+        <input type="number" id="publicationYear" class="form-control" formControlName="publicationYear"
+            [class.is-invalid]="publicationYear?.invalid && (publicationYear?.dirty || publicationYear?.touched)">
+        <div *ngIf="publicationYear?.invalid && (publicationYear?.dirty || publicationYear?.touched)"
+            class="invalid-feedback">
+            <div *ngIf="publicationYear?.errors?.['required']">Publication year is required.</div>
+            <div *ngIf="publicationYear?.errors?.['min']">Publication year must be positive.</div>
+            <div *ngIf="publicationYear?.errors?.['pattern']">Publication year must be a number.</div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="authorId" class="form-label">Author</label>
+        <select id="authorId" class="form-select" formControlName="authorId"
+            [class.is-invalid]="authorIdControl?.invalid && (authorIdControl?.dirty || authorIdControl?.touched)">
+            <option [ngValue]="null" disabled>-- Select an Author --</option>
+            <option *ngFor="let author of allAuthors" [value]="author.id">
+                {{ author.name }} ({{ author.birthYear }}) </option>
+        </select>
+        <div *ngIf="authorIdControl?.invalid && (authorIdControl?.dirty || authorIdControl?.touched)"
+            class="invalid-feedback">
+            <div *ngIf="authorIdControl?.errors?.['required']">Author selection is required.</div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="bookForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Save Book</span>
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span *ngIf="isLoading"> Saving...</span>
+    </button>
+    <button type="button" class="btn btn-secondary ms-2" (click)="router.navigate(['/books'])">Cancel</button>
+
+</form>
