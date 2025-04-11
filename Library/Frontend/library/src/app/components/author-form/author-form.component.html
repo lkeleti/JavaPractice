@@ -1,0 +1,47 @@
+<h1>Add New Author</h1>
+
+<div *ngIf="errorMessage" class="alert alert-danger mt-3">
+  {{ errorMessage }}
+</div>
+
+<form [formGroup]="authorForm" (ngSubmit)="onSubmit()" novalidate class="mt-4">
+
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" id="name" class="form-control" formControlName="name"
+           [class.is-invalid]="name?.invalid && (name?.dirty || name?.touched)">
+    <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="invalid-feedback">
+      <div *ngIf="name?.errors?.['required']">Name is required.</div>
+      <div *ngIf="name?.errors?.['maxlength']">Name cannot be longer than 255 characters.</div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="birthYear" class="form-label">Birth Year</label>
+    <input type="number" id="birthYear" class="form-control" formControlName="birthYear"
+           [class.is-invalid]="birthYear?.invalid && (birthYear?.dirty || birthYear?.touched)">
+    <div *ngIf="birthYear?.invalid && (birthYear?.dirty || birthYear?.touched)" class="invalid-feedback">
+      <div *ngIf="birthYear?.errors?.['required']">Birth year is required.</div>
+      <div *ngIf="birthYear?.errors?.['min']">Birth year must be positive.</div>
+      <div *ngIf="birthYear?.errors?.['pattern']">Birth year must be a number.</div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="nationality" class="form-label">Nationality</label>
+    <input type="text" id="nationality" class="form-control" formControlName="nationality"
+           [class.is-invalid]="nationality?.invalid && (nationality?.dirty || nationality?.touched)">
+    <div *ngIf="nationality?.invalid && (nationality?.dirty || nationality?.touched)" class="invalid-feedback">
+      <div *ngIf="nationality?.errors?.['required']">Nationality is required.</div>
+      <div *ngIf="nationality?.errors?.['maxlength']">Nationality cannot be longer than 255 characters.</div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="authorForm.invalid || isLoading">
+    <span *ngIf="!isLoading">Save Author</span>
+    <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    <span *ngIf="isLoading"> Saving...</span>
+  </button>
+  <button type="button" class="btn btn-secondary ms-2" (click)="router.navigate(['/authors'])">Cancel</button>
+
+</form>

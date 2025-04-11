@@ -5,6 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { BookListComponent } from './components/book-list/book-list.component';
 import { AuthorListComponent } from './components/author-list/author-list.component';
 import { LoanListComponent } from './components/loan-list/loan-list.component';
+import { AuthorFormComponent } from './components/author-form/author-form.component';
+
 
 const routes: Routes = [
   // Alapértelmezett útvonal: Ha a felhasználó a gyökér URL-re megy (''),
@@ -17,6 +19,8 @@ const routes: Routes = [
   // Szerzők útvonal: A '/authors' URL esetén az AuthorListComponent töltődik be.
   { path: 'authors', component: AuthorListComponent },
 
+  {path: 'authors/new', component: AuthorFormComponent },
+  
   // Kölcsönzések útvonal: A '/loans' URL esetén a LoanListComponent töltődik be.
   { path: 'loans', component: LoanListComponent },
 
