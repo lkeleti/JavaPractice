@@ -10,6 +10,7 @@ import { BookListComponent } from './components/book-list/book-list.component';
 import { AuthorListComponent } from './components/author-list/author-list.component';
 import { LoanListComponent } from './components/loan-list/loan-list.component';
 import { AuthorFormComponent } from './components/author-form/author-form.component';
+import { BookFormComponent } from './components/book-form/book-form.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { AuthorFormComponent } from './components/author-form/author-form.compon
     BookListComponent,
     AuthorListComponent,
     LoanListComponent,
-    AuthorFormComponent
+    AuthorFormComponent,
+    BookFormComponent
   ],
   imports: [
     BrowserModule,
