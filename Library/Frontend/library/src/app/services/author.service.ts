@@ -35,4 +35,8 @@ export class AuthorService {
   createAuthor(command: CreateAuthorCommand): Observable<AuthorDto> {
     return this.http.post<AuthorDto>(`${this.apiUrl}/authors`, command);
   }
+
+  deleteAuthor(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/authors/${id}`);
+  }
 }

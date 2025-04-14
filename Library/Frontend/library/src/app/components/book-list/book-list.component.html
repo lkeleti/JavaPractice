@@ -37,8 +37,8 @@
         <td>{{ book.author.name }}</td>
         <td>{{ book.publicationYear }}</td>
         <td>
-          <a [routerLink]="['/books', book.id,'edit']" class="btn btn-sm btn-warning me-1">Edit</a>
-          <button class="btn btn-sm btn-danger me-1">Delete</button>
+          <button class="btn btn-sm btn-warning me-1" [routerLink]="['/books', book.id, 'edit']">Edit</button>
+          <button class="btn btn-sm btn-danger me-1" (click)="openDeleteConfirmation(book)">Delete</button>
           <button class="btn btn-sm btn-success">Checkout</button>
         </td>
       </tr>

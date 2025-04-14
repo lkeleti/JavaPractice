@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -11,6 +12,7 @@ import { AuthorListComponent } from './components/author-list/author-list.compon
 import { LoanListComponent } from './components/loan-list/loan-list.component';
 import { AuthorFormComponent } from './components/author-form/author-form.component';
 import { BookFormComponent } from './components/book-form/book-form.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
   declarations: [
@@ -20,13 +22,15 @@ import { BookFormComponent } from './components/book-form/book-form.component';
     AuthorListComponent,
     LoanListComponent,
     AuthorFormComponent,
-    BookFormComponent
+    BookFormComponent,
+    ConfirmationDialogComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule 
+    ReactiveFormsModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

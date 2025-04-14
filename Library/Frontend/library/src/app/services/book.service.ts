@@ -36,6 +36,7 @@ export class BookService {
     return this.http.put<BookDto>(`${this.apiUrl}/books/${id}`, command);
   }
 
-  // --- Később ide jönnek a többi API hívások ---  
-  // deleteBook(id: number): Observable<void> { ... }
+  deleteBook(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/books/${id}`);
+  }
 }
