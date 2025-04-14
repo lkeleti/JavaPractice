@@ -1,4 +1,5 @@
-<h1>Add New Book</h1>
+<h1 *ngIf="!isEditMode">Add New Author</h1>
+<h1 *ngIf="isEditMode">Edit Author</h1>
 
 <div *ngIf="errorMessage" class="alert alert-danger mt-3">
     {{ errorMessage }}
@@ -53,10 +54,12 @@
     </div>
 
     <button type="submit" class="btn btn-primary" [disabled]="bookForm.invalid || isLoading">
-        <span *ngIf="!isLoading">Save Book</span>
-        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span *ngIf="!isLoading && !isEditMode">Save Book</span> <span *ngIf="!isLoading && isEditMode">Update
+            Book</span> <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"
+            aria-hidden="true"></span>
         <span *ngIf="isLoading"> Saving...</span>
     </button>
+
     <button type="button" class="btn btn-secondary ms-2" (click)="router.navigate(['/books'])">Cancel</button>
 
 </form>

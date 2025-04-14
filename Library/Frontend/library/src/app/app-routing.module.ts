@@ -17,11 +17,13 @@ const routes: Routes = [
   { path: 'books', component: BookListComponent },
 
   { path: 'books/new', component: BookFormComponent },
+  { path: 'books/:id/edit', component: BookFormComponent },
 
   // Szerzők útvonal: A '/authors' URL esetén az AuthorListComponent töltődik be.
   { path: 'authors', component: AuthorListComponent },
 
   { path: 'authors/new', component: AuthorFormComponent },
+  { path: 'authors/:id/edit', component: AuthorFormComponent },
 
   // Kölcsönzések útvonal: A '/loans' URL esetén a LoanListComponent töltődik be.
   { path: 'loans', component: LoanListComponent },
