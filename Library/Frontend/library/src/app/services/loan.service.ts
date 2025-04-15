@@ -3,14 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LoanDto } from '../models/loan.dto';
 import { environment } from '../../environments/environment';
+import { CheckoutBookCommand } from '../models/checkout-book.command';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoanService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Lekérdezi az összes kölcsönzést a backend API-ról.
@@ -18,5 +19,9 @@ export class LoanService {
    */
   getLoans(): Observable<LoanDto[]> {
     return this.http.get<LoanDto[]>(`${this.apiUrl}/loans`);
-  }  
+  }
+
+  checkoutBook(command: CheckoutBookCommand): Observable<LoanDto> {
+    return this.http.post<LoanDto>(`${this.apiUrl}/loans`, command);
+  }
 }

@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h4 class="modal-title">Checkout Book</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()"></button>
+  </div>
+  
+  <div class="modal-body">
+  
+    <p>You are about to check out the following book:</p>
+    <dl class="row">
+      <dt class="col-sm-3">Title:</dt>
+      <dd class="col-sm-9">{{ bookTitle }}</dd>
+  
+      <dt class="col-sm-3">Author:</dt>
+      <dd class="col-sm-9">{{ authorName }}</dd>
+  
+      <dt class="col-sm-3">ISBN:</dt>
+      <dd class="col-sm-9">{{ bookIsbn }}</dd>
+    </dl>
+    <hr>
+  
+    <form [formGroup]="checkoutForm" (ngSubmit)="save()" novalidate>
+  
+      <div class="mb-3">
+        <label for="borrowerName" class="form-label">Borrower's Name</label>
+        <input type="text" id="borrowerName" class="form-control" formControlName="borrowerName"
+               [class.is-invalid]="borrowerNameControl?.invalid && (borrowerNameControl?.dirty || borrowerNameControl?.touched)"
+               required>
+        <div *ngIf="borrowerNameControl?.invalid && (borrowerNameControl?.dirty || borrowerNameControl?.touched)" class="invalid-feedback">
+          <div *ngIf="borrowerNameControl?.errors?.['required']">Borrower name is required.</div>
+          </div>
+      </div>
+  
+      </form> </div> <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="dismiss()">Cancel</button>
+    <button type="submit" class="btn btn-primary" (click)="save()" [disabled]="checkoutForm.invalid || isLoading">
+       <span *ngIf="!isLoading">Checkout</span>
+       <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+       <span *ngIf="isLoading"> Checking out...</span>
+    </button>
+  </div>

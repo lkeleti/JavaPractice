@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +14,7 @@ import { LoanListComponent } from './components/loan-list/loan-list.component';
 import { AuthorFormComponent } from './components/author-form/author-form.component';
 import { BookFormComponent } from './components/book-form/book-form.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { CheckoutModalComponent } from './components/checkout-modal/checkout-modal.component';
 
 @NgModule({
   declarations: [
@@ -23,14 +25,16 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
     LoanListComponent,
     AuthorFormComponent,
     BookFormComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    CheckoutModalComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    ToastrModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
