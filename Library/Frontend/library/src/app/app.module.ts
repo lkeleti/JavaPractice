@@ -4,6 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -15,6 +17,7 @@ import { AuthorFormComponent } from './components/author-form/author-form.compon
 import { BookFormComponent } from './components/book-form/book-form.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { CheckoutModalComponent } from './components/checkout-modal/checkout-modal.component';
+
 
 @NgModule({
   declarations: [
@@ -30,6 +33,7 @@ import { CheckoutModalComponent } from './components/checkout-modal/checkout-mod
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,

@@ -3,7 +3,7 @@
 <div class="row mb-3">
   <div class="col-md-6">
     <input type="text" class="form-control" placeholder="Search by Title/date...">
-  </div>  
+  </div>
 </div>
 
 <div *ngIf="errorMessage" class="alert alert-danger">
@@ -34,11 +34,12 @@
         <td>{{ loan.borrowerName }}</td>
         <td>{{ loan.loanDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ loan.dueDate | date:'yyyy-MM-dd' }}</td>
-        <td>{{ loan.returnDate | date:'yyyy-MM-dd' }}</td> <td>
+        <td>{{ loan.returnDate | date:'yyyy-MM-dd' }}</td>
+        <td>
         <td>
           <button *ngIf="!loan.returnDate" class="btn btn-sm btn-warning me-1">Return book</button>
           <button class="btn btn-sm btn-danger me-1">Delete</button>
-          </td>
+        </td>
       </tr>
     </ng-container>
     <ng-template #noLoans>

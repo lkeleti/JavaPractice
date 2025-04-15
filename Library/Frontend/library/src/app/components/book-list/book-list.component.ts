@@ -3,6 +3,7 @@ import { BookDto } from '../../models/book.dto';
 import { BookService } from '../../services/book.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { CheckoutModalComponent } from '../checkout-modal/checkout-modal.component';
 
 @Component({
   selector: 'app-book-list',
@@ -41,6 +42,33 @@ export class BookListComponent implements OnInit {
         // complete: () => { console.log('Book loading completed.'); } // Opcionális: lefut a next vagy error után
       });
 
+  }
+
+  openCheckoutModal(book: BookDto): void {
+    // Megnyitjuk a modális ablakot a CheckoutModalComponent tartalmával
+    const modalRef = this.modalService.open(CheckoutModalComponent);
+
+    // Átadjuk a szükséges adatokat a modális komponens @Input() property-jeinek
+    modalRef.componentInstance.bookId = book.id;
+    modalRef.componentInstance.bookTitle = book.title;
+    // Feltételezzük, hogy az author és isbn is kellhet a megjelenítéshez a modálban
+    modalRef.componentInstance.authorName = book.author?.name || 'N/A'; // Biztonsági ellenőrzés, ha author null lenne
+    modalRef.componentInstance.bookIsbn = book.isbn;
+
+    // Kezeljük a modális ablak bezárásának eredményét
+    modalRef.result.then(
+      (result) => {
+        // Ha a modált a .close('success') hívással zárták be
+        if (result === 'success') {
+          console.log('Checkout successful, refreshing book list.');
+          this.loadBooks(); // Frissítjük a könyvlistát, hogy az állapotváltozás látszódjon (pl. ha lenne 'kölcsönözve' jelző)
+        }
+      },
+      (reason) => {
+        // Ha a modált a .dismiss() hívással zárták be (Cancel, Esc, stb.)
+        console.log('Checkout modal dismissed:', reason);
+      }
+    );
   }
 
   openDeleteConfirmation(book: BookDto): void {
