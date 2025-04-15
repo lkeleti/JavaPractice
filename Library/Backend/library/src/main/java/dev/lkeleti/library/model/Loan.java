@@ -38,7 +38,7 @@ public class Loan {
     @Column(name = "return_date")
     private LocalDate returnDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     @NotNull
     private Book book;
