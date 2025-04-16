@@ -92,7 +92,7 @@ class LoanServiceTest {
         assertEquals(loanDto.getLoanDate(), result.getLoanDate());
         assertEquals(loanDto.getDueDate(), result.getDueDate());
         assertEquals(loanDto.getReturnDate(), result.getReturnDate());
-        assertEquals(loanDto.getBookDto().getIsbn(), result.getBookDto().getIsbn());
+        assertEquals(loanDto.getBook().getIsbn(), result.getBook().getIsbn());
 
         verify(bookRepository, times(1)).findById(EXISTING_ID);
         verify(loanRepository, times(1)).save(any(Loan.class));
@@ -146,7 +146,7 @@ class LoanServiceTest {
 
         assertNotNull(result.getReturnDate(), "Return date should be set");
 
-        assertEquals(expectedReturnedLoanDto.getBookDto().getId(), result.getBookDto().getId());
+        assertEquals(expectedReturnedLoanDto.getBook().getId(), result.getBook().getId());
 
 
         verify(loanRepository, times(1)).findByBookIdAndReturnDateIsNull(EXISTING_ID);

@@ -24,5 +24,5 @@ public class LoanDto {
     @Schema(description="Könyv visszahozatalának dátuma", example = "2025.04.13")
     private LocalDate returnDate;
     @Schema(description="Könyv entitás")
-    private BookDto bookDto;
+    private BookDto book;
 }

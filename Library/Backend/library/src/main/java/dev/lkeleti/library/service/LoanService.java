@@ -1,7 +1,5 @@
 package dev.lkeleti.library.service;
 
-import dev.lkeleti.library.dto.AuthorDto;
-import dev.lkeleti.library.dto.BookDto;
 import dev.lkeleti.library.dto.CheckoutRequestDto;
 import dev.lkeleti.library.dto.LoanDto;
 import dev.lkeleti.library.exception.ResourceNotFoundException;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,16 +62,7 @@ public class LoanService {
     @Transactional(readOnly = true)
     public List<LoanDto> listLoans() {
         Type targetListType = new TypeToken<List<LoanDto>>(){}.getType();
-        List<Loan> loans = loanRepository.findAll();
-        List<LoanDto> loanDtos = modelMapper.map(loans, targetListType);
-        for (int i = 0; i < loans.size(); i++) {
-            Loan loan = loans.get(i);
-            LoanDto loanDto = loanDtos.get(i);
-            if (loan.getBook() != null) {
-                loanDto.setBookDto(modelMapper.map(loan.getBook(), BookDto.class));
-            }
-        }
-        return loanDtos;
+        return modelMapper.map(loanRepository.findAll(), targetListType);
     }
 
     @Transactional(readOnly = true)
