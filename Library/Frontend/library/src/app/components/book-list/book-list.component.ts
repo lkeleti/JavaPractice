@@ -8,7 +8,7 @@ import { CheckoutModalComponent } from '../checkout-modal/checkout-modal.compone
 @Component({
   selector: 'app-book-list',
   templateUrl: './book-list.component.html',
-  styleUrls: ['./book-list.component.scss']
+  styleUrls: ['./book-list.component.scss'],
 })
 export class BookListComponent implements OnInit {
   books: BookDto[] = [];
@@ -18,7 +18,7 @@ export class BookListComponent implements OnInit {
   constructor(
     private bookService: BookService,
     private modalService: NgbModal
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadBooks();
@@ -28,20 +28,18 @@ export class BookListComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.bookService.getBooks()
-      .subscribe({
-        next: (data) => {
-          this.books = data;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching books:', err);
-          this.errorMessage = 'Failed to load books. Please try again later.';
-          this.isLoading = false;
-        }
-        // complete: () => { console.log('Book loading completed.'); } // Opcionális: lefut a next vagy error után
-      });
-
+    this.bookService.getBooks().subscribe({
+      next: (data) => {
+        this.books = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching books:', err);
+        this.errorMessage = 'Failed to load books. Please try again later.';
+        this.isLoading = false;
+      },
+      // complete: () => { console.log('Book loading completed.'); } // Opcionális: lefut a next vagy error után
+    });
   }
 
   openCheckoutModal(book: BookDto): void {
@@ -100,7 +98,8 @@ export class BookListComponent implements OnInit {
     this.isLoading = true; // Opcionális: jelezhetjük a törlés folyamatát
     this.errorMessage = null;
 
-    this.bookService.deleteBook(id) // Feltételezve, hogy van ilyen metódus a service-ben
+    this.bookService
+      .deleteBook(id) // Feltételezve, hogy van ilyen metódus a service-ben
       .subscribe({
         next: () => {
           console.log('Book deleted successfully:', id);
@@ -112,7 +111,7 @@ export class BookListComponent implements OnInit {
           console.error('Error deleting book:', err);
           this.errorMessage = err.error?.message || 'Failed to delete book.';
           this.isLoading = false;
-        }
+        },
       });
   }
 }

@@ -37,7 +37,7 @@
         <td>{{ loan.returnDate | date:'yyyy-MM-dd' }}</td>
         <td>
         <td>
-          <button *ngIf="!loan.returnDate" class="btn btn-sm btn-warning me-1">Return book</button>
+          <button *ngIf="!loan.returnDate" class="btn btn-sm btn-warning me-1" (click)="openReturnConfirmation(loan)">Return book</button>
           <button class="btn btn-sm btn-danger me-1">Delete</button>
         </td>
       </tr>

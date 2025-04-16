@@ -24,4 +24,11 @@ export class LoanService {
   checkoutBook(command: CheckoutBookCommand): Observable<LoanDto> {
     return this.http.post<LoanDto>(`${this.apiUrl}/loans`, command);
   }
+
+  returnBook(bookId: number): Observable<LoanDto> {
+    return this.http.put<LoanDto>(
+      `${this.apiUrl}/loans/book/${bookId}/return`,
+      null
+    );
+  }
 }
