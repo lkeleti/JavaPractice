@@ -2,9 +2,23 @@
 
 <div class="row mb-3">
   <div class="col-md-6">
-    <input type="text" class="form-control" placeholder="Search by Title/date...">
+    <input type="text" class="form-control" placeholder="Search by Title/date..." [(ngModel)]="searchTerm">    
   </div>
 </div>
+
+
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="loanOptions" id="allLoans" value="allLoans" (click)="radio(1)" checked>
+    <label class="form-check-label" for="allLoans">All loans</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="loanOptions" id="activeLoans" value="activeLoans" (click)="radio(2)">
+    <label class="form-check-label" for="activeLoans">Active loans</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="loanOptions" id="overdueLoans" value="overdueLoans" (click)="radio(3)">
+    <label class="form-check-label" for="overdueLoans">Overdue loans</label>
+  </div>
 
 <div *ngIf="errorMessage" class="alert alert-danger">
   {{ errorMessage }}
@@ -29,16 +43,14 @@
   </thead>
   <tbody>
     <ng-container *ngIf="loans.length > 0; else noLoans">
-      <tr *ngFor="let loan of loans">
+      <tr *ngFor="let loan of filteredLoans">
         <td>{{ loan.book.title }}</td>
         <td>{{ loan.borrowerName }}</td>
         <td>{{ loan.loanDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ loan.dueDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ loan.returnDate | date:'yyyy-MM-dd' }}</td>
         <td>
-        <td>
           <button *ngIf="!loan.returnDate" class="btn btn-sm btn-warning me-1" (click)="openReturnConfirmation(loan)">Return book</button>
-          <button class="btn btn-sm btn-danger me-1">Delete</button>
         </td>
       </tr>
     </ng-container>

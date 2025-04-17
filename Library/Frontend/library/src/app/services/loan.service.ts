@@ -21,6 +21,14 @@ export class LoanService {
     return this.http.get<LoanDto[]>(`${this.apiUrl}/loans`);
   }
 
+  getActiveLoans(): Observable<LoanDto[]> {
+    return this.http.get<LoanDto[]>(`${this.apiUrl}/loans/active`);
+  }
+
+  getOverdueLoans(): Observable<LoanDto[]> {
+    return this.http.get<LoanDto[]>(`${this.apiUrl}/loans/overdue`);
+  }
+
   checkoutBook(command: CheckoutBookCommand): Observable<LoanDto> {
     return this.http.post<LoanDto>(`${this.apiUrl}/loans`, command);
   }
@@ -30,5 +38,9 @@ export class LoanService {
       `${this.apiUrl}/loans/book/${bookId}/return`,
       null
     );
+  }
+
+  deleteLoan(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/loans/${id}`);
   }
 }
