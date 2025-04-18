@@ -2,7 +2,7 @@
 
 <div class="row mb-3">
   <div class="col-md-6">
-    <input type="text" class="form-control" placeholder="Search by Name/Nationality...">
+    <input type="text" class="form-control" placeholder="Search by Name/Nationality..." [(ngModel)]="searchTerm">
   </div>
   <div class="col-md-6 text-md-end">
     <a routerLink="/authors/new" class="btn btn-primary">Add New Author</a>
@@ -30,7 +30,7 @@
   </thead>
   <tbody>
     <ng-container *ngIf="authors.length > 0; else noAuthors">
-      <tr *ngFor="let author of authors">
+      <tr *ngFor="let author of filteredAuthors">
         <td>{{ author.name }}</td>
         <td>{{ author.birthYear }}</td>
         <td>{{ author.nationality }}</td>

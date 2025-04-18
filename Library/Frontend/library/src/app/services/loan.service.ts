@@ -11,7 +11,7 @@ import { CheckoutBookCommand } from '../models/checkout-book.command';
 export class LoanService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Lekérdezi az összes kölcsönzést a backend API-ról.
@@ -42,5 +42,9 @@ export class LoanService {
 
   deleteLoan(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/loans/${id}`);
+  }
+
+  getHistory(id: number): Observable<LoanDto[]> {
+    return this.http.get<LoanDto[]>(`${this.apiUrl}/loans/history/${id}`)
   }
 }

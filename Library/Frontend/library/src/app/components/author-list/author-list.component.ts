@@ -19,6 +19,7 @@ export class AuthorListComponent implements OnInit {
     private authorService: AuthorService,
     private modalService: NgbModal
   ) { }
+  searchTerm: string = '';
 
   ngOnInit(): void {
     this.loadAuthors();
@@ -86,5 +87,16 @@ export class AuthorListComponent implements OnInit {
           this.isLoading = false;
         }
       });
+  }
+
+  get filteredAuthors(): AuthorDto[] {
+    if (!this.searchTerm) return this.authors;
+    const term = this.searchTerm.toLowerCase();
+    return this.authors.filter(
+      (author) =>
+        author.name.toLowerCase().includes(term) ||
+        author.birthYear?.toString().toLowerCase().includes(term) ||
+        author.nationality?.toLowerCase().includes(term)
+    );
   }
 }

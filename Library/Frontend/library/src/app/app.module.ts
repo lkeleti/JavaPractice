@@ -17,6 +17,7 @@ import { BookFormComponent } from './components/book-form/book-form.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { CheckoutModalComponent } from './components/checkout-modal/checkout-modal.component';
 import { FormsModule } from '@angular/forms';
+import { HistoryListComponent } from './components/history-list/history-list.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { FormsModule } from '@angular/forms';
     BookFormComponent,
     ConfirmationDialogComponent,
     CheckoutModalComponent,
+    HistoryListComponent,
   ],
   imports: [
     BrowserModule,

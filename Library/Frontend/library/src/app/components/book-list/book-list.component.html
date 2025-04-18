@@ -2,7 +2,7 @@
 
 <div class="row mb-3">
   <div class="col-md-6">
-    <input type="text" class="form-control" placeholder="Search by Title/ISBN...">
+    <input type="text" class="form-control" placeholder="Search by Title/ISBN..." [(ngModel)]="searchTerm">
   </div>
   <div class="col-md-6 text-md-end">
     <a routerLink="/books/new" class="btn btn-primary">Add New Book</a>
@@ -31,7 +31,7 @@
   </thead>
   <tbody>
     <ng-container *ngIf="books.length > 0; else noBooks">
-      <tr *ngFor="let book of books">
+      <tr *ngFor="let book of filteredBooks">
         <td>{{ book.isbn }}</td>
         <td>{{ book.title }}</td>
         <td>{{ book.author.name }}</td>
@@ -40,6 +40,7 @@
           <button class="btn btn-sm btn-warning me-1" [routerLink]="['/books', book.id, 'edit']">Edit</button>
           <button class="btn btn-sm btn-danger me-1" (click)="openDeleteConfirmation(book)">Delete</button>
           <button class="btn btn-sm btn-success" (click)="openCheckoutModal(book)">Checkout</button>
+          <button class="btn btn-sm btn-secondary" [routerLink]="['/loans', book.id, 'history']">History</button>
         </td>
       </tr>
     </ng-container>

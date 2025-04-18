@@ -18,7 +18,8 @@ export class BookListComponent implements OnInit {
   constructor(
     private bookService: BookService,
     private modalService: NgbModal
-  ) {}
+  ) { }
+  searchTerm: string = '';
 
   ngOnInit(): void {
     this.loadBooks();
@@ -113,5 +114,17 @@ export class BookListComponent implements OnInit {
           this.isLoading = false;
         },
       });
+  }
+
+  get filteredBooks(): BookDto[] {
+    if (!this.searchTerm) return this.books;
+    const term = this.searchTerm.toLowerCase();
+    return this.books.filter(
+      (book) =>
+        book.title.toLowerCase().includes(term) ||
+        book.author.name.toLowerCase().includes(term) ||
+        book.publicationYear?.toString().toLowerCase().includes(term) ||
+        book.isbn.toLowerCase().includes(term)
+    );
   }
 }

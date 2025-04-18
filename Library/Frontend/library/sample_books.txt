@@ -1,0 +1,21 @@
+Könyv címe	ISBN	Megjelenés éve	Szerző neve	Szerző születési éve	Szerző nemzetisége
+A Tale of Two Cities	9781454957546	1859	Charles Dickens	1812	Brit
+The Little Prince	9780152465032	1943	Antoine de Saint-Exupéry	1900	Francia
+The Alchemist	9780061122415	1988	Paulo Coelho	1947	Brazil
+Harry Potter and the Philosopher's Stone	9781408855652	1997	J.K. Rowling	1965	Brit
+And Then There Were None	9780553350005	1939	Agatha Christie	1890	Brit
+Dream of the Red Chamber	9781334123429	1791	Cao Xueqin	kb. 1715	Kínai
+The Hobbit	9780395177112	1937	J.R.R. Tolkien	1892	Brit
+Alice's Adventures in Wonderland	N/A	1865	Lewis Carroll	1832	Brit
+To Kill a Mockingbird	N/A	1960	Harper Lee	1926	Amerikai
+The Great Gatsby	9780785839996	1925	F. Scott Fitzgerald	1896	Amerikai
+War and Peace	N/A	1869	Leo Tolstoy	1828	Orosz
+Pride and Prejudice	N/A	1813	Jane Austen	1775	Brit
+The Catcher in the Rye	N/A	1951	J.D. Salinger	1919	Amerikai
+The Kite Runner	N/A	2003	Khaled Hosseini	1965	Afganisztáni
+The Hunger Games	N/A	2008	Suzanne Collins	1962	Amerikai
+Dune	N/A	1965	Frank Herbert	1920	Amerikai
+The Book Thief	N/A	2005	Markus Zusak	1975	Ausztrál
+The Shadow of the Wind	N/A	2001	Carlos Ruiz Zafón	1964	Spanyol
+The Fault in Our Stars	N/A	2012	John Green	1977	Amerikai
+Life of Pi	N/A	2001	Yann Martel	1963	Kanadai

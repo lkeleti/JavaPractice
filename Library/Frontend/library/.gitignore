@@ -1,0 +1,6 @@
+.idea/
+.angular/
+.vscode/
+node_modules/
+target/
+*$*
