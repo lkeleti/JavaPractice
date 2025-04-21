@@ -15,7 +15,5 @@ public class PaymentMethod {
     private Long id;
 
     @Column(unique = true)
-    private String code;
-
     private String name;
 }
