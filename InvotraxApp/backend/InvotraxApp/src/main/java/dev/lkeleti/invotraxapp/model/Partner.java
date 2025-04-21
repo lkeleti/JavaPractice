@@ -76,5 +76,5 @@ public class Partner {
     private Integer defaultPaymentDeadline;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private boolean deleted = false;
 }

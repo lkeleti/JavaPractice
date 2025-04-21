@@ -50,10 +50,10 @@ public class Product {
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Barcode> barcodes;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SerialNumber> serialNumbers;
 
     @ManyToOne

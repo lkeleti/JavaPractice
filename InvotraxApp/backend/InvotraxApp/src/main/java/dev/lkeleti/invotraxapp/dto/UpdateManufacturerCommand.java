@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class ManufacturerDto {
-    private Long id;
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateManufacturerCommand {
     private String name;
     private String website;
 }
