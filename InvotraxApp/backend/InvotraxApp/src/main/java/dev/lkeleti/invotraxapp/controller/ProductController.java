@@ -4,6 +4,7 @@ import dev.lkeleti.invotraxapp.dto.ProductDto;
 import dev.lkeleti.invotraxapp.dto.UpdateProductCommand;
 import dev.lkeleti.invotraxapp.dto.CreateProductCommand;
 import dev.lkeleti.invotraxapp.service.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @AllArgsConstructor
+@Tag(name = "Műveletek a termékkel")
 public class ProductController {
     private ProductService productService;
 

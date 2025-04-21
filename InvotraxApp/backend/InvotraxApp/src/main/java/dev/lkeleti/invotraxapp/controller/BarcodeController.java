@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/barcodes")
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @AllArgsConstructor
+@Tag(name = "Műveletek a vonlakóddal")
 public class BarcodeController {
     private BarcodeService barcodeService;
 

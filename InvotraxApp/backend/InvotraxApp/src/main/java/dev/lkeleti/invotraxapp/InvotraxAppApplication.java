@@ -16,4 +16,12 @@ public class InvotraxAppApplication {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
+	/*
+	TODO InventorItem CRUD
+	TODO InvoiceItem CRUD
+	TODO InvoiceNumberSequence CRUD
+	TODO InvoiceType CRUD
+	TODO ProductType CRUD
+	TODO SerialNumber CRUD
+	 */
 }

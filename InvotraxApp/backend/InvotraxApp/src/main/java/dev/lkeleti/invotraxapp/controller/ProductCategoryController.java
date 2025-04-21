@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/productcategories")
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @AllArgsConstructor
+@Tag(name = "Műveletek a termék kategóriával")
 public class ProductCategoryController {
     private ProductCategoryService productCategoryService;
 

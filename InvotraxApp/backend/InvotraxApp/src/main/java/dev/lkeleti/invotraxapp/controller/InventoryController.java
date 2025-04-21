@@ -5,6 +5,7 @@ import dev.lkeleti.invotraxapp.dto.UpdateInventoryCommand;
 import dev.lkeleti.invotraxapp.dto.CreateInventoryCommand;
 import dev.lkeleti.invotraxapp.repository.InventoryRepository;
 import dev.lkeleti.invotraxapp.service.InventoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api/inventories")
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @AllArgsConstructor
+@Tag(name = "Műveletek a bevételezéssel")
 public class InventoryController {
     private InventoryRepository inventoryRepository;
     private InventoryService inventoryService;
