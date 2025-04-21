@@ -27,7 +27,7 @@ public class ZipCodeController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Összes irányítószám listázása",
             description = "Visszaadja az összes irányítószám listáját még a törölteket is.")
-    @ApiResponse(responseCode = "200", description = "ÁFA sikeresen listázva")
+    @ApiResponse(responseCode = "200", description = "Irányítószám sikeresen listázva")
     public List<ZipCodeDto> getAllZipCodes() {
         return zipCodeService.getAllZipCodes();
     }
@@ -80,16 +80,16 @@ public class ZipCodeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Új ÁFA rögzítése",
-            description = "Új ÁFA rögzítése a request body-ban megadott adatok alapján.",
+    @Operation(summary = "Új irányítószám rögzítése",
+            description = "Új irányítószám rögzítése a request body-ban megadott adatok alapján.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Az új ÁFA létrehozásához szükséges adatok JSON formátumban.",
+                    description = "Az új irányítószám létrehozásához szükséges adatok JSON formátumban.",
                     required = true,
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CreateZipCodeCommand.class))
             )
     )
-    @ApiResponse(responseCode = "201", description = "ÁFA sikeresen létrehozva")
+    @ApiResponse(responseCode = "201", description = "Irányítószám sikeresen létrehozva")
     @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben (validációs hiba)")
     public ZipCodeDto createZipCode(@RequestBody CreateZipCodeCommand command) {
         return zipCodeService.createZipCode(command);
@@ -97,22 +97,22 @@ public class ZipCodeController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "ÁFA törlése",
-            description = "ÁFA törlése a megadott azonosító alapján (logikai törlés)."
+    @Operation(summary = "Irányítószám törlése",
+            description = "Irányítószám törlése a megadott azonosító alapján (logikai törlés)."
     )
-    @ApiResponse(responseCode = "204", description = "ÁFA sikeresen törölve")
-    @ApiResponse(responseCode = "404", description = "Törlendő ÁFA nem található")
+    @ApiResponse(responseCode = "204", description = "Irányítószám sikeresen törölve")
+    @ApiResponse(responseCode = "404", description = "Törlendő irányítószám nem található")
     public void deleteZipCode(@PathVariable Long id) {
         zipCodeService.deleteZipCode(id);
     }
 
     @DeleteMapping("/undelete/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "ÁFA törlésének megszüntetése",
-            description = "ÁFA visszaállítása aktív állapotba a megadott azonosító alapján."
+    @Operation(summary = "Irányítószám törlésének megszüntetése",
+            description = "Irányítószám visszaállítása aktív állapotba a megadott azonosító alapján."
     )
-    @ApiResponse(responseCode = "200", description = "ÁFA sikeresen visszaállítva")
-    @ApiResponse(responseCode = "404", description = "ÁFA nem található")
+    @ApiResponse(responseCode = "200", description = "Irányítószám sikeresen visszaállítva")
+    @ApiResponse(responseCode = "404", description = "Irányítószám nem található")
     public ZipCodeDto unDeleteZipCode(@PathVariable Long id) {
         return zipCodeService.unDeleteZipCode(id);
     }
