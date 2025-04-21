@@ -19,7 +19,6 @@ import java.util.List;
 public class VatRateController {
     private VatRateService vatRateService;
 
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Összes ÁFA listázása",

@@ -63,6 +63,7 @@ public class VatRateService {
         return modelMapper.map(vatRate,VatRateDto.class);
     }
 
+    @Transactional
     public void deleteVatRate(Long id) {
         VatRate vatRate = vatRateRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find vat rate")
@@ -70,6 +71,7 @@ public class VatRateService {
         vatRate.setDeleted(true);
     }
 
+    @Transactional
     public VatRateDto unDeleteVatRate(Long id) {
         VatRate vatRate = vatRateRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find vat rate")

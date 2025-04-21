@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class ZipCodeDto {
+
+public class CreateZipCodeCommand {
     private Long id;
     private String zip;
     private String city;
-    private boolean deleted;
 }

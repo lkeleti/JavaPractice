@@ -17,9 +17,12 @@ public class ZipCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "zip", nullable = false)
+    @Column(name = "zip", nullable = false, unique = false)
     private String zip;
 
     @Column(name = "city", nullable = false)
     private String city;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 }

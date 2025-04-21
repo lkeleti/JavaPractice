@@ -23,6 +23,6 @@ public class CreateInvoiceCommand {
     private BigDecimal netTotal;
     private BigDecimal grossTotal;
     private Long invoiceTypeId;
-    private String paymentMethodCode;
+    private Long paymentMethodId;
     private List<InvoiceItemDto> items;
 }
