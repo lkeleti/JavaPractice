@@ -9,7 +9,7 @@ Ez a dokumentum összegyűjti a projekt aktuális állapotát és a még hátral
 - [ ] InventoryItem CRUD (DTO + Controller + Service)
 - [ ] InvoiceItem CRUD (DTO + Controller + Service)
 - [ ] InvoiceNumberSequence kezelés (Admin CRUD vagy csak Service szint)
-- [ ] InvoiceType CRUD (kód + megjelenített név)
+- [x] InvoiceType CRUD (kód + megjelenített név)
 - [ ] PaymentMethod CRUD
 - [ ] ProductType CRUD (kód + név + készletkezelést végző flag)
 - [ ] SerialNumber kezelés (csak olvasás vagy admin CRUD?)

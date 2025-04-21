@@ -18,7 +18,8 @@ public class InvoiceType {
     private Long id;
 
     @Column(unique = true)
-    private String code;
-
     private String name;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 }
