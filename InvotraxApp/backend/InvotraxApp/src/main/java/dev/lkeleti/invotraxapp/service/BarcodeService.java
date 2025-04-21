@@ -31,18 +31,26 @@ public class BarcodeService {
 
     @Transactional(readOnly = true)
     public BarcodeDto getBarcodeByCode(String code) {
+        if (code.length() == 12) {
+            code = "0" + code;
+        }
         return modelMapper.map(barcodeRepository.findByCode(code), BarcodeDto.class);
     }
 
     @Transactional
     public BarcodeDto createBarcode(CreateBarcodeCommand command) {
-        Product product = productRepository.findById(command.getProductId()).orElseThrow(
-                () -> new EntityNotFoundException("Cannot find product")
-        );
+        if (command.getCode().length() == 12) {
+            command.setCode("0" + command.getCode());
+        }
 
         if (!isValidEAN13Barcode(command.getCode())) {
             throw new IllegalStateException("Invalid EAN code");
         }
+
+        Product product = productRepository.findById(command.getProductId()).orElseThrow(
+                () -> new EntityNotFoundException("Cannot find product")
+        );
+
         Barcode barcode = new Barcode();
         barcode.setCode(command.getCode());
         barcode.setIsGenerated(command.getIsGenerated());
