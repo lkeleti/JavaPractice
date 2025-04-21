@@ -64,7 +64,7 @@ public class ManufacturerController {
     @Operation(summary = "Új gyártó rögzítése",
             description = "Új gyártó rögzítése a request body-ban megadott adatok alapján.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Az gyártó szerző létrehozásához szükséges adatok JSON formátumban.",
+                    description = "Az gyártó létrehozásához szükséges adatok JSON formátumban.",
                     required = true,
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CreateManufacturerCommand.class))
