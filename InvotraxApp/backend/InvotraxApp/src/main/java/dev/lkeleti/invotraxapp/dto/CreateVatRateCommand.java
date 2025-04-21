@@ -11,9 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class VatRateDto {
-    private Long id;
+public class CreateVatRateCommand {
     private String name;
     private BigDecimal rate;
-    private boolean deleted = false;
 }

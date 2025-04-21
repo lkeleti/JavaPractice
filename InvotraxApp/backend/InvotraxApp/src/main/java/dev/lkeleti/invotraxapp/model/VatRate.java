@@ -24,4 +24,7 @@ public class VatRate {
 
     @Column(name = "rate", nullable = false)
     private BigDecimal rate;
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 }

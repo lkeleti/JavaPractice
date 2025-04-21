@@ -7,13 +7,12 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class VatRateDto {
-    private Long id;
+public class UpdateVatRateCommand {
     private String name;
     private BigDecimal rate;
-    private boolean deleted = false;
+    private boolean deleted;
 }
