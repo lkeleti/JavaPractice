@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class BarcodeDto {
-    private Long id;
+@AllArgsConstructor
+@NoArgsConstructor
+public class CreateBarcodeCommand {
     private String code;
     private Boolean isGenerated;
     private Long productId;

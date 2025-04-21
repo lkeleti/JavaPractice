@@ -20,6 +20,9 @@ public class Barcode {
     @Column(name = "code", unique = true, nullable = false)
     private String code;
 
+    @Column(name = "is_generated")
+    private Boolean isGenerated;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
