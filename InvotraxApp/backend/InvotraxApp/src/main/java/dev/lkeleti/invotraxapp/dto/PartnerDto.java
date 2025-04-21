@@ -31,5 +31,8 @@ public class PartnerDto {
     private LocalDateTime createdAt;
     private BigDecimal balance;
     private Integer defaultPaymentDeadline;
+    private String bankName;
+    private String bankNumber;
+    private String iban;
     private boolean deleted;
 }

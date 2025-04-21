@@ -72,6 +72,16 @@ public class Partner {
     @Column(name = "balance")
     private BigDecimal balance;
 
+    @Column(name = "bank_name")
+    private String bankName;
+
+    @Column(name = "bank_number")
+    private String bankNumber;
+
+    @Column(name = "iban")
+    private String iban;
+
+
     @Column(name = "default_payment_deadline")
     private Integer defaultPaymentDeadline;
 

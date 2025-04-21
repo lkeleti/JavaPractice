@@ -23,7 +23,7 @@ public class Invoice {
 
     @ManyToOne
     @JoinColumn(name = "seller_id")
-    private Partner seller;
+    private SellerCompanyProfile seller;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id")

@@ -2,10 +2,7 @@ package dev.lkeleti.invotraxapp.service;
 
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import dev.lkeleti.invotraxapp.model.Invoice;
-import dev.lkeleti.invotraxapp.model.InvoiceItem;
-import dev.lkeleti.invotraxapp.model.Partner;
-import dev.lkeleti.invotraxapp.model.ZipCode;
+import dev.lkeleti.invotraxapp.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.itextpdf.kernel.pdf.*;
@@ -21,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 
 @AllArgsConstructor
 @Service
@@ -58,7 +54,7 @@ public class PdfInvoiceGeneratorService {
         Table parties = new Table(UnitValue.createPercentArray(new float[]{50, 50}))
                 .setWidth(UnitValue.createPercentValue(100));
 
-        parties.addCell(createNoBorderCell("Eladó:\n" + formatPartner(invoice.getSeller(), zipCodeSeller)));
+        parties.addCell(createNoBorderCell("Eladó:\n" + formatSeller(invoice.getSeller())));
         parties.addCell(createNoBorderCell("Vevő:\n" + formatPartner(invoice.getBuyer(), zipCodeBuyer)));
 
         document.add(parties);
@@ -159,6 +155,18 @@ public class PdfInvoiceGeneratorService {
         document.close();
         return byteStream.toByteArray();
     }
+
+    private static String formatSeller(SellerCompanyProfile seller) {
+        Partner p = seller.getPartner();
+        return p.getName() + "\n" +
+                seller.getHeadOfficeAddress() + "\n" +
+                "Telephely: " + seller.getDefaultBranchAddress() + "\n" +
+                "Cégjegyzékszám: " + seller.getCompanyRegistrationNumber() + "\n" +
+                "Adószám: " + p.getTaxNumber()  + "\n" +
+                "Bank: " + p.getBankName()  + " " + p.getBankNumber() + "\n" +
+                "IBAN: " + p.getIban();
+    }
+
 
     private static String formatPartner(Partner partner, ZipCode zipCode) {
         return partner.getName() + "\n" +

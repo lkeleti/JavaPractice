@@ -33,6 +33,7 @@ public class InvoiceService {
     private PdfInvoiceGeneratorService pdfInvoiceGeneratorService;
     private ModelMapper modelMapper;
     private final ZipCodeRepository zipCodeRepository;
+    private final SellerCompanyProfileRepository sellerCompanyProfileRepository;
 
 
     @Transactional(readOnly = true)
@@ -53,9 +54,8 @@ public class InvoiceService {
     @Transactional
     public InvoiceDto createInvoice(CreateInvoiceCommand createInvoiceCommand) {
         byte[] invoicePdf;
-        Partner seller =partnerRepository.findById(createInvoiceCommand.getSellerId()).orElseThrow(
-                () -> new EntityNotFoundException("Cannot find Seller!")
-        );
+        SellerCompanyProfile seller = sellerCompanyProfileRepository.findById(createInvoiceCommand.getSellerId())
+                .orElseThrow(() -> new EntityNotFoundException("Seller not found"));
 
         Partner buyer =partnerRepository.findById(createInvoiceCommand.getBuyerId()).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find Buyer!")
@@ -129,7 +129,7 @@ public class InvoiceService {
                 .toList();
     }
 
-    public String generateInvoiceNumber(Long invoiceTypeId) {
+    private String generateInvoiceNumber(Long invoiceTypeId) {
         InvoiceType invoiceType = invoiceTypeRepository.findById(invoiceTypeId)
                 .orElseThrow(() -> new EntityNotFoundException("InvoiceType not found"));
 
@@ -148,7 +148,7 @@ public class InvoiceService {
         return String.format("%s%06d", prefix, newNumber);
     }
 
-    public void saveInvoicePdfToFile(String fileName, byte[] pdfBytes) {
+    private void saveInvoicePdfToFile(String fileName, byte[] pdfBytes) {
         String basePath = "/app/invoices";
         Path filePath = Paths.get(basePath, fileName);
 
@@ -162,7 +162,7 @@ public class InvoiceService {
         }
     }
 
-    public String getUnprotectedInvoicePdfBase64(Invoice invoice) {
+    private String getUnprotectedInvoicePdfBase64(Invoice invoice) {
         byte[] encryptedPdf;
         try {
             encryptedPdf = Files.readAllBytes(Paths.get("/app/invoices" + invoice.getPdfPath()));
