@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface InvoiceNumberSequenceRepository extends JpaRepository<InvoiceNumberSequence, String> {
+public interface InvoiceNumberSequenceRepository extends JpaRepository<InvoiceNumberSequence, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM InvoiceNumberSequence s WHERE s.invoiceType = :invoiceType")
