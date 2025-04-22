@@ -30,4 +30,8 @@ public class SerialNumber {
     @ManyToOne
     @JoinColumn(name = "inventory_item_id")
     private InventoryItem inventoryItem;
+
+    @ManyToOne
+    @JoinColumn(name = "invoice_item_id")
+    private InvoiceItem invoiceItem;
 }
