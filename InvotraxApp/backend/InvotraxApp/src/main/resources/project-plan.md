@@ -12,7 +12,7 @@ Ez a dokumentum összegyűjti a projekt aktuális állapotát és a még hátral
 - [x] InvoiceType CRUD (kód + megjelenített név)
 - [x] PaymentMethod CRUD
 - [x] ProductType CRUD (kód + név + készletkezelést végző flag)
-- [ ] SerialNumber kezelés (csak olvasás vagy admin CRUD?)
+- [x] SerialNumber kezelés (csak olvasás vagy admin CRUD?)
 
 ---
 
