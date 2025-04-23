@@ -16,7 +16,9 @@ public class InventoryItemDto {
     private Long inventoryId;
     private Long productId;
     private int quantity;
-    private BigDecimal netPrice;
-    private BigDecimal grossPrice;
+    private BigDecimal netPurchasePrice;
+    private BigDecimal grossPurchasePrice;
+    private BigDecimal netSellingPrice;
+    private BigDecimal grossSellingPrice;
     private Integer warrantyPeriodMonths;
 }

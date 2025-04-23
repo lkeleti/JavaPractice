@@ -35,11 +35,17 @@ public class Product {
     @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
 
-    @Column(name = "net_price")
-    private BigDecimal netPrice;
+    @Column(name = "net_purchase_price")
+    private BigDecimal netPurchasePrice;
 
-    @Column(name = "gross_price")
-    private BigDecimal grossPrice;
+    @Column(name = "gross_purchase_price")
+    private BigDecimal grossPurchasePrice;
+
+    @Column(name = "net_selling_price")
+    private BigDecimal netSellingPrice;
+
+    @Column(name = "gross_selling_price")
+    private BigDecimal grossSellingPrice;
 
     @Column(name = "warranty_period_months")
     private Integer warrantyPeriodMonths;
@@ -62,20 +68,4 @@ public class Product {
 
     private boolean deleted;
 
-    public Product(String name, String sku, String description, ProductCategory category, Manufacturer manufacturer, BigDecimal netPrice, BigDecimal grossPrice, Integer warrantyPeriodMonths, boolean serialNumberRequired, List<Barcode> barcodes, List<SerialNumber> serialNumbers, int stockQuantity, VatRate vatRate) {
-        this.name = name;
-        this.sku = sku;
-        this.description = description;
-        this.category = category;
-        this.manufacturer = manufacturer;
-        this.netPrice = netPrice;
-        this.grossPrice = grossPrice;
-        this.warrantyPeriodMonths = warrantyPeriodMonths;
-        this.serialNumberRequired = serialNumberRequired;
-        this.barcodes = barcodes;
-        this.serialNumbers = serialNumbers;
-        this.vatRate = vatRate;
-        this.stockQuantity = stockQuantity;
-        deleted = false;
-    }
 }

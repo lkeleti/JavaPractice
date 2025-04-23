@@ -17,8 +17,10 @@ public class CreateProductCommand {
     private String description;
     private Long categoryId;
     private Long manufacturerId;
-    private BigDecimal netPrice;
-    private BigDecimal grossPrice;
+    private BigDecimal netPurchasePrice;
+    private BigDecimal grossPurchasePrice;
+    private BigDecimal netSellingPrice;
+    private BigDecimal grossSellingPrice;
     private Integer warrantyPeriodMonths;
     private int stockQuantity;
     private boolean serialNumberRequired;

@@ -17,8 +17,10 @@ public class UpdateProductCommand {
     private String description;
     private Long categoryId;
     private Long manufacturerId;
-    private BigDecimal netPrice;
-    private BigDecimal grossPrice;
+    private BigDecimal netPurchasePrice;
+    private BigDecimal grossPurchasePrice;
+    private BigDecimal netSellingPrice;
+    private BigDecimal grossSellingPrice;
     private Integer warrantyPeriodMonths;
     private boolean serialNumberRequired;
     private int stockQuantity;

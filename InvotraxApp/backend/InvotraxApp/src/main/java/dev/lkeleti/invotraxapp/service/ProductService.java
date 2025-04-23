@@ -53,21 +53,23 @@ public class ProductService {
         Manufacturer manufacturer = manufacturerRepository.findById(command.getManufacturerId()).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find Manufacturer!")
         );
-        Product product = new Product(
-                command.getName(),
-                command.getSku(),
-                command.getDescription(),
-                productCategory,
-                manufacturer,
-                command.getNetPrice(),
-                command.getGrossPrice(),
-                command.getWarrantyPeriodMonths(),
-                command.isSerialNumberRequired(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                command.getStockQuantity(),
-                vatRate
-        );
+        Product product = new Product();
+        product.setName(command.getName());
+        product.setSku(command.getSku());
+        product.setDescription(command.getDescription());
+        product.setCategory(productCategory);
+        product.setManufacturer(manufacturer);
+        product.setNetPurchasePrice(command.getNetPurchasePrice());
+        product.setGrossPurchasePrice(command.getGrossPurchasePrice());
+        product.setNetSellingPrice(command.getNetSellingPrice());
+        product.setGrossSellingPrice(command.getGrossSellingPrice());
+        product.setWarrantyPeriodMonths(command.getWarrantyPeriodMonths());
+        product.setSerialNumberRequired(command.isSerialNumberRequired());
+        product.setBarcodes(new ArrayList<>());
+        product.setSerialNumbers(new ArrayList<>());
+        product.setStockQuantity(command.getStockQuantity());
+        product.setVatRate(vatRate);
+
         return modelMapper.map(productRepository.save(product), ProductDto.class);
     }
 
@@ -94,13 +96,15 @@ public class ProductService {
         product.setDescription(command.getDescription());
         product.setCategory(productCategory);
         product.setManufacturer(manufacturer);
-        product.setNetPrice(command.getNetPrice());
-        product.setGrossPrice(command.getGrossPrice());
+        product.setNetPurchasePrice(command.getNetPurchasePrice());
+        product.setGrossPurchasePrice(command.getGrossPurchasePrice());
+        product.setNetSellingPrice(command.getNetSellingPrice());
+        product.setGrossSellingPrice(command.getGrossSellingPrice());
         product.setWarrantyPeriodMonths(command.getWarrantyPeriodMonths());
         product.setSerialNumberRequired(command.isSerialNumberRequired());
         product.setStockQuantity(command.getStockQuantity());
         product.setVatRate(vatRate);
-        product.setDeleted(command.isDeleted());
+
         return modelMapper.map(product, ProductDto.class);
     }
 

@@ -30,11 +30,17 @@ public class InventoryItem {
     @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "net_price")
-    private BigDecimal netPrice;
+    @Column(name = "net_purchase_price")
+    private BigDecimal netPurchasePrice;
 
-    @Column(name = "gross_price")
-    private BigDecimal grossPrice;
+    @Column(name = "gross_purchase_price")
+    private BigDecimal grossPurchasePrice;
+
+    @Column(name = "net_selling_price")
+    private BigDecimal netSellingPrice;
+
+    @Column(name = "gross_selling_price")
+    private BigDecimal grossSellingPrice;
 
     @Column(name = "warranty_period_months")
     private Integer warrantyPeriodMonths;
