@@ -21,6 +21,47 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //Az alábbi mezők azért kellenek, hogy a számla kiállításának pillanatában érvényes adatokat le tudjam tárolni!!
+    @Column(name = "seller_name")
+    private String sellerName;
+
+    @Column(name = "seller_tax_number")
+    private String sellerTaxNumber;
+
+    @Column(name = "seller_address")
+    private String sellerAddress;
+
+    @Column(name = "seller_head_office_address")
+    private String sellerHeadOfficeAddress;
+
+    @Column(name = "seller_default_branch_address")
+    private String sellerDefaultBranchAddress;
+
+    @Column(name = "seller_company_reg_number")
+    private String sellerCompanyRegNumber;
+
+    @Column(name = "seller_bank_details")
+    private String sellerBankDetails;
+
+    @Column(name = "seller_iban")
+    private String sellerIban;
+
+    @Column(name = "buyer_name")
+    private String buyerName;
+
+    @Column(name = "buyer_tax_number")
+    private String buyerTaxNumber;
+
+    @Column(name = "buyer_address")
+    private String buyerAddress;
+
+    @Column(name = "invoice_type_name")
+    private String invoiceTypeName;
+
+    @Column(name = "payment_method_name")
+    private String paymentMethodName;
+    ///////////////////////
+
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private SellerCompanyProfile seller;

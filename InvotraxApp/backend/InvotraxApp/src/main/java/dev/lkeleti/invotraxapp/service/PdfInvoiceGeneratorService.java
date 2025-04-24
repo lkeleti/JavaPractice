@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Service
 public class PdfInvoiceGeneratorService {
-    public byte[] generateInvoicePdf(Invoice invoice, ZipCode zipCodeSeller, ZipCode zipCodeBuyer,  String password) {
+    public byte[] generateInvoicePdf(Invoice invoice, String password) {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 
         WriterProperties writerProperties = new WriterProperties()
@@ -54,8 +54,8 @@ public class PdfInvoiceGeneratorService {
         Table parties = new Table(UnitValue.createPercentArray(new float[]{50, 50}))
                 .setWidth(UnitValue.createPercentValue(100));
 
-        parties.addCell(createNoBorderCell("Eladó:\n" + formatSeller(invoice.getSeller())));
-        parties.addCell(createNoBorderCell("Vevő:\n" + formatPartner(invoice.getBuyer(), zipCodeBuyer)));
+        parties.addCell(createNoBorderCell("Eladó:\n" + formatSeller(invoice)));
+        parties.addCell(createNoBorderCell("Vevő:\n" + formatPartner(invoice.getBuyer(), invoice)));
 
         document.add(parties);
 
@@ -156,37 +156,27 @@ public class PdfInvoiceGeneratorService {
         return byteStream.toByteArray();
     }
 
-    private static String formatSeller(SellerCompanyProfile seller) {
-        Partner p = seller.getPartner();
-        return p.getName() + "\n" +
-                seller.getHeadOfficeAddress() + "\n" +
-                "Telephely: " + seller.getDefaultBranchAddress() + "\n" +
-                "Cégjegyzékszám: " + seller.getCompanyRegistrationNumber() + "\n" +
-                "Adószám: " + p.getTaxNumber()  + "\n" +
-                "Bank: " + p.getBankName()  + " " + p.getBankNumber() + "\n" +
-                "IBAN: " + p.getIban();
+    public String formatSeller(Invoice invoice) {
+        return invoice.getSellerName() + "\n" +
+                "Cím: " + invoice.getSellerDefaultBranchAddress() + "\n" +
+                "Cégjegyzékszám: " + invoice.getSellerCompanyRegNumber() + "\n" +
+                "Adószám: " + invoice.getSellerTaxNumber()  + "\n" +
+                "Bank: " + invoice.getSellerBankDetails() + "\n" +
+                "IBAN: " + invoice.getSellerIban();
     }
 
 
-    private static String formatPartner(Partner partner, ZipCode zipCode) {
+    public String formatPartner(Partner partner, Invoice invoice) {
         return partner.getName() + "\n" +
-                zipCode.getZip() + " " + zipCode.getCity() + "\n" +
-                partner.getStreetName() + " " +
-                partner.getStreetType() + " " +
-                partner.getHouseNumber() + " " +
-                partner.getBuilding() + " " +
-                partner.getStaircase() + " " +
-                partner.getFloor() + " " +
-                partner.getDoor() + " " +
-                partner.getLandRegistryNumber() + " " + "\n" +
+                invoice.getBuyerAddress() + "\n" +
                 "Adószám: " + partner.getTaxNumber();
     }
 
-    private static Cell createNoBorderCell(String text) {
+    private Cell createNoBorderCell(String text) {
         return new Cell().add(new Paragraph(text)).setBorder(Border.NO_BORDER);
     }
 
-    private static Cell createBoldCell(String text) {
+    private Cell createBoldCell(String text) {
         return new Cell().add(new Paragraph(text).setBold()).setBorder(Border.NO_BORDER);
     }
 

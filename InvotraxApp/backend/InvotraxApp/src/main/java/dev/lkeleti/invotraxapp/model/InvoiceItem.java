@@ -19,6 +19,15 @@ public class InvoiceItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Az alábbi mezők azért kellenek, hogy a számla kiállításának pillanatában érvényes állapotot le tudjam tárolni
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "warranty_period_months_at_sale")
+    private Integer warrantyPeriodMonthsAtSale;
+    ///////////
+
+
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;

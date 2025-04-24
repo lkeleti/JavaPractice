@@ -17,6 +17,21 @@ public class InvoiceDto {
     private Long id;
     private Long sellerId;
     private Long buyerId;
+
+    private String sellerName;
+    private String sellerTaxNumber;
+    private String sellerAddress;
+    private String sellerHeadOfficeAddress;
+    private String sellerDefaultBranchAddress;
+    private String sellerCompanyRegNumber;
+    private String sellerBankDetails;
+    private String sellerIban;
+    private String buyerName;
+    private String buyerTaxNumber;
+    private String buyerAddress;
+    private String invoiceTypeName;
+    private String paymentMethodName;
+
     private LocalDate issuedAt;
     private LocalDate fulfillmentAt;
     private LocalDate dueDate;

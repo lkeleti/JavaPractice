@@ -84,10 +84,25 @@ public class InvoiceService {
         invoice.setNetTotal(createInvoiceCommand.getNetTotal());
         invoice.setGrossTotal(createInvoiceCommand.getGrossTotal());
         invoice.setInvoiceNumber(generateInvoiceNumber(createInvoiceCommand.getInvoiceTypeId()));
+        invoice.setSellerName(seller.getPartner().getName());
+        invoice.setSellerAddress(seller.getDefaultBranchAddress());
+        invoice.setSellerTaxNumber(seller.getPartner().getTaxNumber());
+        invoice.setSellerHeadOfficeAddress(seller.getHeadOfficeAddress());
+        invoice.setSellerDefaultBranchAddress(seller.getDefaultBranchAddress());
+        invoice.setSellerCompanyRegNumber(seller.getCompanyRegistrationNumber());
+        invoice.setSellerBankDetails(seller.getPartner().getBankName() + ", " + seller.getPartner().getBankNumber());
+        invoice.setSellerIban(seller.getPartner().getIban());
+        invoice.setBuyerName(buyer.getName());
+        String buyerAddress = formatAddress(buyer, zipCodeBuyer);
+        invoice.setBuyerAddress(buyerAddress);
+        invoice.setBuyerTaxNumber(buyer.getTaxNumber());
+        invoice.setInvoiceTypeName(invoiceType.getName());
+        invoice.setPaymentMethodName(paymentMethod.getName());
+
         invoice.setItems(getInvoiceItems(createInvoiceCommand));
 
         String pdfPassword = UUID.randomUUID().toString().replace("-", "");
-        invoicePdf = pdfInvoiceGeneratorService.generateInvoicePdf(invoice, zipCodeSeller, zipCodeBuyer, pdfPassword);
+        invoicePdf = pdfInvoiceGeneratorService.generateInvoicePdf(invoice, pdfPassword);
 
         String fileName = invoice.getInvoiceNumber() + ".pdf";
         saveInvoicePdfToFile(fileName, invoicePdf);
@@ -116,6 +131,8 @@ public class InvoiceService {
 
                     InvoiceItem item = new InvoiceItem();
                     item.setProduct(product);
+                    item.setProductName(product.getName());
+                    item.setWarrantyPeriodMonthsAtSale(product.getWarrantyPeriodMonths());
                     item.setQuantity(itemDto.getQuantity());
                     item.setUnit(itemDto.getUnit());
                     item.setUnitPrice(itemDto.getUnitPrice());
@@ -171,5 +188,17 @@ public class InvoiceService {
         }
         byte[] decryptedPdf = pdfInvoiceGeneratorService.decryptPdfToMemory(encryptedPdf, invoice.getPdfPassword());
         return Base64.getEncoder().encodeToString(decryptedPdf);
+    }
+
+    private String formatAddress(Partner partner, ZipCode zipCode) {
+        return zipCode.getZip() + " " + zipCode.getCity() + "\n" +
+                partner.getStreetName() + " " +
+                partner.getStreetType() + " " +
+                partner.getHouseNumber() + " " +
+                partner.getBuilding() + " " +
+                partner.getStaircase() + " " +
+                partner.getFloor() + " " +
+                partner.getDoor() + " " +
+                partner.getLandRegistryNumber() + " ";
     }
 }
