@@ -29,15 +29,15 @@ public class Inventory {
     private LocalDate receivedAt;
 
     @Column(name = "invoice_number")
-    private String invoiceNUmber;
+    private String invoiceNumber;
 
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL)
     private List<InventoryItem> items;
 
-    public Inventory(Partner supplier, LocalDate receivedAt, String invoiceNUmber) {
+    public Inventory(Partner supplier, LocalDate receivedAt, String invoiceNumber) {
         this.supplier = supplier;
         this.receivedAt = receivedAt;
-        this.invoiceNUmber = invoiceNUmber;
+        this.invoiceNumber = invoiceNumber;
         this.items = new ArrayList<>();
     }
 }

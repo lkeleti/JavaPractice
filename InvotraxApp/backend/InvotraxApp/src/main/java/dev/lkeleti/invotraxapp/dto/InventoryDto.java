@@ -16,6 +16,6 @@ public class InventoryDto {
     private Long id;
     private Long supplierId;
     private LocalDate receivedAt;
-    private String invoiceNUmber;
+    private String invoiceNumber;
     private List<InventoryItemDto> items;
 }

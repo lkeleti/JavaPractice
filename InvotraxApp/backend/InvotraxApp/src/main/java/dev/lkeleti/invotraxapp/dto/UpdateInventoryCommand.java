@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,4 +16,5 @@ public class UpdateInventoryCommand {
     private Long supplierId;
     private LocalDate receivedAt;
     private String invoiceNUmber;
+    private List<UpdateInventoryItemCommand> updateInventoryItemCommands;
 }

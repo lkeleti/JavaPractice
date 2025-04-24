@@ -3,7 +3,6 @@ package dev.lkeleti.invotraxapp.controller;
 import dev.lkeleti.invotraxapp.dto.InventoryDto;
 import dev.lkeleti.invotraxapp.dto.UpdateInventoryCommand;
 import dev.lkeleti.invotraxapp.dto.CreateInventoryCommand;
-import dev.lkeleti.invotraxapp.repository.InventoryRepository;
 import dev.lkeleti.invotraxapp.service.InventoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Tag(name = "Műveletek a bevételezéssel")
 public class InventoryController {
-    private InventoryRepository inventoryRepository;
     private InventoryService inventoryService;
 
     @GetMapping
