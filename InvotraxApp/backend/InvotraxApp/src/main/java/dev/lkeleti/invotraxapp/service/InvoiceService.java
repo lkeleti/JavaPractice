@@ -73,9 +73,6 @@ public class InvoiceService {
         PaymentMethod paymentMethod = paymentMethodRepository.findById(createInvoiceCommand.getPaymentMethodId())
                 .orElseThrow(() -> new EntityNotFoundException("Payment method not found"));
 
-        ZipCode zipCodeSeller = zipCodeRepository.findById(createInvoiceCommand.getSellerId())
-                .orElseThrow(() -> new EntityNotFoundException("Seller zip code not found"));
-
         ZipCode zipCodeBuyer = zipCodeRepository.findById(createInvoiceCommand.getBuyerId())
                 .orElseThrow(() -> new EntityNotFoundException("Buyer zip code not found"));
 
