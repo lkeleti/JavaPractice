@@ -1,14 +1,13 @@
 package dev.lkeleti.invotraxapp.service;
 
 import dev.lkeleti.invotraxapp.dto.*;
-import dev.lkeleti.invotraxapp.model.Inventory;
-import dev.lkeleti.invotraxapp.model.InventoryItem;
-import dev.lkeleti.invotraxapp.model.Partner;
-import dev.lkeleti.invotraxapp.model.Product;
+import dev.lkeleti.invotraxapp.model.*;
 import dev.lkeleti.invotraxapp.repository.InventoryRepository;
 import dev.lkeleti.invotraxapp.repository.PartnerRepository;
 import dev.lkeleti.invotraxapp.repository.ProductRepository;
+import dev.lkeleti.invotraxapp.repository.SerialNumberRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -16,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -27,6 +23,7 @@ public class InventoryService {
     private InventoryRepository inventoryRepository;
     private PartnerRepository partnerRepository;
     private ProductRepository productRepository;
+    private SerialNumberRepository serialNumberRepository;
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
@@ -51,6 +48,8 @@ public class InventoryService {
                 createInventoryCommand.getReceivedAt(),
                 createInventoryCommand.getInvoiceNUmber()
         );
+
+        List<SerialNumber> serialsToSave = new ArrayList<>();
 
         if (createInventoryCommand.getCreateInventoryItemCommands() != null) {
             for (CreateInventoryItemCommand itemCommand : createInventoryCommand.getCreateInventoryItemCommands()) {
@@ -79,11 +78,48 @@ public class InventoryService {
                 product.setGrossSellingPrice(itemCommand.getGrossSellingPrice());
                 product.setWarrantyPeriodMonths(itemCommand.getWarrantyPeriodMonths());
 
+                if (product.isSerialNumberRequired()) {
+                    if (itemCommand.getSerialNumbers() == null || itemCommand.getSerialNumbers().isEmpty()) {
+                        throw new ValidationException("Serial numbers are required for product: " + product.getName() + " (ID: " + product.getId() + ")");
+                    }
+                    if (itemCommand.getSerialNumbers().size() != itemCommand.getQuantity()) {
+                        throw new ValidationException("Number of serial numbers (" + itemCommand.getSerialNumbers().size() +
+                                ") does not match quantity (" + itemCommand.getQuantity() + ") for product: " + product.getName());
+                    }
+
+                    Set<String> uniqueSerials = new HashSet<>(itemCommand.getSerialNumbers());
+                    if (uniqueSerials.size() != itemCommand.getSerialNumbers().size()) {
+                        throw new ValidationException("Duplicate serial numbers provided for product: " + product.getName());
+                    }
+
+                    for (String serialStr : itemCommand.getSerialNumbers()) {
+                        if (serialNumberRepository.existsBySerial(serialStr)) {
+                            throw new ValidationException("Serial number already exists: " + serialStr);
+                        }
+                    }
+
+                    for (String serialStr : itemCommand.getSerialNumbers()) {
+                        SerialNumber newSerial = new SerialNumber();
+                        newSerial.setSerial(serialStr);
+                        newSerial.setProduct(product);
+                        newSerial.setInventoryItem(newItem);
+                        newSerial.setUsed(false);
+                        serialsToSave.add(newSerial);
+                    }
+                } else {
+                    if (itemCommand.getSerialNumbers() != null && !itemCommand.getSerialNumbers().isEmpty()) {
+                        throw new ValidationException("Serial numbers provided for product that does not require them: " + product.getName());
+                    }
+                }
+
                 productRepository.save(product);
                 inventory.getItems().add(newItem);
             }
         }
         Inventory savedInventory = inventoryRepository.save(inventory);
+        if (!serialsToSave.isEmpty()) {
+            serialNumberRepository.saveAll(serialsToSave);
+        }
         return modelMapper.map(savedInventory, InventoryDto.class);
     }
 
@@ -104,10 +140,23 @@ public class InventoryService {
         inventory.setReceivedAt(updateInventoryCommand.getReceivedAt());
 
         Map<Long, Integer> stockAdjustments = new HashMap<>();
+        List<SerialNumber> serialsToDelete = new ArrayList<>();
+        List<SerialNumber> serialsToSave = new ArrayList<>(); // Új gyáriszámok gyűjtése
+
         for (InventoryItem oldItem : oldItems) {
             Product product = oldItem.getProduct();
             if (product.getProductType().isManagesStock()) {
                 stockAdjustments.put(product.getId(), stockAdjustments.getOrDefault(product.getId(), 0) - oldItem.getQuantity());
+            }
+            if (product.isSerialNumberRequired()) {
+                List<SerialNumber> oldSerials = serialNumberRepository.findByInventoryItemId(oldItem.getId());
+                for (SerialNumber sn : oldSerials) {
+                    if (sn.isUsed()) {
+                        throw new ValidationException("Cannot update inventory. Serial number " + sn.getSerial() +
+                                " linked to item ID " + oldItem.getId() + " is already marked as used (sold).");
+                    }
+                    serialsToDelete.add(sn);
+                }
             }
         }
 
@@ -115,8 +164,32 @@ public class InventoryService {
             for (UpdateInventoryItemCommand newItemCommand : updateInventoryCommand.getUpdateInventoryItemCommands()) {
                 Product product = productRepository.findById(newItemCommand.getProductId())
                         .orElseThrow(() -> new EntityNotFoundException("Cannot find Product with id: " + newItemCommand.getProductId()));
+
                 if (product.getProductType().isManagesStock()) {
                     stockAdjustments.put(product.getId(), stockAdjustments.getOrDefault(product.getId(), 0) + newItemCommand.getQuantity());
+                }
+
+                if (product.isSerialNumberRequired()) {
+                    if (newItemCommand.getSerialNumbers() == null || newItemCommand.getSerialNumbers().isEmpty()) {
+                        throw new ValidationException("Serial numbers required for product: " + product.getName());
+                    }
+                    if (newItemCommand.getSerialNumbers().size() != newItemCommand.getQuantity()) {
+                        throw new ValidationException("Serial number count mismatch for product: " + product.getName());
+                    }
+                    Set<String> uniqueSerials = new HashSet<>(newItemCommand.getSerialNumbers());
+                    if (uniqueSerials.size() != newItemCommand.getSerialNumbers().size()) {
+                        throw new ValidationException("Duplicate serial numbers provided for product: " + product.getName());
+                    }
+                    // TODO: Optimalizált DB ellenőrzés az összes új gyáriszámra egyszerre!
+                    for (String serialStr : newItemCommand.getSerialNumbers()) {
+                        if (serialNumberRepository.existsBySerial(serialStr)) {
+                            throw new ValidationException("Serial number already exists: " + serialStr);
+                        }
+                    }
+                } else {
+                    if (newItemCommand.getSerialNumbers() != null && !newItemCommand.getSerialNumbers().isEmpty()) {
+                        throw new ValidationException("Serial numbers provided for product that does not require them: " + product.getName());
+                    }
                 }
             }
         }
@@ -124,14 +197,10 @@ public class InventoryService {
         for (Map.Entry<Long, Integer> entry : stockAdjustments.entrySet()) {
             Long productId = entry.getKey();
             Integer adjustment = entry.getValue();
-
             if (adjustment != 0) {
-                Product product = productRepository.findById(productId)
-                        .orElseThrow(() -> new EntityNotFoundException("Cannot find Product with id: " + productId + " for stock adjustment")); // Hiba, ha közben törlődött
-
+                Product product = productRepository.findById(productId).orElseThrow(/*...*/);
                 int currentStock = product.getStockQuantity();
                 int newStock = currentStock + adjustment;
-
                 if (newStock < 0) {
                     throw new IllegalStateException("Stock update for product ID " + productId + " [" + product.getName() + "] results in negative quantity (" + newStock + ")");
                 }
@@ -140,12 +209,15 @@ public class InventoryService {
             }
         }
 
+        if (!serialsToDelete.isEmpty()) {
+            serialNumberRepository.deleteAll(serialsToDelete);
+        }
+
         inventory.getItems().clear();
 
         if (updateInventoryCommand.getUpdateInventoryItemCommands() != null) {
             for (UpdateInventoryItemCommand newItemCommand : updateInventoryCommand.getUpdateInventoryItemCommands()) {
-                Product product = productRepository.findById(newItemCommand.getProductId())
-                        .orElseThrow(() -> new EntityNotFoundException("Cannot find Product with id: " + newItemCommand.getProductId()));
+                Product product = productRepository.findById(newItemCommand.getProductId()).orElseThrow(/*...*/);
 
                 InventoryItem newItem = new InventoryItem();
                 newItem.setInventory(inventory);
@@ -165,10 +237,23 @@ public class InventoryService {
                 productRepository.save(product);
 
                 inventory.getItems().add(newItem);
+                if (product.isSerialNumberRequired()) {
+                    for (String serialStr : newItemCommand.getSerialNumbers()) {
+                        SerialNumber newSerial = new SerialNumber();
+                        newSerial.setSerial(serialStr);
+                        newSerial.setProduct(product);
+                        newSerial.setInventoryItem(newItem);
+                        newSerial.setUsed(false);
+                        serialsToSave.add(newSerial);
+                    }
+                }
             }
         }
 
         Inventory savedInventory = inventoryRepository.save(inventory);
+        if (!serialsToSave.isEmpty()) {
+            serialNumberRepository.saveAll(serialsToSave);
+        }
         return modelMapper.map(savedInventory, InventoryDto.class);
     }
 

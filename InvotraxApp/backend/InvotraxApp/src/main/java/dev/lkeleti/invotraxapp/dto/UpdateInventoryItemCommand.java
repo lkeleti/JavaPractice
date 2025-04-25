@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +19,5 @@ public class UpdateInventoryItemCommand {
     private BigDecimal netSellingPrice;
     private BigDecimal grossSellingPrice;
     private Integer warrantyPeriodMonths;
+    private List<String> serialNumbers;
 }

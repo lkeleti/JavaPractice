@@ -6,23 +6,19 @@ Ez a dokumentum összegyűjti a projekt aktuális állapotát és a még hátral
 
 ## 1. 🔁 CRUD műveletek (hiányzó entitásokhoz)
 
-- [ ] InventoryItem CRUD (DTO + Controller + Service)
-- [ ] InvoiceItem CRUD (DTO + Controller + Service)
+- [x] InventoryItem CRUD (DTO + Controller + Service)
 - [x] InvoiceNumberSequence kezelés (Admin CRUD vagy csak Service szint)
 - [x] InvoiceType CRUD (kód + megjelenített név)
 - [x] PaymentMethod CRUD
 - [x] ProductType CRUD (kód + név + készletkezelést végző flag)
 - [x] SerialNumber kezelés (csak olvasás vagy admin CRUD?)
-- [ ] Partner Entity changed
-- [ ] Invoice Entity changed
-- [ ] Invoice Item Entity changed
-
+- 
 ---
 
 ## 2. 📦 Üzleti logika / folyamatok
 
 - [ ] Eladás (számlázás) → készlet csökkentés (ProductType alapján)
-- [ ] Bevételezés → készlet növelés
+- [x] Bevételezés → készlet növelés
 - [ ] SerialNumber kezelés: kötelező kitölteni, ha be van állítva
 - [ ] SerialNumber `used` státusz kezelése eladásnál/stornónál
 - [ ] Stornózás (Invoice és készlet visszaállítása)
