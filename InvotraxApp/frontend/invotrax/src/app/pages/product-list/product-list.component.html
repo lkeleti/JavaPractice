@@ -1,0 +1,38 @@
+<h2>Termékek</h2>
+<a routerLink="/master-data/products/new" class="btn btn-primary mb-3">Új Termék</a>
+
+<table class="table table-striped table-hover" *ngIf="products$ | async as products; else loading">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Név</th>
+            <th>Cikkszám (SKU)</th>
+            <th>Típus</th>
+            <th>Készlet</th>
+            <th>Nettó Eladási Ár</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let product of products">
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.sku }}</td>
+            <td>{{ product.productType.name }}</td>
+            <td>{{ product.stockQuantity }}</td>
+            <td>{{ product.netSellingPrice.toNumber() | currency:'HUF':'Ft':'1.0-0' }}</td>
+            <td>
+                <a [routerLink]="['/master-data/products/edit', product.id]"
+                    class="btn btn-sm btn-outline-secondary me-1">Szerkesztés</a>
+                <button (click)="deleteProduct(product.id)" class="btn btn-sm btn-outline-danger">Törlés</button>
+            </td>
+        </tr>
+        <tr *ngIf="products.length === 0">
+            <td colspan="7" class="text-center">Nincsenek termékek.</td>
+        </tr>
+    </tbody>
+</table>
+
+<ng-template #loading>
+    <p>Adatok betöltése...</p>
+</ng-template>

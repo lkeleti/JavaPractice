@@ -23,4 +23,17 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumber, Long
 
     List<SerialNumber> findAllByUsedTrue();
     List<SerialNumber> findAllByUsedFalse();
+    boolean existsBySerial(String serial);
+
+    List<SerialNumber> findByInventoryItemId(Long inventoryItemId);
+
+    // Példa: Gyáriszám keresése a string alapján (ha kell a teljes entitás)
+    // Optional<SerialNumber> findBySerial(String serial);
+
+    // Példa: Teljes információ lekérdezése (a Service-ben használtad) - JPQL lehet szükséges a joinok miatt
+    // @Query("SELECT sn FROM SerialNumber sn LEFT JOIN FETCH sn.product LEFT JOIN FETCH sn.inventoryItem inv LEFT JOIN FETCH inv.inventory LEFT JOIN FETCH sn.invoiceItem invc LEFT JOIN FETCH invc.invoice WHERE sn.serial = :serial")
+    // Optional<SerialNumber> findFullInfoBySerial(@Param("serial") String serial);
+
+    // @Query("SELECT s.serial FROM SerialNumber s WHERE s.serial IN :serials")
+    // List<String> findExistingSerials(@Param("serials") List<String> serials);
 }

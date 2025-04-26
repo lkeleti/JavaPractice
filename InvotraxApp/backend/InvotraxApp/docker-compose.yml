@@ -1,0 +1,56 @@
+services:
+  # MariaDB Adatbázis Szolgáltatás
+  db:
+    image: mariadb:latest
+    container_name: invotrax-db
+    environment:
+      # Jelszavak és adatbázis nevek - ezeket használja az adatbázis inicializáláskor
+      # Használj erős jelszavakat valós környezetben! Fejlesztéshez ez is jó.
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: invotrax
+      MARIADB_USER: invotrax
+      MARIADB_PASSWORD: invotrax
+    volumes:
+      # Adatbázis adatainak perzisztens tárolása a hoston (opcionális, de ajánlott)
+      # Így az adatok megmaradnak a konténer újraindítása után is.
+      - mariadb_data:/var/lib/mysql
+    ports:
+      # Opcionális: Ha a host gépről is el akarod érni az adatbázist (pl. DBeaverrel)
+      # A host 3307-es portját köti a konténer 3306-os portjára.
+      - "3307:3306"
+    healthcheck:
+      # Ellenőrzi, hogy az adatbázis készen áll-e (az app indítása előtt hasznos)
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost", "-uinvotrax", "-pinvotrax" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Alkalmazás Szolgáltatás
+  app:
+    container_name: invotrax-app
+    # Az image-et a projekt gyökerében lévő Dockerfile alapján építi meg
+    build: .
+    ports:
+      # A host 8080-as portját köti a konténer 8080-as portjára
+      - "8080:8080"
+    environment:
+      # Felülírjuk az application.properties beállításait, hogy a konténeren belüli
+      # 'db' nevű szolgáltatásra mutasson az adatbázis kapcsolat.
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/invotrax?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: invotrax
+      SPRING_DATASOURCE_PASSWORD: invotrax
+      # Fontos, hogy a Flyway itt is fusson le az app indulásakor!
+      SPRING_FLYWAY_ENABLED: false
+      # A séma validálása vagy semmi (Flyway kezeli)
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      # Ezzel a host ./invoices mappáját a konténer /app/invoices útvonalára mountolod
+      - ./invoices:/app/invoices
+    depends_on:
+      db:
+        # Megvárja, amíg a 'db' szolgáltatás "healthy" állapotú lesz
+        condition: service_healthy
+
+# Docker kötet definíciója az adatbázis adatokhoz
+volumes:
+  mariadb_data:

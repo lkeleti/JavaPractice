@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" routerLink="/">InvotraxApp</a> <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" aria-current="page"
+                        routerLink="/invoicing">Számlázás</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" routerLink="/inventory-receipts">Bevételezés</a>
+                </li>
+                <li class="nav-item dropdown" ngbDropdown>
+                    <a class="nav-link dropdown-toggle" id="masterDataDropdown" role="button" ngbDropdownToggle
+                        aria-expanded="false" (click)="$event.preventDefault()">
+                        Törzsadatok
+                    </a>
+                    <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="masterDataDropdown">
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/products">Termékek</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/partners">Partnerek</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/categories">Kategóriák</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/manufacturers">Gyártók</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active" routerLink="/master-data/vat-rates">ÁFA
+                                Kulcsok</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/product-types">Termék Típusok</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/invoice-types">Számla Típusok</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/payment-methods">Fizetési Módok</a></li>
+                        <li><a class="dropdown-item" routerLinkActive="active"
+                                routerLink="/master-data/zip-codes">Irányítószámok</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" routerLink="/queries">Lekérdezések</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
