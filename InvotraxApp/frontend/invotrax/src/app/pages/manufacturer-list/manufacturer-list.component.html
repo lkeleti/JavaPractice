@@ -2,9 +2,8 @@
 
 <div class="row mb-3">
     <div class="col-md-6">
-        <input type="text" class="form-control" placeholder="Keresés név vagy weboldal szerint..."
-            [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)">
-
+        <input type="text" class="form-control" placeholder="Keresés név szerint..." [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchTermChange()">
     </div>
     <div class="col-md-6 text-md-end">
         <a routerLink="/master-data/manufacturers/new" class="btn btn-primary">Új gyártó</a>
@@ -21,35 +20,53 @@
     </div>
 </div>
 
-<table *ngIf="!isLoading && !errorMessage" class="table table-striped table-hover mt-3">
+<table *ngIf="!isLoading && !errorMessage && manufacturers.length > 0" class="table table-striped table-hover mt-3">
     <thead>
         <tr>
-            <th>Megnevezés</th>
-            <th>Weboldal</th>
+            <th (click)="changeSort('name')" style="cursor:pointer">
+                Megnevezés
+                <span *ngIf="currentSortField === 'name'">
+                    {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+                </span>
+            </th>
+            <th (click)="changeSort('website')" style="cursor:pointer">
+                Weboldal
+                <span *ngIf="currentSortField === 'website'">
+                    {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+                </span>
+            </th>
             <th>Műveletek</th>
         </tr>
     </thead>
     <tbody>
-        <ng-container *ngIf="manufacturers.length > 0; else noManufacturers">
-            <tr
-                *ngFor="let manufacturer of manufacturers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }">
-                <td>{{ manufacturer.name }}</td>
-                <td>
-                    <a *ngIf="manufacturer.website" [href]="manufacturer.website" target="_blank"
-                        rel="noopener noreferrer">{{ manufacturer.website }}</a>
-                </td>
-                <td>
-                    <a class="btn btn-sm btn-warning me-1"
-                        [routerLink]="['/master-data/manufacturers/edit', manufacturer.id]">Szerkesztés</a>
-                    <button class="btn btn-sm btn-danger me-1"
-                        (click)="openDeleteConfirmation(manufacturer)">Törlés</button>
-                </td>
-            </tr>
-        </ng-container>
-        <ng-template #noManufacturers>
-            <tr *ngIf="manufacturers.length === 0 && !isLoading">
-                <td colspan="3" class="text-center">Nincsenek még gyártók rögzítve.</td>
-            </tr>
-        </ng-template>
+        <tr *ngFor="let manufacturer of manufacturers">
+            <td>{{ manufacturer.name }}</td>
+            <td>
+                <a *ngIf="manufacturer.website" [href]="manufacturer.website" target="_blank"
+                    rel="noopener noreferrer">{{ manufacturer.website }}</a>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-warning me-1"
+                    [routerLink]="['/master-data/manufacturers/edit', manufacturer.id]">Szerkesztés</a>
+                <button class="btn btn-sm btn-danger me-1"
+                    (click)="openDeleteConfirmation(manufacturer)">Törlés</button>
+            </td>
+        </tr>
     </tbody>
 </table>
+
+<div *ngIf="manufacturers.length === 0 && !isLoading">
+    <p class="text-center">Nincsenek még gyártók rögzítve.</p>
+</div>
+
+<div *ngIf="totalItems > itemsPerPage" class="d-flex justify-content-between align-items-center mt-3">
+    <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">
+        Előző
+    </button>
+
+    <span>Oldal: {{ currentPage }} / {{ totalPages }}</span>
+
+    <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        Következő
+    </button>
+</div>

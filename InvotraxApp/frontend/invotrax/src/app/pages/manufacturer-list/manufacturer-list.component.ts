@@ -6,9 +6,6 @@ import { Component, OnInit } from '@angular/core';
 import { ManufacturerDto } from '../../models/manufacturer.dto';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { CommonModule } from '@angular/common';
-import { NgxPaginationModule } from 'ngx-pagination'; // <-- Import NgxPaginationModule
-import { Subject } from 'rxjs'; // <-- Import Subject
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'; // <-- Import operators
 import { PaginatedManufacturersResponse } from '../../models/paginated-response.dto';
 
 @Component({
@@ -16,8 +13,7 @@ import { PaginatedManufacturersResponse } from '../../models/paginated-response.
   imports: [
     FormsModule,
     RouterModule,
-    CommonModule,
-    NgxPaginationModule
+    CommonModule
   ],
   templateUrl: './manufacturer-list.component.html',
   styleUrl: './manufacturer-list.component.scss'
@@ -27,12 +23,12 @@ export class ManufacturerListComponent implements OnInit {
   errorMessage: string | null = null;
 
   manufacturers: ManufacturerDto[] = [];
-  totalItems: number = 0;
-  currentPage: number = 1;
-  itemsPerPage: number = 10;
-  searchTerm: string = '';
-  sort: string = '';
-  private searchSubject = new Subject<string>();
+  totalItems = 0;
+  currentPage = 1;
+  itemsPerPage = 10;
+  searchTerm = '';
+  currentSortField = 'name'; // alapértelmezett mező
+  sortDirection = 'asc'; // alapértelmezett irány
 
   constructor(
     private manufacturerService: ManufacturerService,
@@ -42,52 +38,73 @@ export class ManufacturerListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadManufacturers();
-    this.searchSubject.pipe(
-      debounceTime(500), // Wait for 500ms pause in events
-      distinctUntilChanged(), // Only emit if value changed
-      // No need for switchMap here if loadManufacturers handles the search term
-      // switchMap(term => this.manufacturerService.getManufacturers(1, this.itemsPerPage, term))
-    ).subscribe(term => {
-      // Reset to first page on new search
-      this.currentPage = 1;
-      this.loadManufacturers(); // Reload data with the new search term
-    });
-  }
-
-  // Method to trigger search subject update
-  onSearchTermChange(term: string): void {
-    this.searchSubject.next(term);
   }
 
   loadManufacturers(): void {
     this.isLoading = true;
     this.errorMessage = null;
 
+    const sortParam = `${this.currentSortField},${this.sortDirection}`;
+
     this.manufacturerService.getManufacturers(
       this.currentPage,
       this.itemsPerPage,
-      this.searchTerm // Pass the current search term
-      // Add sorting parameter if needed: this.currentSort
+      this.searchTerm,
+      sortParam
     ).subscribe({
       next: (response: PaginatedManufacturersResponse) => {
-        this.manufacturers = response.content; // Get items for the current page
-        this.totalItems = response.totalElements; // Get total count for pagination controls
-        // this.currentPage = response.number + 1; // Sync page number if needed (careful with loops)
+        this.manufacturers = response.content;
+        this.totalItems = response.page.totalElements;
+        this.itemsPerPage = response.page.size;
+        this.currentPage = response.page.number + 1;
         this.isLoading = false;
+        console.log(this.totalItems + " " + this.itemsPerPage);
+        console.log(response);
       },
       error: (err) => {
         console.error('Error fetching manufacturers:', err);
-        const defaultMsg = 'Nem sikerült betölteni a gyártókat. Kérem próbálja meg később.';
-        this.errorMessage = err.error?.message || err.message || defaultMsg;
+        this.errorMessage = err.error?.message || err.message || 'Hiba a gyártók betöltésekor';
         this.isLoading = false;
       }
     });
   }
 
-  // Called by the pagination controls component
-  pageChanged(event: number): void {
-    this.currentPage = event;
+  pageChanged(newPage: number): void {
+    this.currentPage = newPage;
     this.loadManufacturers();
+  }
+
+  onSearchTermChange(): void {
+    this.currentPage = 1;
+    this.loadManufacturers();
+  }
+
+  changeSort(field: string): void {
+    if (this.currentSortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.currentSortField = field;
+      this.sortDirection = 'asc';
+    }
+    this.loadManufacturers();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadManufacturers();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadManufacturers();
+    }
   }
 
   openDeleteConfirmation(manufacturer: ManufacturerDto): void {
