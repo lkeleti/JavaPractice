@@ -4,7 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 @SpringBootApplication
 public class InvotraxAppApplication {
 
@@ -16,12 +18,5 @@ public class InvotraxAppApplication {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
-	/*
-	TODO InventorItem CRUD
-	TODO InvoiceItem CRUD
-	TODO InvoiceNumberSequence CRUD
-	TODO InvoiceType CRUD
-	TODO ProductType CRUD
-	TODO SerialNumber CRUD
-	 */
+
 }
