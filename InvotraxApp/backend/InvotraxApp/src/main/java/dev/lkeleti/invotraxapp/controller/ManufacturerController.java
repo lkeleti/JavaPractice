@@ -10,10 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/manufacturers")
@@ -26,11 +27,11 @@ public class ManufacturerController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Összes gyártó listázása",
-            description = "Visszaadja az összes regisztrált gyártó listáját.")
+    @Operation(summary = "Gyártók listázása oldalakban (paging)",
+            description = "Visszaadja az összes gyártót oldalakban, page/size paraméterezéssel.")
     @ApiResponse(responseCode = "200", description = "Gyártók sikeresen listázva")
-    public List<ManufacturerDto> getAllManufacturers() {
-        return manufacturerService.getAllManufacturers();
+    public Page<ManufacturerDto> getAllManufacturers(Pageable pageable, @RequestParam(required = false) String searchTerm) {
+        return manufacturerService.getAllManufacturers(pageable, searchTerm);
     }
 
     @GetMapping("/{id}")
