@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ManufacturerDto } from '../models/manufacturer.dto';
+import { PaginatedManufacturersResponse } from '../models/paginated-response.dto'; // Import the new interface
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -12,11 +13,31 @@ export class ManufacturerService {
   constructor(private http: HttpClient) { }
 
   /**
- * Lekérdezi az összes authort a backend API-ról.
- * @returns Observable, ami AuthorDto tömböt fog kibocsátani.
+ * Lekérdezi az összes gyártót a backend API-ról.
+ * @returns Observable, ami ManufacturerDto tömböt fog kibocsátani.
  */
-  getManufacturers(): Observable<ManufacturerDto[]> {
-    return this.http.get<ManufacturerDto[]>(`${this.apiUrl}/manufacturers`);
+  getManufacturers(
+    page: number,       // Page number (ngx-pagination uses 1-based, Spring uses 0-based)
+    size: number,       // Items per page
+    searchTerm?: string, // Optional search term
+    sort?: string        // Optional sort parameter (e.g., 'name,asc')
+  ): Observable<PaginatedManufacturersResponse> {
+
+    // Adjust page number for Spring Boot (0-based index)
+    const zeroBasedPage = page - 1;
+
+    let params = new HttpParams()
+      .set('page', zeroBasedPage.toString())
+      .set('size', size.toString());
+
+    if (searchTerm) {
+      params = params.set('searchTerm', searchTerm); // Use the param name expected by backend
+    }
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+
+    return this.http.get<PaginatedManufacturersResponse>(`${this.apiUrl}/manufacturers`, { params });
   }
 
   findManufacturerById(id: number): Observable<ManufacturerDto> {

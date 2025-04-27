@@ -1,0 +1,15 @@
+services:
+  db: # (marad minden, amit eddig írtál)
+
+  app: # (marad minden, amit eddig írtál)
+
+  frontend:
+    container_name: invotrax-frontend
+    build:
+      context: ./frontend # vagy ahol az Angular projekted van
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80" # A helyi 4200-es portra kötjük az Nginx 80-as portját
+    depends_on:
+      - app
+    restart: unless-stopped

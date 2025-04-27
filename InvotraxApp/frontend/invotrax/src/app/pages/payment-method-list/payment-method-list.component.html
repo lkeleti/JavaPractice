@@ -1,0 +1,45 @@
+<h1>Fizetési módok</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Keresés név szerint..." [(ngModel)]="searchTerm">
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a routerLink="/master-data/payment-methods/new" class="btn btn-primary">Új fizetési mód</a>
+    </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<table *ngIf="!isLoading && !errorMessage" class="table table-striped table-hover mt-3">
+    <thead>
+        <tr>
+            <th>Megnevezés</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="paymentMethods.length > 0; else noPaymentMethods">
+            <tr *ngFor="let paymentMethod of paymentMethods">
+                <td>{{ paymentMethod.name }}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning me-1"
+                        [routerLink]="['/payment-method/new', paymentMethod.id, 'edit']">Szerkesztés</button>
+                </td>
+            </tr>
+        </ng-container>
+        <ng-template #noPaymentMethods>
+            <tr>
+                <td colspan="4" class="text-center">Nem találok fizetési módot.</td>
+            </tr>
+        </ng-template>
+    </tbody>
+</table>

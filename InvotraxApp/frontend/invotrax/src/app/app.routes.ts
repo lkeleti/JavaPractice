@@ -3,12 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { InvoicingComponent } from './pages/invoicing/invoicing.component';
 import { InventoryReceiptListComponent } from './pages/inventory-receipt-list/inventory-receipt-list.component';
 import { InventoryReceiptFormComponent } from './pages/inventory-receipt-form/inventory-receipt-form.component';
-import { MasterDataShellComponent } from './pages/master-data-shell/master-data-shell.component';
 import { ProductListComponent } from './pages/product-list/product-list.component';
 import { PartnerListComponent } from './pages/partner-list/partner-list.component';
 import { QueryPageComponent } from './pages/query-page/query-page.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { ManufacturerListComponent } from './pages/manufacturer-list/manufacturer-list.component';
+import { ManufacturerFormComponent } from './pages/manufacturer-form/manufacturer-form.component';
+import { PaymentMethodListComponent } from './pages/payment-method-list/payment-method-list.component';
 
 export const routes: Routes = [
     // Alapértelmezett átirányítás a számlázásra
@@ -25,6 +26,9 @@ export const routes: Routes = [
             { path: 'products', component: ProductListComponent, title: 'Termékek' },
             { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
             { path: 'manufacturers', component: ManufacturerListComponent, title: 'Gyártók' },
+            { path: 'manufacturers/new', component: ManufacturerFormComponent, title: 'Új gyártó' },
+            { path: 'payment-methods', component: PaymentMethodListComponent, title: 'Gyártók' },
+            //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },
             // ... további törzsadat route-ok (categories, manufacturers, stb.)
         ]
     },

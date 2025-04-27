@@ -3,10 +3,11 @@
 <div class="row mb-3">
     <div class="col-md-6">
         <input type="text" class="form-control" placeholder="Keresés név vagy weboldal szerint..."
-            [(ngModel)]="searchTerm">
+            [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange($event)">
+
     </div>
     <div class="col-md-6 text-md-end">
-        <a routerLink="/manufacturers/new" class="btn btn-primary">Új gyártó</a>
+        <a routerLink="/master-data/manufacturers/new" class="btn btn-primary">Új gyártó</a>
     </div>
 </div>
 
@@ -30,20 +31,24 @@
     </thead>
     <tbody>
         <ng-container *ngIf="manufacturers.length > 0; else noManufacturers">
-            <tr *ngFor="let manufacturer of filteredManufacturers">
+            <tr
+                *ngFor="let manufacturer of manufacturers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage, totalItems: totalItems }">
                 <td>{{ manufacturer.name }}</td>
-                <td>{{ manufacturer.website }}</td>
                 <td>
-                    <button class="btn btn-sm btn-warning me-1"
-                        [routerLink]="['/manufacturers', manufacturer.id, 'edit']">Edit</button>
+                    <a *ngIf="manufacturer.website" [href]="manufacturer.website" target="_blank"
+                        rel="noopener noreferrer">{{ manufacturer.website }}</a>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-warning me-1"
+                        [routerLink]="['/master-data/manufacturers/edit', manufacturer.id]">Szerkesztés</a>
                     <button class="btn btn-sm btn-danger me-1"
-                        (click)="openDeleteConfirmation(manufacturer)">Delete</button>
+                        (click)="openDeleteConfirmation(manufacturer)">Törlés</button>
                 </td>
             </tr>
         </ng-container>
         <ng-template #noManufacturers>
-            <tr>
-                <td colspan="4" class="text-center">Nem találok gyártót.</td>
+            <tr *ngIf="manufacturers.length === 0 && !isLoading">
+                <td colspan="3" class="text-center">Nincsenek még gyártók rögzítve.</td>
             </tr>
         </ng-template>
     </tbody>
