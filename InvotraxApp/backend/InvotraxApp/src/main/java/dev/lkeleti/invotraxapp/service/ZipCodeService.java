@@ -33,7 +33,7 @@ public class ZipCodeService {
         if (searchTerm == null || searchTerm.isBlank()) {
             zipCode = zipCodeRepository.findAll(pageable);
         } else {
-            zipCode = zipCodeRepository.findByZipContainingIgnoreCaseOrCityContainingIgnoreCase(searchTerm, pageable);
+            zipCode = zipCodeRepository.searchByZipOrCity(searchTerm, pageable);
         }
 
         return zipCode.map(ZipCode -> modelMapper.map(zipCode, ZipCodeDto.class));

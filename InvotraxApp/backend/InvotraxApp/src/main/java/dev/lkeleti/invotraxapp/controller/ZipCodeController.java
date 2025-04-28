@@ -26,14 +26,14 @@ import java.util.List;
 public class ZipCodeController {
     private ZipCodeService zipCodeService;
 
-    @GetMapping
+/*    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Összes irányítószám listázása",
             description = "Visszaadja az összes irányítószám listáját még a törölteket is.")
     @ApiResponse(responseCode = "200", description = "Irányítószám sikeresen listázva")
     public List<ZipCodeDto> getAllZipCodes() {
         return zipCodeService.getAllZipCodes();
-    }
+    }*/
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
