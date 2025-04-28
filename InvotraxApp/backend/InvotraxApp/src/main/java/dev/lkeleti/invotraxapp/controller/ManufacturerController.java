@@ -28,7 +28,7 @@ public class ManufacturerController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Gyártók listázása oldalakban (paging)",
-            description = "Visszaadja az összes gyártót oldalakban, page/size paraméterezéssel.")
+            description = "Visszaadja az összes gyártót oldalakban, page/size paraméterezéssel és névre történő kereséssel/szűkítéssel.")
     @ApiResponse(responseCode = "200", description = "Gyártók sikeresen listázva")
     public Page<ManufacturerDto> getAllManufacturers(Pageable pageable, @RequestParam(required = false) String searchTerm) {
         return manufacturerService.getAllManufacturers(pageable, searchTerm);

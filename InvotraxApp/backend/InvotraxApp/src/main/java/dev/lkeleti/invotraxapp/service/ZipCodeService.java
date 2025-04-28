@@ -9,6 +9,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,17 @@ public class ZipCodeService {
         Type targetListType = new TypeToken<List<ZipCodeDto>>(){}.getType();
         return modelMapper.map(zipCodeRepository.findAll(), targetListType);
     }
+    public Page<ZipCodeDto> getAllZipCodes(Pageable pageable, String searchTerm) {
+        Page<ZipCode> zipCodes;
+        if (searchTerm == null || searchTerm.isBlank()) {
+            zipCodes = zipCodeRepository.findAll(pageable);
+        } else {
+            zipCodes = zipCodeRepository.searchByZipOrCity(searchTerm, pageable);
+        }
+
+        return zipCodes.map(zipCode -> modelMapper.map(zipCode, ZipCodeDto.class));
+    }
+
 
     @Transactional(readOnly = true)
     public List<ZipCodeDto> getAllActiveZipCodes() {

@@ -1,6 +1,7 @@
 package dev.lkeleti.invotraxapp.controller;
 
 import dev.lkeleti.invotraxapp.dto.CreateZipCodeCommand;
+import dev.lkeleti.invotraxapp.dto.ManufacturerDto;
 import dev.lkeleti.invotraxapp.dto.UpdateZipCodeCommand;
 import dev.lkeleti.invotraxapp.dto.ZipCodeDto;
 import dev.lkeleti.invotraxapp.service.ZipCodeService;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +26,22 @@ import java.util.List;
 public class ZipCodeController {
     private ZipCodeService zipCodeService;
 
-    @GetMapping
+/*    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Összes irányítószám listázása",
             description = "Visszaadja az összes irányítószám listáját még a törölteket is.")
     @ApiResponse(responseCode = "200", description = "Irányítószám sikeresen listázva")
     public List<ZipCodeDto> getAllZipCodes() {
         return zipCodeService.getAllZipCodes();
+    }*/
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Összes irányítószám listázása oldalakban (paging)",
+            description = "Visszaadja az összes irányítószám listáját még a törölteket is oldalakban, page/size paraméterezéssel és irányítószámra, vagy városra történő kereséssel/szűkítéssel.")
+    @ApiResponse(responseCode = "200", description = "Irányítószám sikeresen listázva")
+    public Page<ZipCodeDto> getAllZipCodes(Pageable pageable, @RequestParam(required = false) String searchTerm) {
+        return zipCodeService.getAllZipCodes(pageable, searchTerm);
     }
 
     @GetMapping("/active")
