@@ -29,14 +29,14 @@ public class ZipCodeService {
         return modelMapper.map(zipCodeRepository.findAll(), targetListType);
     }
     public Page<ZipCodeDto> getAllZipCodes(Pageable pageable, String searchTerm) {
-        Page<ZipCode> zipCode;
+        Page<ZipCode> zipCodes;
         if (searchTerm == null || searchTerm.isBlank()) {
-            zipCode = zipCodeRepository.findAll(pageable);
+            zipCodes = zipCodeRepository.findAll(pageable);
         } else {
-            zipCode = zipCodeRepository.searchByZipOrCity(searchTerm, pageable);
+            zipCodes = zipCodeRepository.searchByZipOrCity(searchTerm, pageable);
         }
 
-        return zipCode.map(ZipCode -> modelMapper.map(zipCode, ZipCodeDto.class));
+        return zipCodes.map(zipCode -> modelMapper.map(zipCode, ZipCodeDto.class));
     }
 
 
