@@ -7,13 +7,15 @@ import { ManufacturerDto } from '../../models/manufacturer.dto';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { CommonModule } from '@angular/common';
 import { PaginatedManufacturersResponse } from '../../models/paginated-response.dto';
+import { PaginationControlsComponent } from '../../shared/pagination-controls/pagination-controls.component';
 
 @Component({
   selector: 'app-manufacturer-list',
   imports: [
     FormsModule,
     RouterModule,
-    CommonModule
+    CommonModule,
+    PaginationControlsComponent
   ],
   templateUrl: './manufacturer-list.component.html',
   styleUrl: './manufacturer-list.component.scss'
@@ -94,31 +96,14 @@ export class ManufacturerListComponent implements OnInit {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
 
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onItemsPerPageChange(event: any): void {
+  onItemsPerPageChange(newItemsPerPage: number): void {
+    this.itemsPerPage = newItemsPerPage;
     this.currentPage = 1;
     this.loadManufacturers();
   }
 
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadManufacturers();
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.loadManufacturers();
-    }
-  }
-
-  goToPage(page: number): void {
-    if (page !== this.currentPage) {
+  goToPage(page: number | string): void {
+    if (typeof page === 'number' && page !== this.currentPage) {
       this.currentPage = page;
       this.loadManufacturers();
     }

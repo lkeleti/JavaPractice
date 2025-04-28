@@ -1,0 +1,46 @@
+<div class="container-fluid my-3">
+    <div class="row align-items-center mb-2">
+        <div class="col-md-6 mb-2 mb-md-0">
+            <div class="d-flex align-items-center">
+                <label for="itemsPerPageSelect" class="me-2 fw-bold mb-0">Elemek oldalanként:</label>
+                <select id="itemsPerPageSelect" class="form-select form-select-sm w-auto" [ngModel]="itemsPerPage"
+                    (ngModelChange)="onItemsPerPageChange($event)">
+                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6 text-md-end">
+            <small class="fw-bold">
+                Oldal:
+                <span class="badge bg-primary">{{ currentPage }}</span> /
+                <span class="badge bg-secondary">{{ totalPages }}</span>
+            </small>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <ul class="pagination mb-0 flex-wrap">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link" (click)="previousPage()">Előző</button>
+                </li>
+
+                <ng-container *ngFor="let page of pages">
+                    <li class="page-item" *ngIf="page !== '...'; else dots" [class.active]="page === currentPage">
+                        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                    </li>
+                    <ng-template #dots>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    </ng-template>
+                </ng-container>
+
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link" (click)="nextPage()">Következő</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,8 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { ManufacturerListComponent } from './pages/manufacturer-list/manufacturer-list.component';
 import { ManufacturerFormComponent } from './pages/manufacturer-form/manufacturer-form.component';
 import { PaymentMethodListComponent } from './pages/payment-method-list/payment-method-list.component';
+import { ZipCodeListComponent } from './pages/zip-code-list/zip-code-list.component';
+import { ZipCodeFormComponent } from './pages/zip-code-form/zip-code-form.component';
 
 export const routes: Routes = [
     // Alapértelmezett átirányítás a számlázásra
@@ -27,6 +29,8 @@ export const routes: Routes = [
             { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
             { path: 'manufacturers', component: ManufacturerListComponent, title: 'Gyártók' },
             { path: 'manufacturers/new', component: ManufacturerFormComponent, title: 'Új gyártó' },
+            { path: 'zip-codes', component: ZipCodeListComponent, title: 'Irányítószámok' },
+            { path: 'zip-codes/new', component: ZipCodeFormComponent, title: 'Új irányítószám' },
             { path: 'payment-methods', component: PaymentMethodListComponent, title: 'Gyártók' },
             //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },
             // ... további törzsadat route-ok (categories, manufacturers, stb.)

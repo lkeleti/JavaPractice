@@ -1,4 +1,5 @@
 import { ManufacturerDto } from "./manufacturer.dto";
+import { ZipCodeDto } from "./zip-code.dto";
 
 export interface Page<T> {
     content: T[];
@@ -12,4 +13,5 @@ export interface Page<T> {
 
 // Specific type for Manufacturers
 export type PaginatedManufacturersResponse = Page<ManufacturerDto>;
+export type PaginatedZipCodesResponse = Page<ZipCodeDto>;
 
