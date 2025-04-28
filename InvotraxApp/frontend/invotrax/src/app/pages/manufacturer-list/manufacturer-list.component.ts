@@ -25,7 +25,8 @@ export class ManufacturerListComponent implements OnInit {
   manufacturers: ManufacturerDto[] = [];
   totalItems = 0;
   currentPage = 1;
-  itemsPerPage = 10;
+  pageSizeOptions: number[] = [10, 25, 50, 100];
+  itemsPerPage: number = 10;
   searchTerm = '';
   currentSortField = 'name'; // alapértelmezett mező
   sortDirection = 'asc'; // alapértelmezett irány
@@ -93,6 +94,15 @@ export class ManufacturerListComponent implements OnInit {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  onItemsPerPageChange(event: any): void {
+    this.currentPage = 1;
+    this.loadManufacturers();
+  }
+
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
@@ -103,6 +113,13 @@ export class ManufacturerListComponent implements OnInit {
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.loadManufacturers();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page !== this.currentPage) {
+      this.currentPage = page;
       this.loadManufacturers();
     }
   }

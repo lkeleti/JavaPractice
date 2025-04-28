@@ -59,14 +59,49 @@
     <p class="text-center">Nincsenek még gyártók rögzítve.</p>
 </div>
 
-<div *ngIf="totalItems > itemsPerPage" class="d-flex justify-content-between align-items-center mt-3">
-    <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">
-        Előző
-    </button>
+<div class="container-fluid my-3">
+    <div class="row align-items-center mb-2">
+        <div class="col-md-6 mb-2 mb-md-0">
+            <div class="d-flex align-items-center">
+                <label for="itemsPerPageSelect" class="me-2 fw-bold mb-0">Elemek oldalanként:</label>
+                <select id="itemsPerPageSelect" class="form-select form-select-sm w-auto" [(ngModel)]="itemsPerPage"
+                    (change)="onItemsPerPageChange($event)">
+                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+            </div>
+        </div>
 
-    <span>Oldal: {{ currentPage }} / {{ totalPages }}</span>
+        <div class="col-md-6 text-md-end">
+            <small class="fw-bold">
+                Oldal:
+                <span class="badge bg-primary">{{ currentPage }}</span> /
+                <span class="badge bg-secondary">{{ totalPages }}</span>
+            </small>
+        </div>
+    </div>
 
-    <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">
-        Következő
-    </button>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <ul class="pagination mb-0 flex-wrap">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Előző</button>
+                </li>
+
+                <ng-container *ngFor="let page of pages">
+                    <li class="page-item" [class.active]="page === currentPage">
+                        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                    </li>
+                </ng-container>
+
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link" (click)="nextPage()"
+                        [disabled]="currentPage === totalPages">Következő</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-2">
+    <small>Oldal: {{ currentPage }} / {{ totalPages }}</small>
 </div>
