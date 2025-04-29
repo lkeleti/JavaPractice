@@ -16,6 +16,7 @@ public class PartnerDto {
     private Long id;
     private String name;
     private ZipCodeDto zipCode;
+    private String streetName;
     private String streetType;
     private String houseNumber;
     private String building;

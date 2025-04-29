@@ -1,1 +1,75 @@
-<p>partner-list works!</p>
+<h1>Partnerek</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Keresés név, vagy adószám szerint..."
+            [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()">
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a routerLink="/master-data/partners/new" class="btn btn-primary">Új partner</a>
+    </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="scrollable-table">
+    <table *ngIf="!isLoading && !errorMessage && partners.length > 0" class="table table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th (click)="changeSort('name')" style="cursor:pointer">
+                    Név
+                    <span *ngIf="currentSortField === 'name'">
+                        {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+                    </span>
+                </th>
+                <th>Cím</th>
+                <th (click)="changeSort('taxnumber')" style="cursor:pointer">
+                    Adószám
+                    <span *ngIf="currentSortField === 'taxNumber'">
+                        {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+                    </span>
+                </th>
+                <th>Törölt</th>
+                <th>Műveletek</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let partner of partners">
+                <td>{{ partner.name }}</td>
+                <td>{{ getPartnerAddress(partner) }}</td>
+                <td>{{ partner.taxNumber }}</td>
+                <td>
+                    <span class="badge" [ngClass]="partner.deleted ? 'bg-danger' : 'bg-success'">
+                        {{ partner.deleted ? 'Törölt' : 'Aktív' }}
+                    </span>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-warning me-1"
+                        [routerLink]="['/master-data/partners/edit', partner.id]">Szerkesztés</a>
+                    <button class="btn btn-sm btn-danger me-1" [disabled]="partner.deleted"
+                        (click)="openDeleteConfirmation(partner)">Törlés</button>
+                    <button class="btn btn-sm btn-success me-1" [disabled]="!partner.deleted"
+                        (click)="openUnDeleteConfirmation(partner)">Törlés
+                        visszavonása</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div *ngIf="partners.length === 0 && !isLoading">
+    <p class="text-center">Nincsenek még partnerek rögzítve.</p>
+</div>
+
+<app-pagination-controls [currentPage]="currentPage" [totalPages]="totalPages" [itemsPerPage]="itemsPerPage"
+    [pageSizeOptions]="pageSizeOptions" (pageChange)="goToPage($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+</app-pagination-controls>
