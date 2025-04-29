@@ -14,6 +14,8 @@ import { PaymentMethodListComponent } from './pages/payment-method-list/payment-
 import { ZipCodeListComponent } from './pages/zip-code-list/zip-code-list.component';
 import { ZipCodeFormComponent } from './pages/zip-code-form/zip-code-form.component';
 import { InvoiceTypeFromComponent } from './pages/invoice-type-from/invoice-type-from.component';
+import { VatRateListComponent } from './pages/vat-rate-list/vat-rate-list.component';
+import { VatRateFormComponent } from './pages/vat-rate-form/vat-rate-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -74,6 +76,16 @@ export const routes: Routes = [
         path: 'invoice-types/new',
         component: InvoiceTypeFromComponent,
         title: 'Új számla típus',
+      },
+      {
+        path: 'vat-rates',
+        component: VatRateListComponent,
+        title: 'Áfa kódok',
+      },
+      {
+        path: 'vat-rates/new',
+        component: VatRateFormComponent,
+        title: 'Új Áfa kód',
       },
       {
         path: 'payment-methods',
