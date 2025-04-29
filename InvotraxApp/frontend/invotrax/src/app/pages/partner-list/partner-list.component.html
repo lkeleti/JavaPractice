@@ -31,7 +31,7 @@
                     </span>
                 </th>
                 <th>Cím</th>
-                <th (click)="changeSort('taxnumber')" style="cursor:pointer">
+                <th (click)="changeSort('taxNumber')" style="cursor:pointer">
                     Adószám
                     <span *ngIf="currentSortField === 'taxNumber'">
                         {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
