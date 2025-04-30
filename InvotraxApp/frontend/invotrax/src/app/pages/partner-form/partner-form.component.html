@@ -1,1 +1,110 @@
-<p>partner-form works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Név *</label>
+        <input class="form-control" formControlName="name">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Irányítószám *</label>
+        <select class="form-select" formControlName="zipCode">
+            <option *ngFor="let zip of zipCodes" [ngValue]="zip">{{ zip.zip }} - {{ zip.city }}</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" formControlName="isPrivate" id="isPrivate">
+            <label class="form-check-label" for="isPrivate">Magánszemély</label>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Adószám</label>
+        <input class="form-control" formControlName="taxNumber">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Email</label>
+        <input class="form-control" formControlName="email">
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Telefonszám</label>
+        <input class="form-control" formControlName="phoneNumber">
+    </div>
+
+    <fieldset class="border p-2">
+        <legend class="float-none w-auto px-3">Cím</legend>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Helyrajzi szám</label>
+                <input class="form-control" formControlName="landRegistryNumber">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Utca</label>
+                <input class="form-control" formControlName="streetName">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Utcatípus</label>
+                <input class="form-control" formControlName="streetType">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Házszám</label>
+                <input class="form-control" formControlName="houseNumber">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Épület</label>
+                <input class="form-control" formControlName="building">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Lépcsőház</label>
+                <input class="form-control" formControlName="staircase">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Ajtó</label>
+                <input class="form-control" formControlName="door">
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="border p-2 mt-3">
+        <legend class="float-none w-auto px-3">Bankszámla</legend>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Bank neve</label>
+                <input class="form-control" formControlName="bankName">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Bankszámlaszám</label>
+                <input class="form-control" formControlName="bankNumber">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">IBAN</label>
+                <input class="form-control" formControlName="iban">
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="col-md-3">
+        <label class="form-label">Fizetési határidő (nap)</label>
+        <input type="number" class="form-control" formControlName="defaultPaymentDeadline">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Egyenleg</label>
+        <input type="number" class="form-control" formControlName="balance">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Preferált fizetési mód</label>
+        <input class="form-control" formControlName="preferredPaymentMethod">
+    </div>
+
+    <div class="col-12 text-end">
+        <button class="btn btn-primary" type="submit">Mentés</button>
+    </div>
+</form>

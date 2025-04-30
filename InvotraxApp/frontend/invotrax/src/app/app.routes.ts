@@ -16,6 +16,7 @@ import { ZipCodeFormComponent } from './pages/zip-code-form/zip-code-form.compon
 import { InvoiceTypeFromComponent } from './pages/invoice-type-from/invoice-type-from.component';
 import { VatRateListComponent } from './pages/vat-rate-list/vat-rate-list.component';
 import { VatRateFormComponent } from './pages/vat-rate-form/vat-rate-form.component';
+import { PartnerFormComponent } from './pages/partner-form/partner-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -47,6 +48,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'products', pathMatch: 'full' }, // Alapértelmezett törzsadat
       { path: 'products', component: ProductListComponent, title: 'Termékek' },
       { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
+      { path: 'partners/new', component: PartnerFormComponent, title: 'Új partnerek' },
       {
         path: 'manufacturers',
         component: ManufacturerListComponent,
@@ -105,4 +107,4 @@ export const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
