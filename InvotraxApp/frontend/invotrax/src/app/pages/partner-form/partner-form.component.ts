@@ -5,6 +5,7 @@ import {
   Output,
   OnInit,
   OnDestroy,
+  HostListener,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -20,6 +21,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ZipCodeService } from '../../services/zip-code.service';
 import { EntityLookupModalComponent } from '../../shared/entity-lookup-modal/entity-lookup-modal.component';
 import { map } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PartnerService } from '../../services/partner.service';
+import { CreatePartnerCommand } from '../../models/create-partner.command';
+import { UpdatePartnerCommand } from '../../models/update-partner.command';
 
 
 @Component({
@@ -30,20 +35,37 @@ import { map } from 'rxjs/operators';
   imports: [ReactiveFormsModule, CommonModule, FormsModule],
 })
 export class PartnerFormComponent implements OnInit, OnDestroy {
-  @Input() initialPartner?: PartnerDto;
   @Input() zipCodes: ZipCodeDto[] = [];
   @Output() formSubmit = new EventEmitter<PartnerDto>();
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
+  isEditMode = false;
+  partnerId?: number;
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
     private modalService: NgbModal,
+    private partnerService: PartnerService,
     private zipCodeService: ZipCodeService
   ) { }
 
   ngOnInit(): void {
+    this.createForm();
+
+    this.route.paramMap.subscribe((params) => {
+      const idParam = params.get('id');
+      if (idParam) {
+        this.isEditMode = true;
+        this.partnerId = +idParam;
+        this.loadPartner(this.partnerId);
+      }
+    });
+  }
+
+  createForm() {
     this.form = this.fb.group({
       name: ['', Validators.required],
       zipCode: [null, Validators.required],
@@ -67,14 +89,13 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
       balance: [0],
     });
 
-    if (this.initialPartner) {
-      this.form.patchValue(this.initialPartner);
-    }
-
+    this.setupValidation();
+  }
+  setupValidation() {
     this.form.get('isPrivate')?.valueChanges.subscribe((value) => {
       const tax = this.form.get('taxNumber');
       const bankFields = ['bankName', 'bankNumber', 'iban'];
-      if (value === true) {
+      if (value) {
         tax?.setValidators([Validators.required]);
         bankFields.forEach((field) => this.form.get(field)?.clearValidators());
       } else {
@@ -106,16 +127,54 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadPartner(id: number): void {
+    this.partnerService.findPartnerById(id).subscribe({
+      next: (partner) => this.form.patchValue(partner),
+      error: () => alert('Nem sikerült betölteni a partner adatokat.')
+    });
+  }
+
+
+
   submit(): void {
-    if (this.form.valid) {
-      this.formSubmit.emit(this.form.value);
-    } else {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.form.value;
+
+    const createCommand: CreatePartnerCommand = {
+      ...formValue,
+      zipCodeId: formValue.zipCode?.id,
+      deleted: false, // vagy formValue.deleted ha szükséges
+      createdAt: this.isEditMode ? formValue.createdAt : new Date(),
+    };
+
+    const updateCommand: UpdatePartnerCommand = {
+      ...formValue,
+      zipCodeId: formValue.zipCode?.id,
+      deleted: false, // vagy formValue.deleted ha szükséges
+      createdAt: this.isEditMode ? formValue.createdAt : new Date(),
+    };
+
+    const data: PartnerDto = this.form.value;
+    if (this.isEditMode && this.partnerId) {
+      console.log(this.form.patchValue(updateCommand));
+      this.partnerService.updatePartner(this.partnerId, updateCommand).subscribe({
+        next: () => this.router.navigate(['/master-data/partners']),
+        error: () => alert('Nem sikerült frissíteni a partnert.')
+      });
+    } else {
+      this.partnerService.createPartner(createCommand).subscribe({
+        next: () => this.router.navigate(['/master-data/partners']),
+        error: () => alert('Nem sikerült létrehozni a partnert.')
+      });
     }
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.router.navigate(['/master-data/partners']);
   }
 
   openEntityLookupModal(): void {
@@ -144,5 +203,28 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
       })
       .catch(() => { });
   }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent): void {
+    const isModalOpen = document.body.classList.contains('modal-open');
+
+    if (event.key === 'Escape' && !isModalOpen) {
+      event.preventDefault();
+      this.onCancel();
+    }
+  }
+
+  @HostListener('keydown.enter', ['$event'])
+  handleEnterToNext(event: KeyboardEvent): void {
+    const formElements = Array.from(document.querySelectorAll<HTMLElement>('input, select, textarea, button'))
+      .filter(el => !el.hasAttribute('disabled') && el.tabIndex >= 0);
+
+    const currentIndex = formElements.indexOf(document.activeElement as HTMLElement);
+    if (currentIndex > -1 && currentIndex < formElements.length - 1) {
+      event.preventDefault();
+      formElements[currentIndex + 1].focus();
+    }
+  }
+
   ngOnDestroy(): void { }
 }

@@ -1,126 +1,147 @@
-<form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
+<div class="paper-form container mt-4 p-4 shadow  rounded border">
+  <h3 class="mb-4">
+    {{ isEditMode ? 'Partner szerkesztése' : 'Új partner rögzítése' }}
+  </h3>
 
-  <!-- Név -->
-  <div class="col-12">
-    <label class="form-label">Név *</label>
-    <input class="form-control" formControlName="name">
-  </div>
-
-  <!-- Irányítószám (lookup) -->
-  <div class="col-12">
-    <label class="form-label">Irányítószám *</label>
-    <div class="input-group">
-      <input class="form-control"
-        [value]="form.value.zipCode ? form.value.zipCode.zip + ' ' + form.value.zipCode.city : ''" readonly
-        placeholder="Kattints a kereséshez" />
-      <button class="btn btn-outline-secondary" type="button" (click)="openEntityLookupModal()">
-        Keresés
-      </button>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <!-- Név -->
+    <div class="mb-3">
+      <label class="form-label">Név *</label>
+      <input class="form-control" formControlName="name"
+        [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched" />
+      <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
+        A név megadása kötelező.
+      </div>
     </div>
-  </div>
 
-  <!-- Magánszemély -->
-  <div class="col-12 form-check">
-    <input class="form-check-input" type="checkbox" formControlName="isPrivate" id="isPrivate">
-    <label class="form-check-label" for="isPrivate">Magánszemély</label>
-  </div>
+    <fieldset class="border p-3 mt-3">
+      <legend class="w-auto px-2">Cím</legend>
+      <!-- Irányítószám keresés -->
+      <div class="mb-3">
+        <label class="form-label">Irányítószám *</label>
+        <div class="input-group">
+          <input class="form-control"
+            [value]="form.value.zipCode ? form.value.zipCode.zip + ' ' + form.value.zipCode.city : ''" readonly>
+          <button class="btn btn-outline-secondary" type="button" (click)="openEntityLookupModal()">Keresés</button>
+        </div>
+      </div>
 
-  <!-- Adószám -->
-  <div class="col-12">
-    <label class="form-label">Adószám</label>
-    <input class="form-control" formControlName="taxNumber">
-  </div>
+      <!-- Cím mezők -->
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Utca</label>
+          <input class="form-control" formControlName="streetName">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Utcatípus</label>
+          <input class="form-control" formControlName="streetType">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Házszám</label>
+          <input class="form-control" formControlName="houseNumber">
+        </div>
 
-  <!-- Email -->
-  <div class="col-12">
-    <label class="form-label">Email</label>
-    <input class="form-control" formControlName="email">
-  </div>
+        <div class="col-md-3">
+          <label class="form-label">Épület</label>
+          <input class="form-control" formControlName="building">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Lépcsőház</label>
+          <input class="form-control" formControlName="staircase">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Emelet</label>
+          <input class="form-control" formControlName="floor">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Ajtó</label>
+          <input class="form-control" formControlName="door">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Helyrajzi szám</label>
+          <input class="form-control" formControlName="landRegistryNumber">
+        </div>
+      </div>
+    </fieldset>
 
-  <!-- Telefonszám -->
-  <div class="col-12">
-    <label class="form-label">Telefonszám</label>
-    <input class="form-control" formControlName="phoneNumber">
-  </div>
+    <fieldset class="border p-3 mt-3">
+      <legend class="w-auto px-2">Kapcsolattartási adatok</legend>
+      <div class="row g-3">
+        <!-- Email -->
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input class="form-control" formControlName="email"
+            [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
+          <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">
+            Nem megfelelő email formátum.
+          </div>
+        </div>
 
-  <!-- Cím adatok -->
-  <fieldset class="border p-3 mt-3">
-    <legend class="w-auto px-2">Cím</legend>
+        <!-- Telefonszám -->
+        <div class="col-md-6">
+          <label class="form-label">Telefonszám</label>
+          <input class="form-control" formControlName="phoneNumber">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Magánszemély -->
+    <div class="form-check form-switch my-3">
+      <input type="checkbox" class="form-check-input" id="isPrivate" formControlName="isPrivate" />
+      <label class="form-check-label" for="isPrivate">Magánszemély</label>
+    </div>
 
     <div class="row g-3">
+      <!-- Adószám -->
+      <div class="col-md-4">
+        <label class="form-label">Adószám</label>
+        <input class="form-control" formControlName="taxNumber">
+      </div>
+
+      <!-- Preferált fizetési mód -->
+      <div class="col-md-4">
+        <label class="form-label">Preferált fizetési mód</label>
+        <input class="form-control" formControlName="preferredPaymentMethod">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Fizetési határidő (nap)</label>
+        <input type="number" class="form-control" formControlName="defaultPaymentDeadline">
+      </div>
+
+    </div>
+
+    <!-- Bankszámla mezők -->
+    <fieldset class="border p-3 mt-3">
+      <legend class="w-auto px-2">Bankszámla</legend>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Bank neve</label>
+          <input class="form-control" formControlName="bankName">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Bankszámlaszám</label>
+          <input class="form-control" formControlName="bankNumber">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">IBAN</label>
+          <input class="form-control" formControlName="iban">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Egyéb mezők -->
+    <div class="row g-3 mt-3">
       <div class="col-md-6">
-        <label class="form-label">Helyrajzi szám</label>
-        <input class="form-control" formControlName="landRegistryNumber">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Utca</label>
-        <input class="form-control" formControlName="streetName">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Utcatípus</label>
-        <input class="form-control" formControlName="streetType">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Házszám</label>
-        <input class="form-control" formControlName="houseNumber">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Épület</label>
-        <input class="form-control" formControlName="building">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Lépcsőház</label>
-        <input class="form-control" formControlName="staircase">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Emelet</label>
-        <input class="form-control" formControlName="floor">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Ajtó</label>
-        <input class="form-control" formControlName="door">
+        <label class="form-label">Egyenleg</label>
+        <input type="number" class="form-control" formControlName="balance">
       </div>
     </div>
-  </fieldset>
 
-  <!-- Bankszámla -->
-  <fieldset class="border p-3 mt-3">
-    <legend class="w-auto px-2">Bankszámla</legend>
-    <div class="row g-3">
-      <div class="col-md-4">
-        <label class="form-label">Bank neve</label>
-        <input class="form-control" formControlName="bankName">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Bankszámlaszám</label>
-        <input class="form-control" formControlName="bankNumber">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">IBAN</label>
-        <input class="form-control" formControlName="iban">
-      </div>
+    <!-- Műveleti gombok -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Mégsem</button>
+      <button type="submit" class="btn btn-primary">Mentés</button>
     </div>
-  </fieldset>
-
-  <!-- Egyéb mezők -->
-  <div class="col-md-6">
-    <label class="form-label">Fizetési határidő (nap)</label>
-    <input type="number" class="form-control" formControlName="defaultPaymentDeadline">
-  </div>
-
-  <div class="col-md-6">
-    <label class="form-label">Egyenleg</label>
-    <input type="number" class="form-control" formControlName="balance">
-  </div>
-
-  <div class="col-12">
-    <label class="form-label">Preferált fizetési mód</label>
-    <input class="form-control" formControlName="preferredPaymentMethod">
-  </div>
-
-  <!-- Műveleti gombok -->
-  <div class="col-12 text-end mt-3">
-    <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Mégsem</button>
-    <button class="btn btn-primary" type="submit">Mentés</button>
-  </div>
-</form>
+  </form>
+</div>

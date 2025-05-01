@@ -50,6 +50,10 @@ export const routes: Routes = [
       { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
       { path: 'partners/new', component: PartnerFormComponent, title: 'Új partnerek' },
       {
+        path: 'partners/edit/:id', component: PartnerFormComponent,
+        title: 'Partner szerkesztése',
+      },
+      {
         path: 'manufacturers',
         component: ManufacturerListComponent,
         title: 'Gyártók',

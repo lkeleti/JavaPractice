@@ -4,6 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { PartnerDto } from '../models/partner.dto';
 import { Observable } from 'rxjs';
 import { PaginatedPartnersResponse } from '../models/paginated-response.dto';
+import { UpdatePartnerCommand } from '../models/update-partner.command';
+import { CreatePartnerCommand } from '../models/create-partner.command';
 
 @Injectable({
     providedIn: 'root',
@@ -44,15 +46,15 @@ export class PartnerService {
     findPartnerById(id: number): Observable<PartnerDto> {
         return this.http.get<PartnerDto>(`${this.apiUrl}/partners/${id}`);
     }
-    /*
-      updateAuthor(id: number, command: UpdateAuthorCommand): Observable<InvoiceTypeDto> {
-        return this.http.put<InvoiceTypeDto>(`${this.apiUrl}/authors/${id}`, command);
-      }
-    
-      createAuthor(command: CreateAuthorCommand): Observable<InvoiceTypeDto> {
-        return this.http.post<InvoiceTypeDto>(`${this.apiUrl}/authors`, command);
-      }
-    */
+
+    updatePartner(id: number, command: UpdatePartnerCommand): Observable<PartnerDto> {
+        return this.http.put<PartnerDto>(`${this.apiUrl}/partners/${id}`, command);
+    }
+
+    createPartner(command: CreatePartnerCommand): Observable<PartnerDto> {
+        return this.http.post<PartnerDto>(`${this.apiUrl}/partners`, command);
+    }
+
 
     deletePartner(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/partners/${id}`);
