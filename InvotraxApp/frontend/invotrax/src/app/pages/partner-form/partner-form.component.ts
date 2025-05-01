@@ -2,8 +2,8 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
   Output,
+  OnInit,
   OnDestroy,
 } from '@angular/core';
 import {
@@ -17,11 +17,10 @@ import { PartnerDto } from '../../models/partner.dto';
 import { ZipCodeDto } from '../../models/zip-code.dto';
 import { CommonModule } from '@angular/common';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-  EntityLookupModalComponent,
-  LookupItem,
-} from '../../shared/entity-lookup-modal/entity-lookup-modal/entity-lookup-modal.component';
 import { ZipCodeService } from '../../services/zip-code.service';
+import { EntityLookupModalComponent } from '../../shared/entity-lookup-modal/entity-lookup-modal.component';
+import { map } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-partner-form',
@@ -37,20 +36,12 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
-  zipCodeLookupItems: any;
 
   constructor(
     private fb: FormBuilder,
     private modalService: NgbModal,
     private zipCodeService: ZipCodeService
-  ) {}
-
-  keyListener = (event: KeyboardEvent): void => {
-    if (event.ctrlKey && event.key.toLowerCase() === 'h') {
-      event.preventDefault();
-      this.openZipCodeLookupModal();
-    }
-  };
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -113,8 +104,6 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
         this.form.get(field)?.updateValueAndValidity()
       );
     });
-
-    window.addEventListener('keydown', this.keyListener);
   }
 
   submit(): void {
@@ -129,36 +118,31 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     this.cancel.emit();
   }
 
-  openZipCodeLookupModal(): void {
-    this.zipCodeService.getZipCodes(1, 1000).subscribe((response) => {
-      const zipCodeLookupItems: LookupItem[] = response.content.map((zip) => ({
-        id: zip.id,
-        label: zip.zip,
-        subLabel: zip.city,
-      }));
-
-      const modalRef = this.modalService.open(EntityLookupModalComponent, {
-        size: 'lg',
-        backdrop: 'static',
-        keyboard: true,
-      });
-
-      modalRef.componentInstance.items = zipCodeLookupItems;
-      modalRef.componentInstance.title = 'Irányítószám keresés';
-
-      modalRef.componentInstance.selected.subscribe((item: LookupItem) => {
-        const selectedZip = response.content.find((z) => z.id === item.id);
-        if (selectedZip) {
-          this.form.get('zipCode')?.setValue(selectedZip);
-        }
-        modalRef.close();
-      });
-
-      modalRef.componentInstance.cancelled.subscribe(() => modalRef.dismiss());
+  openEntityLookupModal(): void {
+    const modalRef = this.modalService.open(EntityLookupModalComponent<ZipCodeDto>, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: true
     });
-  }
 
-  ngOnDestroy(): void {
-    window.removeEventListener('keydown', this.keyListener);
+    modalRef.componentInstance.title = 'Irányítószám keresés';
+    modalRef.componentInstance.fetchFunction = (page: number, size: number, search: string | undefined) =>
+      this.zipCodeService.getZipCodes(page, size, search).pipe(map(res => res.content));
+
+    modalRef.componentInstance.displayFn = (zip: ZipCodeDto) => ({
+      label: zip.zip,
+      subLabel: zip.city
+    });
+
+    modalRef.result
+      .then((selectedId: number) => {
+        if (selectedId) {
+          this.zipCodeService.findZipCodeById(selectedId).subscribe({
+            next: zip => this.form.get('zipCode')?.setValue(zip)
+          });
+        }
+      })
+      .catch(() => { });
   }
+  ngOnDestroy(): void { }
 }
