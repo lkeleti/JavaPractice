@@ -25,6 +25,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PartnerService } from '../../services/partner.service';
 import { CreatePartnerCommand } from '../../models/create-partner.command';
 import { UpdatePartnerCommand } from '../../models/update-partner.command';
+import { PaymentMethodDto } from '../../models/paymentMethod.dto';
+import { PaymentMethodService } from '../../services/payment-method.service';
 
 
 @Component({
@@ -42,6 +44,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   isEditMode = false;
   partnerId?: number;
+  paymentMethods: PaymentMethodDto[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -49,11 +52,26 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     private router: Router,
     private modalService: NgbModal,
     private partnerService: PartnerService,
-    private zipCodeService: ZipCodeService
+    private zipCodeService: ZipCodeService,
+    private paymentMethodService: PaymentMethodService
   ) { }
 
   ngOnInit(): void {
     this.createForm();
+    this.paymentMethodService.getPaymentMethods().subscribe({
+      next: (methods) => {
+        this.paymentMethods = methods;
+
+        // Ha edit módban vagyunk és a partner már be van töltve
+        if (this.isEditMode && this.form.value.preferredPaymentMethod) {
+          const matched = this.paymentMethods.find(pm => pm.id === this.form.value.preferredPaymentMethod.id);
+          if (matched) {
+            this.form.get('preferredPaymentMethod')?.setValue(matched);
+          }
+        }
+      },
+      error: () => console.error('Nem sikerült betölteni a fizetési módokat.')
+    });
 
     this.route.paramMap.subscribe((params) => {
       const idParam = params.get('id');
@@ -73,7 +91,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
       taxNumber: [''],
       email: ['', Validators.email],
       phoneNumber: [''],
-      preferredPaymentMethod: [''],
+      preferredPaymentMethod: [null, Validators.required],
       streetName: [''],
       streetType: [''],
       houseNumber: [''],
@@ -85,7 +103,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
       bankName: [''],
       bankNumber: [''],
       iban: [''],
-      defaultPaymentDeadline: [null],
+      defaultPaymentDeadline: [1],
       balance: [0],
     });
 
@@ -129,7 +147,16 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
 
   loadPartner(id: number): void {
     this.partnerService.findPartnerById(id).subscribe({
-      next: (partner) => this.form.patchValue(partner),
+      next: (partner) => {
+        this.form.patchValue(partner);
+
+        if (partner.preferredPaymentMethod && this.paymentMethods.length) {
+          const matched = this.paymentMethods.find(pm => pm.id === partner.preferredPaymentMethod.id);
+          if (matched) {
+            this.form.get('preferredPaymentMethod')?.setValue(matched);
+          }
+        }
+      },
       error: () => alert('Nem sikerült betölteni a partner adatokat.')
     });
   }
@@ -147,6 +174,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     const createCommand: CreatePartnerCommand = {
       ...formValue,
       zipCodeId: formValue.zipCode?.id,
+      preferredPaymentMethodId: formValue.preferredPaymentMethod.id,
       deleted: false, // vagy formValue.deleted ha szükséges
       createdAt: this.isEditMode ? formValue.createdAt : new Date(),
     };
@@ -154,6 +182,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     const updateCommand: UpdatePartnerCommand = {
       ...formValue,
       zipCodeId: formValue.zipCode?.id,
+      preferredPaymentMethodId: formValue.preferredPaymentMethod?.id ?? null,
       deleted: false, // vagy formValue.deleted ha szükséges
       createdAt: this.isEditMode ? formValue.createdAt : new Date(),
     };

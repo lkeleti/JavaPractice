@@ -1,3 +1,4 @@
+import { PaymentMethodDto } from "./paymentMethod.dto";
 import { ZipCodeDto } from "./zip-code.dto";
 
 export interface PartnerDto {
@@ -18,7 +19,7 @@ export interface PartnerDto {
     taxNumber: string;
     email: string;
     phoneNumber: string;
-    preferredPaymentMethod: string;
+    preferredPaymentMethod: PaymentMethodDto;
     createdAt: Date;
     balance: number;
     defaultPaymentDeadline: number;

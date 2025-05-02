@@ -100,8 +100,17 @@
 
       <!-- Preferált fizetési mód -->
       <div class="col-md-4">
-        <label class="form-label">Preferált fizetési mód</label>
-        <input class="form-control" formControlName="preferredPaymentMethod">
+        <label class="form-label">Fizetési mód *</label>
+        <select class="form-select" formControlName="preferredPaymentMethod"
+          [class.is-invalid]="form.get('preferredPaymentMethod')?.invalid && form.get('preferredPaymentMethod')?.touched">
+          <option [ngValue]="null" disabled>-- Válassz fizetési módot --</option>
+          <option *ngFor="let method of paymentMethods" [ngValue]="method">
+            {{ method.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="form.get('preferredPaymentMethod')?.errors?.['required']">
+          A fizetési mód kiválasztása kötelező.
+        </div>
       </div>
 
       <div class="col-md-4">

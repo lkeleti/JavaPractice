@@ -15,7 +15,7 @@ export interface UpdatePartnerCommand {
     taxNumber: string;
     email: string;
     phoneNumber: string;
-    preferredPaymentMethod: string;
+    preferredPaymentMethodId: number;
     createdAt: Date;
     balance: number;
     defaultPaymentDeadline: number;
