@@ -3,6 +3,7 @@ package dev.lkeleti.invotraxapp.service;
 import dev.lkeleti.invotraxapp.dto.CreateSellerCompanyProfileCommand;
 import dev.lkeleti.invotraxapp.dto.SellerCompanyProfileDto;
 import dev.lkeleti.invotraxapp.dto.UpdateSellerCompanyProfileCommand;
+import dev.lkeleti.invotraxapp.exception.ResourceNotFoundException;
 import dev.lkeleti.invotraxapp.model.Partner;
 import dev.lkeleti.invotraxapp.model.SellerCompanyProfile;
 import dev.lkeleti.invotraxapp.repository.PartnerRepository;
@@ -25,7 +26,7 @@ public class SellerCompanyProfileService {
         SellerCompanyProfile profile = sellerRepository.findAll()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Nincs beállítva saját cég profil."));
+                .orElseThrow(() -> new ResourceNotFoundException("SELLER_NOT_FOUND"));
         return modelMapper.map(profile, SellerCompanyProfileDto.class);
     }
 

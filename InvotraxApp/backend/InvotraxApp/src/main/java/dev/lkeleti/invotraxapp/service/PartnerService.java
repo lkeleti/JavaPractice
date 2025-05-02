@@ -34,9 +34,9 @@ public class PartnerService {
     public Page<PartnerDto> getAllPartners(Pageable pageable, String searchTerm) {
         Page<Partner> partners;
         if (searchTerm == null || searchTerm.isBlank()) {
-            partners = partnerRepository.findAll(pageable);
+            partners = partnerRepository.findAllExcludingSeller(pageable);
         } else {
-            partners = partnerRepository.searchByNameOrTaxNumber(searchTerm, pageable);
+            partners = partnerRepository.searchByNameOrTaxNumberExcludingSeller(searchTerm, pageable);
         }
 
         return partners.map(partner -> modelMapper.map(partner, PartnerDto.class));
