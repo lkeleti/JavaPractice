@@ -56,7 +56,7 @@ public class InvoiceTypeService {
         InvoiceType invoiceType = new InvoiceType();
         invoiceType.setName(command.getName());
         invoiceType.setDeleted(command.isDeleted());
-        return modelMapper.map(invoiceType, InvoiceTypeDto.class);
+        return modelMapper.map(invoiceTypeRepository.save(invoiceType), InvoiceTypeDto.class);
     }
 
     @Transactional

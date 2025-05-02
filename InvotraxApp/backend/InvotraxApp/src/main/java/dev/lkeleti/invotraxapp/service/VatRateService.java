@@ -59,8 +59,7 @@ public class VatRateService {
         vatRate.setName(command.getName());
         vatRate.setRate(command.getRate());
         vatRate.setDeleted(false);
-        vatRateRepository.save(vatRate);
-        return modelMapper.map(vatRate,VatRateDto.class);
+        return modelMapper.map(vatRateRepository.save(vatRate),VatRateDto.class);
     }
 
     @Transactional

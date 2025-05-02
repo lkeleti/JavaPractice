@@ -45,7 +45,7 @@ public class ManufacturerService {
         manufacturer.setName(command.getName());
         manufacturer.setWebsite(command.getWebsite());
         manufacturer.setProducts(new ArrayList<>());
-        return modelMapper.map(manufacturer, ManufacturerDto.class);
+        return modelMapper.map(manufacturerRepository.save(manufacturer), ManufacturerDto.class);
     }
 
     @Transactional
