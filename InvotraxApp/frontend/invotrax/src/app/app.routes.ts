@@ -13,7 +13,7 @@ import { ManufacturerFormComponent } from './pages/manufacturer-form/manufacture
 import { PaymentMethodListComponent } from './pages/payment-method-list/payment-method-list.component';
 import { ZipCodeListComponent } from './pages/zip-code-list/zip-code-list.component';
 import { ZipCodeFormComponent } from './pages/zip-code-form/zip-code-form.component';
-import { InvoiceTypeFromComponent } from './pages/invoice-type-from/invoice-type-from.component';
+import { InvoiceTypeFormComponent } from './pages/invoice-type-form/invoice-type-form.component';
 import { VatRateListComponent } from './pages/vat-rate-list/vat-rate-list.component';
 import { VatRateFormComponent } from './pages/vat-rate-form/vat-rate-form.component';
 import { PartnerFormComponent } from './pages/partner-form/partner-form.component';
@@ -50,56 +50,21 @@ export const routes: Routes = [
       { path: 'products', component: ProductListComponent, title: 'Termékek' },
       { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
       { path: 'partners/new', component: PartnerFormComponent, title: 'Új partnerek' },
-      {
-        path: 'partners/edit/:id', component: PartnerFormComponent,
-        title: 'Partner szerkesztése',
-      },
+      { path: 'partners/edit/:id', component: PartnerFormComponent, title: 'Partner szerkesztése' },
       { path: 'seller-profile', component: PartnerFormComponent, data: { mode: 'seller' }, title: 'Eladó adatai' },
-      {
-        path: 'manufacturers',
-        component: ManufacturerListComponent,
-        title: 'Gyártók',
-      },
-      {
-        path: 'manufacturers/new',
-        component: ManufacturerFormComponent,
-        title: 'Új gyártó',
-      },
-      {
-        path: 'zip-codes',
-        component: ZipCodeListComponent,
-        title: 'Irányítószámok',
-      },
-      {
-        path: 'zip-codes/new',
-        component: ZipCodeFormComponent,
-        title: 'Új irányítószám',
-      },
-      {
-        path: 'invoice-types',
-        component: InvoiceTypeListComponent,
-        title: 'Számla típusok',
-      },
-      {
-        path: 'invoice-types/new',
-        component: InvoiceTypeFromComponent,
-        title: 'Új számla típus',
-      },
-      {
-        path: 'vat-rates',
-        component: VatRateListComponent,
-        title: 'Áfa kódok',
-      },
-      {
-        path: 'vat-rates/new',
-        component: VatRateFormComponent,
-        title: 'Új Áfa kód',
-      },
-      {
-        path: 'payment-methods',
-        component: PaymentMethodListComponent,
-        title: 'Fizetési módok',
-      },
+      { path: 'manufacturers', component: ManufacturerListComponent, title: 'Gyártók' },
+      { path: 'manufacturers/new', component: ManufacturerFormComponent, title: 'Új gyártó' },
+      { path: 'manufacturers/edit/:id', component: ManufacturerFormComponent, title: 'Gyártó szerkesztése' },
+      { path: 'zip-codes', component: ZipCodeListComponent, title: 'Irányítószámok' },
+      { path: 'zip-codes/new', component: ZipCodeFormComponent, title: 'Új irányítószám' },
+      { path: 'zip-codes/edit/:id', component: ZipCodeFormComponent, title: 'Irányítószám szerkesztése' },
+      { path: 'invoice-types', component: InvoiceTypeListComponent, title: 'Számla típusok' },
+      { path: 'invoice-types/new', component: InvoiceTypeFormComponent, title: 'Új számlatípus' },
+      { path: 'invoice-types/edit/:id', component: InvoiceTypeFormComponent, title: 'Számlatípus szerkesztése' },
+      { path: 'vat-rates', component: VatRateListComponent, title: 'Áfa kódok' },
+      { path: 'vat-rates/new', component: VatRateFormComponent, title: 'Új ÁFA kulcs' },
+      { path: 'vat-rates/edit/:id', component: VatRateFormComponent, title: 'ÁFA kulcs szerkesztése' },
+      { path: 'payment-methods', component: PaymentMethodListComponent, title: 'Fizetési módok' },
       { path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új fizetési mód' },
       { path: 'payment-methods/edit/:id', component: PaymentMethodFormComponent, title: 'Fizetési mód szerkesztése' },
       //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },

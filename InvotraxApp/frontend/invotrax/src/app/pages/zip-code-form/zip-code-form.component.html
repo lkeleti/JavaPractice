@@ -1,1 +1,33 @@
-<p>zip-code-form works!</p>
+<div class="paper-form container mt-4 p-4 shadow rounded border">
+    <h3 class="mb-4">
+        {{ isEditMode ? 'Irányítószám szerkesztése' : 'Új irányítószám rögzítése' }}
+    </h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <!-- Irányítószám -->
+        <div class="mb-3">
+            <label class="form-label">Irányítószám *</label>
+            <input class="form-control" formControlName="zip"
+                [class.is-invalid]="form.get('zip')?.invalid && form.get('zip')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('zip')?.errors?.['required']">
+                Az irányítószám megadása kötelező.
+            </div>
+        </div>
+
+        <!-- Város -->
+        <div class="mb-3">
+            <label class="form-label">Város *</label>
+            <input class="form-control" formControlName="city"
+                [class.is-invalid]="form.get('city')?.invalid && form.get('city')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('city')?.errors?.['required']">
+                A város megadása kötelező.
+            </div>
+        </div>
+
+        <!-- Műveleti gombok -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Mégsem</button>
+            <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+    </form>
+</div>

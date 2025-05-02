@@ -3,13 +3,15 @@ import { environment } from '../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { InvoiceTypeDto } from '../models/invoice-type.dto';
 import { Observable } from 'rxjs';
+import { UpdateInvoiceTypeCommand } from '../models/update-invoice-type-command';
+import { CreateInvoiceTypeCommand } from '../models/create-invoice-type-command';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InvoiceTypeService {
   private apiUrl = environment.apiUrl;
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Lekérdezi az összes számla típust a backend API-ról.
@@ -22,15 +24,15 @@ export class InvoiceTypeService {
   findInvoiceTypeById(id: number): Observable<InvoiceTypeDto> {
     return this.http.get<InvoiceTypeDto>(`${this.apiUrl}/invoice_types/${id}`);
   }
-  /*
-    updateAuthor(id: number, command: UpdateAuthorCommand): Observable<InvoiceTypeDto> {
-      return this.http.put<InvoiceTypeDto>(`${this.apiUrl}/authors/${id}`, command);
-    }
-  
-    createAuthor(command: CreateAuthorCommand): Observable<InvoiceTypeDto> {
-      return this.http.post<InvoiceTypeDto>(`${this.apiUrl}/authors`, command);
-    }
-  */
+
+  updateInvoiceType(id: number, command: UpdateInvoiceTypeCommand): Observable<InvoiceTypeDto> {
+    return this.http.put<InvoiceTypeDto>(`${this.apiUrl}/invoice_types/${id}`, command);
+  }
+
+  createInvoiceType(command: CreateInvoiceTypeCommand): Observable<InvoiceTypeDto> {
+    return this.http.post<InvoiceTypeDto>(`${this.apiUrl}/invoice_types`, command);
+  }
+
 
   deleteInvoiceType(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/invoice_types/${id}`);

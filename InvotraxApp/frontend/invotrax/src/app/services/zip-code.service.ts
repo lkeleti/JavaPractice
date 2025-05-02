@@ -4,6 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { ZipCodeDto } from '../models/zip-code.dto';
 import { PaginatedZipCodesResponse } from '../models/paginated-response.dto';
 import { Observable } from 'rxjs';
+import { UpdateZipCodeCommand } from '../models/update-zip-code-command';
+import { CreateZipCodeCommand } from '../models/create-zip-code-command';
 
 @Injectable({
     providedIn: 'root'
@@ -43,15 +45,15 @@ export class ZipCodeService {
     findZipCodeById(id: number): Observable<ZipCodeDto> {
         return this.http.get<ZipCodeDto>(`${this.apiUrl}/zipcodes/${id}`);
     }
-    /*
-      updateZipCpde(id: number, command: UpdateZipCodeCommand): Observable<ZipCodeDto> {
+
+    updateZipCode(id: number, command: UpdateZipCodeCommand): Observable<ZipCodeDto> {
         return this.http.put<ZipCodeDto>(`${this.apiUrl}/zipcodes/${id}`, command);
-      }
-    
-      createZipCode(command: CreateZipCodeCommand): Observable<ZipCodeDto> {
+    }
+
+    createZipCode(command: CreateZipCodeCommand): Observable<ZipCodeDto> {
         return this.http.post<ZipCodeDto>(`${this.apiUrl}/zipcodes`, command);
-      }
-    */
+    }
+
     deleteZipCode(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/zipcodes/${id}`);
     }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InvoiceTypeFromComponent } from './invoice-type-from.component';
+import { InvoiceTypeFromComponent } from './invoice-type-form.component';
 
 describe('InvoiceTypeFromComponent', () => {
   let component: InvoiceTypeFromComponent;
@@ -10,7 +10,7 @@ describe('InvoiceTypeFromComponent', () => {
     await TestBed.configureTestingModule({
       imports: [InvoiceTypeFromComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(InvoiceTypeFromComponent);
     component = fixture.componentInstance;

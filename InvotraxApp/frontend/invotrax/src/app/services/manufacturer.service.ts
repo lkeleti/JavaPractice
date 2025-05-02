@@ -4,6 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { ManufacturerDto } from '../models/manufacturer.dto';
 import { PaginatedManufacturersResponse } from '../models/paginated-response.dto'; // Import the new interface
 import { Observable } from 'rxjs';
+import { UpdateManufacturerCommand } from '../models/update-manufacturer-command';
+import { CreateManufacturerCommand } from '../models/create-manufacturer-command';
 
 @Injectable({
   providedIn: 'root'
@@ -43,15 +45,16 @@ export class ManufacturerService {
   findManufacturerById(id: number): Observable<ManufacturerDto> {
     return this.http.get<ManufacturerDto>(`${this.apiUrl}/manufacturers/${id}`);
   }
-  /*
-    updateAuthor(id: number, command: UpdateAuthorCommand): Observable<ManufacturerDto> {
-      return this.http.put<ManufacturerDto>(`${this.apiUrl}/authors/${id}`, command);
-    }
-  
-    createAuthor(command: CreateAuthorCommand): Observable<ManufacturerDto> {
-      return this.http.post<ManufacturerDto>(`${this.apiUrl}/authors`, command);
-    }
-  */
+
+  updateManufacturer(id: number, command: UpdateManufacturerCommand): Observable<ManufacturerDto> {
+    return this.http.put<ManufacturerDto>(`${this.apiUrl}/manufacturers/${id}`, command);
+  }
+
+  createManufacturer(command: CreateManufacturerCommand): Observable<ManufacturerDto> {
+    console.log(command);
+    return this.http.post<ManufacturerDto>(`${this.apiUrl}/manufacturers`, command);
+  }
+
   deleteManufacturer(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/manufacturers/${id}`);
   }

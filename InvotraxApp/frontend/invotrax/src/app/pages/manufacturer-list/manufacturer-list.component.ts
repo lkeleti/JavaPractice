@@ -61,8 +61,6 @@ export class ManufacturerListComponent implements OnInit {
         this.itemsPerPage = response.page.size;
         this.currentPage = response.page.number + 1;
         this.isLoading = false;
-        console.log(this.totalItems + " " + this.itemsPerPage);
-        console.log(response);
       },
       error: (err) => {
         console.error('Error fetching manufacturers:', err);

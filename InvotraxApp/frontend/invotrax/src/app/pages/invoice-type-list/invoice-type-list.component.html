@@ -5,7 +5,7 @@
         <input type="text" class="form-control" placeholder="Keresés név szerint..." [(ngModel)]="searchTerm">
     </div>
     <div class="col-md-6 text-md-end">
-        <a routerLink="/master-data/invoice-type/new" class="btn btn-primary">Új fizetési mód</a>
+        <a routerLink="/master-data/invoice-types/new" class="btn btn-primary">Új számla típus</a>
     </div>
 </div>
 
@@ -33,8 +33,8 @@
                 <td>{{ invoiceType.name }}</td>
                 <td>
                     <button class="btn btn-sm btn-warning me-1"
-                        [routerLink]="['/invoice-type/new', invoiceType.id, 'edit']">Szerkesztés</button>
-                        <button class="btn btn-sm btn-danger me-1" [disabled]="invoiceType.deleted"
+                        [routerLink]="['/master-data/invoice-types/edit', invoiceType.id]">Szerkesztés</button>
+                    <button class="btn btn-sm btn-danger me-1" [disabled]="invoiceType.deleted"
                         (click)="openDeleteConfirmation(invoiceType)">Törlés</button>
                     <button class="btn btn-sm btn-success me-1" [disabled]="!invoiceType.deleted"
                         (click)="openUnDeleteConfirmation(invoiceType)">Törlés

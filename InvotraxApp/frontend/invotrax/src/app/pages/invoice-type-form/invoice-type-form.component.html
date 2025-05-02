@@ -1,23 +1,20 @@
 <div class="paper-form container mt-4 p-4 shadow rounded border">
     <h3 class="mb-4">
-        {{ isEditMode ? 'Gyártó szerkesztése' : 'Új gyártó hozzáadása' }}
+        {{ isEditMode ? 'Számlatípus szerkesztése' : 'Új számlatípus rögzítése' }}
     </h3>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <!-- Név -->
         <div class="mb-3">
             <label class="form-label">Név *</label>
             <input class="form-control" formControlName="name"
                 [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched" />
             <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
-                A név megadása kötelező.
+                A számlatípus neve kötelező.
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Weboldal</label>
-            <input class="form-control" formControlName="website" />
-        </div>
-
+        <!-- Műveleti gombok -->
         <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-secondary" (click)="cancel()">Mégsem</button>
             <button type="submit" class="btn btn-primary">Mentés</button>

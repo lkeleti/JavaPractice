@@ -1,1 +1,33 @@
-<p>vat-rate-form works!</p>
+<div class="paper-form container mt-4 p-4 shadow rounded border">
+    <h3 class="mb-4">
+        {{ isEditMode ? 'ÁFA kulcs szerkesztése' : 'Új ÁFA kulcs létrehozása' }}
+    </h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <!-- Név -->
+        <div class="mb-3">
+            <label class="form-label">Név *</label>
+            <input class="form-control" formControlName="name"
+                [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
+                A név megadása kötelező.
+            </div>
+        </div>
+
+        <!-- Kulcs (százalék) -->
+        <div class="mb-3">
+            <label class="form-label">ÁFA mértéke (%) *</label>
+            <input type="number" step="0.01" class="form-control" formControlName="rate"
+                [class.is-invalid]="form.get('rate')?.invalid && form.get('rate')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('rate')?.errors?.['required']">
+                Az ÁFA mértékének megadása kötelező.
+            </div>
+        </div>
+
+        <!-- Műveleti gombok -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Mégsem</button>
+            <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+    </form>
+</div>
