@@ -54,6 +54,7 @@ export const routes: Routes = [
         path: 'partners/edit/:id', component: PartnerFormComponent,
         title: 'Partner szerkesztése',
       },
+      { path: 'seller-profile', component: PartnerFormComponent, data: { mode: 'seller' }, title: 'Eladó adatai' },
       {
         path: 'manufacturers',
         component: ManufacturerListComponent,

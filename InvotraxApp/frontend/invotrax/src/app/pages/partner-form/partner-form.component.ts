@@ -27,6 +27,10 @@ import { CreatePartnerCommand } from '../../models/create-partner.command';
 import { UpdatePartnerCommand } from '../../models/update-partner.command';
 import { PaymentMethodDto } from '../../models/paymentMethod.dto';
 import { PaymentMethodService } from '../../services/payment-method.service';
+import { SellerService } from '../../services/seller.service';
+import { CreateSellerCommand } from './../../models/create-seller-command';
+import { UpdateSellerCommand } from '../../models/update-seller-commad';
+import { getPartnerAddress } from '../../shared/utils/address.util';
 
 
 @Component({
@@ -38,6 +42,7 @@ import { PaymentMethodService } from '../../services/payment-method.service';
 })
 export class PartnerFormComponent implements OnInit, OnDestroy {
   @Input() zipCodes: ZipCodeDto[] = [];
+  @Input() mode: 'partner' | 'seller' = 'partner';
   @Output() formSubmit = new EventEmitter<PartnerDto>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -53,11 +58,47 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private partnerService: PartnerService,
     private zipCodeService: ZipCodeService,
-    private paymentMethodService: PaymentMethodService
+    private paymentMethodService: PaymentMethodService,
+    private sellerService: SellerService
   ) { }
 
   ngOnInit(): void {
+    const routeMode = this.route.snapshot.data['mode'];
+    if (routeMode === 'seller') {
+      this.mode = 'seller';
+
+      this.sellerService.getSeller().subscribe({
+        next: (seller) => {
+          this.isEditMode = true;
+          this.partnerId = seller.partner.id;
+          this.form.patchValue({
+            ...seller.partner,
+            headOfficeAddress: seller.headOfficeAddress,
+            companyRegistrationNumber: seller.companyRegistrationNumber
+          });
+
+          const matched = this.paymentMethods.find(pm => pm.id === seller.partner.preferredPaymentMethod?.id);
+          if (matched) {
+            this.form.get('preferredPaymentMethod')?.setValue(matched);
+          }
+        },
+        error: (err) => {
+          if (err.status === 404 && err.error?.message === 'SELLER_NOT_FOUND') {
+            this.isEditMode = false; // új seller létrehozása
+          } else {
+            alert('Nem sikerült betölteni az eladó adatait.');
+          }
+        }
+      });
+    }
+
     this.createForm();
+
+    if (this.mode === 'seller') {
+      this.form.addControl('headOfficeAddress', this.fb.control('', Validators.required));
+      this.form.addControl('companyRegistrationNumber', this.fb.control('', Validators.required));
+    }
+
     this.paymentMethodService.getActivePaymentMethods().subscribe({
       next: (methods) => {
         this.paymentMethods = methods;
@@ -187,23 +228,59 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
       createdAt: this.isEditMode ? formValue.createdAt : new Date(),
     };
 
-    const data: PartnerDto = this.form.value;
-    if (this.isEditMode && this.partnerId) {
-      console.log(this.form.patchValue(updateCommand));
-      this.partnerService.updatePartner(this.partnerId, updateCommand).subscribe({
-        next: () => this.router.navigate(['/master-data/partners']),
-        error: () => alert('Nem sikerült frissíteni a partnert.')
-      });
+    if (this.mode === 'seller') {
+      if (this.isEditMode && this.partnerId) {
+        this.partnerService.updatePartner(this.partnerId, updateCommand).subscribe({
+          next: () => {
+            const sellerCommand: UpdateSellerCommand = {
+              partnerId: this.partnerId!, // biztosan ismert
+              headOfficeAddress: formValue.headOfficeAddress,
+              companyRegistrationNumber: formValue.companyRegistrationNumber,
+              defaultBranchAddress: getPartnerAddress(this.form.value),
+            };
+            this.sellerService.updateSeller(this.partnerId!, sellerCommand).subscribe({
+              next: () => this.router.navigate(['/master-data/partners']),
+              error: () => alert('Nem sikerült frissíteni az eladó adatokat.')
+            });
+          },
+          error: () => alert('Nem sikerült frissíteni a partner adatokat.')
+        });
+      } else {
+        this.partnerService.createPartner(createCommand).subscribe({
+          next: (created) => {
+            const sellerCommand: UpdateSellerCommand = {
+              partnerId: created.id, // itt kapjuk meg a partnerId-t
+              headOfficeAddress: formValue.headOfficeAddress,
+              companyRegistrationNumber: formValue.companyRegistrationNumber,
+              defaultBranchAddress: getPartnerAddress(created),
+            };
+            this.sellerService.createSeller(created.id, sellerCommand).subscribe({
+              next: () => this.router.navigate(['/master-data/partners']),
+              error: () => alert('Nem sikerült létrehozni az eladó adatokat.')
+            });
+          },
+          error: () => alert('Nem sikerült létrehozni a partner adatokat.')
+        });
+      }
     } else {
-      this.partnerService.createPartner(createCommand).subscribe({
-        next: () => this.router.navigate(['/master-data/partners']),
-        error: () => alert('Nem sikerült létrehozni a partnert.')
-      });
+      // partner mód
+      if (this.isEditMode && this.partnerId) {
+        this.partnerService.updatePartner(this.partnerId, updateCommand).subscribe({
+          next: () => this.router.navigate(['/master-data/partners']),
+          error: () => alert('Nem sikerült frissíteni a partnert.')
+        });
+      } else {
+        this.partnerService.createPartner(createCommand).subscribe({
+          next: () => this.router.navigate(['/master-data/partners']),
+          error: () => alert('Nem sikerült létrehozni a partnert.')
+        });
+      }
     }
   }
 
   onCancel(): void {
-    this.router.navigate(['/master-data/partners']);
+    const route = '/master-data/partners';
+    this.router.navigate([route]);
   }
 
   openEntityLookupModal(): void {

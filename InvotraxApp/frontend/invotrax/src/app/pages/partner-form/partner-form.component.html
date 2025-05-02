@@ -147,6 +147,31 @@
       </div>
     </div>
 
+    <div *ngIf="mode === 'seller'">
+      <fieldset class="border p-3 mt-4">
+        <legend class="w-auto px-2">Eladó specifikus adatok</legend>
+
+        <div class="mb-3">
+          <label for="headOfficeAddress" class="form-label">Székhely *</label>
+          <input id="headOfficeAddress" type="text" class="form-control" formControlName="headOfficeAddress"
+            [class.is-invalid]="form.get('headOfficeAddress')?.invalid && form.get('headOfficeAddress')?.touched" />
+          <div class="invalid-feedback" *ngIf="form.get('headOfficeAddress')?.errors?.['required']">
+            A székhely megadása kötelező.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="companyRegistrationNumber" class="form-label">Cégjegyzékszám *</label>
+          <input id="companyRegistrationNumber" type="text" class="form-control"
+            formControlName="companyRegistrationNumber"
+            [class.is-invalid]="form.get('companyRegistrationNumber')?.invalid && form.get('companyRegistrationNumber')?.touched" />
+          <div class="invalid-feedback" *ngIf="form.get('companyRegistrationNumber')?.errors?.['required']">
+            A cégjegyzékszám megadása kötelező.
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
     <!-- Műveleti gombok -->
     <div class="d-flex justify-content-end gap-2 mt-4">
       <button type="button" class="btn btn-secondary" (click)="onCancel()">Mégsem</button>
