@@ -17,6 +17,7 @@ import { InvoiceTypeFromComponent } from './pages/invoice-type-from/invoice-type
 import { VatRateListComponent } from './pages/vat-rate-list/vat-rate-list.component';
 import { VatRateFormComponent } from './pages/vat-rate-form/vat-rate-form.component';
 import { PartnerFormComponent } from './pages/partner-form/partner-form.component';
+import { PaymentMethodFormComponent } from './pages/payment-method-form/payment-method-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -96,8 +97,10 @@ export const routes: Routes = [
       {
         path: 'payment-methods',
         component: PaymentMethodListComponent,
-        title: 'Gyártók',
+        title: 'Fizetési módok',
       },
+      { path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új fizetési mód' },
+      { path: 'payment-methods/edit/:id', component: PaymentMethodFormComponent, title: 'Fizetési mód szerkesztése' },
       //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },
       // ... további törzsadat route-ok (categories, manufacturers, stb.)
     ],

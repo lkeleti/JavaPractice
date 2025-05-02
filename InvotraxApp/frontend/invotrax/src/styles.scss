@@ -1,2 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 @use 'bootstrap/scss/bootstrap';
+
+.paper-form {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #d6d6d6;
+    border: 1px solid #ccc;
+}

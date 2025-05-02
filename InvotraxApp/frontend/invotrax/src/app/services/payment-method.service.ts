@@ -3,6 +3,8 @@ import { environment } from '../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { PaymentMethodDto } from '../models/paymentMethod.dto';
 import { Observable } from 'rxjs';
+import { UpdatePaymentMethodCommand } from '../models/update-payment-method.command';
+import { CreatePaymentMethodCommand } from '../models/create-payment-method.command';
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +24,24 @@ export class PaymentMethodService {
   findPaymentMethodById(id: number): Observable<PaymentMethodDto> {
     return this.http.get<PaymentMethodDto>(`${this.apiUrl}/paymentmethods/${id}`);
   }
-  /*
-    updateAuthor(id: number, command: UpdateAuthorCommand): Observable<ManufacturerDto> {
-      return this.http.put<ManufacturerDto>(`${this.apiUrl}/authors/${id}`, command);
-    }
-  
-    createAuthor(command: CreateAuthorCommand): Observable<ManufacturerDto> {
-      return this.http.post<ManufacturerDto>(`${this.apiUrl}/authors`, command);
-    }
-  */
+
+  updatePaymentMethod(id: number, command: UpdatePaymentMethodCommand): Observable<PaymentMethodDto> {
+    return this.http.put<PaymentMethodDto>(`${this.apiUrl}/paymentmethods/${id}`, command);
+  }
+
+  createPaymentMethod(command: CreatePaymentMethodCommand): Observable<PaymentMethodDto> {
+    return this.http.post<PaymentMethodDto>(`${this.apiUrl}/paymentmethods`, command);
+  }
+
+
+  deletePaymentMethod(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/paymentmethods/${id}`);
+  }
+
+  unDeletePaymentMethod(id: number): Observable<PaymentMethodDto> {
+    return this.http.delete<PaymentMethodDto>(
+      `${this.apiUrl}/paymentmethods/undelete/${id}`
+    );
+  }
 
 }
