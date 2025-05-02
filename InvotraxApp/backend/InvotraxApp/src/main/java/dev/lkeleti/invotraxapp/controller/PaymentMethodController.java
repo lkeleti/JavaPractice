@@ -38,7 +38,7 @@ public class PaymentMethodController {
     @Operation(summary = "Összes aktív fizetési mód listázása",
             description = "Visszaadja az összes fizetési mód listáját, de csak az aktívakat.")
     @ApiResponse(responseCode = "200", description = "Fizetési mód sikeresen listázva")
-    public List<ZipCodeDto> getAllActivePaymentMethods() {
+    public List<PaymentMethodDto> getAllActivePaymentMethods() {
         return paymentMethodService.getAllActivePaymentMethods();
     }
 

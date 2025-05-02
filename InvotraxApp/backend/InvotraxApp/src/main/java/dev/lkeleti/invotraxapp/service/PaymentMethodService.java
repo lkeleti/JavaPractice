@@ -30,7 +30,7 @@ public class PaymentMethodService {
     }
 
     @Transactional(readOnly = true)
-    public List<ZipCodeDto> getAllActivePaymentMethods() {
+    public List<PaymentMethodDto> getAllActivePaymentMethods() {
         Type targetListType = new TypeToken<List<PaymentMethodDto>>(){}.getType();
         return modelMapper.map(paymentMethodRepository.findByDeletedIsFalse(), targetListType);
     }
