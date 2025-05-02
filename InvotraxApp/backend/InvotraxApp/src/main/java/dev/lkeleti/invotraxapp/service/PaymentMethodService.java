@@ -56,7 +56,8 @@ public class PaymentMethodService {
     public PaymentMethodDto createPaymentMethod(CreatePaymentMethodCommand command) {
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setName(command.getName());
-        return modelMapper.map(paymentMethod,PaymentMethodDto.class);
+        paymentMethod.setDeleted(false);
+        return modelMapper.map(paymentMethodRepository.save(paymentMethod),PaymentMethodDto.class);
     }
 
     @Transactional
