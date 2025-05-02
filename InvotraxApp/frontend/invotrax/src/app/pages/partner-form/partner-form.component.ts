@@ -58,7 +58,7 @@ export class PartnerFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.createForm();
-    this.paymentMethodService.getPaymentMethods().subscribe({
+    this.paymentMethodService.getActivePaymentMethods().subscribe({
       next: (methods) => {
         this.paymentMethods = methods;
 

@@ -21,6 +21,10 @@ export class PaymentMethodService {
     return this.http.get<PaymentMethodDto[]>(`${this.apiUrl}/paymentmethods`);
   }
 
+  getActivePaymentMethods(): Observable<PaymentMethodDto[]> {
+    return this.http.get<PaymentMethodDto[]>(`${this.apiUrl}/paymentmethods/active`);
+  }
+
   findPaymentMethodById(id: number): Observable<PaymentMethodDto> {
     return this.http.get<PaymentMethodDto>(`${this.apiUrl}/paymentmethods/${id}`);
   }
