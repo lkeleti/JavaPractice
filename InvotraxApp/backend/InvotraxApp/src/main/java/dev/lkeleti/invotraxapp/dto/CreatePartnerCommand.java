@@ -26,7 +26,7 @@ public class CreatePartnerCommand {
     private String taxNumber;
     private String email;
     private String phoneNumber;
-    private String preferredPaymentMethod;
+    private Long preferredPaymentMethodId;
     private BigDecimal balance;
     private Integer defaultPaymentDeadline;
     private String bankName;

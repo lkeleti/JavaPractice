@@ -11,4 +11,5 @@ import lombok.Setter;
 
 public class UpdatePaymentMethodCommand {
     private String name;
+    private boolean deleted;
 }

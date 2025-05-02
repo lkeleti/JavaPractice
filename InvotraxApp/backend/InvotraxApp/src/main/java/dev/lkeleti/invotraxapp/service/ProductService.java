@@ -1,11 +1,8 @@
 package dev.lkeleti.invotraxapp.service;
 
+import dev.lkeleti.invotraxapp.model.*;
 import dev.lkeleti.invotraxapp.repository.VatRateRepository;
 import dev.lkeleti.invotraxapp.dto.*;
-import dev.lkeleti.invotraxapp.model.Manufacturer;
-import dev.lkeleti.invotraxapp.model.Product;
-import dev.lkeleti.invotraxapp.model.ProductCategory;
-import dev.lkeleti.invotraxapp.model.VatRate;
 import dev.lkeleti.invotraxapp.repository.ManufacturerRepository;
 import dev.lkeleti.invotraxapp.repository.ProductCategoryRepository;
 import dev.lkeleti.invotraxapp.repository.ProductRepository;
@@ -13,6 +10,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +32,18 @@ public class ProductService {
     public List<ProductDto> getAllProducts() {
         Type targetListType = new TypeToken<List<ProductDto>>(){}.getType();
         return modelMapper.map(productRepository.findAll(), targetListType);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getAllProducts(Pageable pageable, String searchTerm) {
+        Page<Product> partners;
+        if (searchTerm == null || searchTerm.isBlank()) {
+            partners = productRepository.findAll(pageable);
+        } else {
+            partners = productRepository.searchByNameOrBarCodeOrSku(searchTerm, pageable);
+        }
+
+        return partners.map(partner -> modelMapper.map(partner, ProductDto.class));
     }
 
     @Transactional(readOnly = true)

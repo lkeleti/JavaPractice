@@ -12,4 +12,5 @@ import lombok.Setter;
 public class PaymentMethodDto {
     private Long id;
     private String name;
+    private boolean deleted;
 }

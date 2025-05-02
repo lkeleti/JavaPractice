@@ -4,8 +4,10 @@ import dev.lkeleti.invotraxapp.dto.CreatePartnerCommand;
 import dev.lkeleti.invotraxapp.dto.PartnerDto;
 import dev.lkeleti.invotraxapp.dto.UpdatePartnerCommand;
 import dev.lkeleti.invotraxapp.model.Partner;
+import dev.lkeleti.invotraxapp.model.PaymentMethod;
 import dev.lkeleti.invotraxapp.model.ZipCode;
 import dev.lkeleti.invotraxapp.repository.PartnerRepository;
+import dev.lkeleti.invotraxapp.repository.PaymentMethodRepository;
 import dev.lkeleti.invotraxapp.repository.ZipCodeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class PartnerService {
     private PartnerRepository partnerRepository;
     private ZipCodeRepository zipCodeRepository;
     private ModelMapper modelMapper;
+    private final PaymentMethodRepository paymentMethodRepository;
 
     @Transactional(readOnly = true)
     public Page<PartnerDto> getAllPartners(Pageable pageable, String searchTerm) {
@@ -70,6 +73,9 @@ public class PartnerService {
         ZipCode zipCode = zipCodeRepository.findById(command.getZipCodeId())
                 .orElseThrow(() -> new EntityNotFoundException("ZipCode not found with id: " + command.getZipCodeId()));
 
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(command.getPreferredPaymentMethodId())
+                .orElseThrow(() -> new EntityNotFoundException("PAyment method not found with id: " + command.getPreferredPaymentMethodId()));
+
         partner.setName(command.getName());
         partner.setZipCode(zipCode);
         partner.setStreetName(command.getStreetName());
@@ -84,7 +90,7 @@ public class PartnerService {
         partner.setTaxNumber(command.getTaxNumber());
         partner.setEmail(command.getEmail());
         partner.setPhoneNumber(command.getPhoneNumber());
-        partner.setPreferredPaymentMethod(command.getPreferredPaymentMethod());
+        partner.setPreferredPaymentMethod(paymentMethod);
         partner.setBalance(command.getBalance());
         partner.setDefaultPaymentDeadline(command.getDefaultPaymentDeadline());
         partner.setBankName(command.getBankName());
@@ -101,6 +107,9 @@ public class PartnerService {
         ZipCode zipCode = zipCodeRepository.findById(command.getZipCodeId())
                 .orElseThrow(() -> new EntityNotFoundException("ZipCode not found with id: " + command.getZipCodeId()));
 
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(command.getPreferredPaymentMethodId())
+                .orElseThrow(() -> new EntityNotFoundException("PAyment method not found with id: " + command.getPreferredPaymentMethodId()));
+
         Partner partner = new Partner();
         partner.setName(command.getName());
         partner.setZipCode(zipCode);
@@ -116,7 +125,7 @@ public class PartnerService {
         partner.setTaxNumber(command.getTaxNumber());
         partner.setEmail(command.getEmail());
         partner.setPhoneNumber(command.getPhoneNumber());
-        partner.setPreferredPaymentMethod(command.getPreferredPaymentMethod());
+        partner.setPreferredPaymentMethod(paymentMethod);
         partner.setBalance(command.getBalance());
         partner.setDefaultPaymentDeadline(command.getDefaultPaymentDeadline());
         partner.setBankName(command.getBankName());

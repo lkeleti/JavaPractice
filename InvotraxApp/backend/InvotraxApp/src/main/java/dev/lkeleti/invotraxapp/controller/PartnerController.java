@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Tag(name = "Műveletek a partnerekkel")
 
-public class PertnerController {
+public class PartnerController {
         private PartnerService partnerService;
 
         @GetMapping
@@ -74,7 +74,7 @@ public class PertnerController {
                                 schema = @Schema(implementation = UpdatePartnerCommand.class))
                 )
         )
-        @ApiResponse(responseCode = "200", description = "Partber sikeresen frissítve")
+        @ApiResponse(responseCode = "200", description = "Partner sikeresen frissítve")
         @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben (validációs hiba)")
         @ApiResponse(responseCode = "404", description = "Módosítandó partner nem található")
         public PartnerDto updatePartner(@PathVariable Long id, @RequestBody UpdatePartnerCommand command) {
@@ -114,7 +114,7 @@ public class PertnerController {
         @Operation(summary = "Partner törlésének megszüntetése",
                 description = "Partner visszaállítása aktív állapotba a megadott azonosító alapján."
         )
-        @ApiResponse(responseCode = "200", description = "Partne sikeresen visszaállítva")
+        @ApiResponse(responseCode = "200", description = "Partner sikeresen visszaállítva")
         @ApiResponse(responseCode = "404", description = "Partner nem található")
         public PartnerDto unDeletePartner(@PathVariable Long id) {
             return partnerService.unDeletePartner(id);

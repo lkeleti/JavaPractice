@@ -16,4 +16,6 @@ public class PaymentMethod {
 
     @Column(unique = true)
     private String name;
+
+    private boolean deleted;
 }

@@ -63,8 +63,9 @@ public class Partner {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "preferred_payment_method")
-    private String preferredPaymentMethod;
+    @ManyToOne
+    @JoinColumn(name = "preferred_payment_method_id")
+    private PaymentMethod preferredPaymentMethod;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

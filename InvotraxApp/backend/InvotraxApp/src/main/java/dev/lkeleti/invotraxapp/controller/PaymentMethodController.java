@@ -3,6 +3,7 @@ package dev.lkeleti.invotraxapp.controller;
 import dev.lkeleti.invotraxapp.dto.CreatePaymentMethodCommand;
 import dev.lkeleti.invotraxapp.dto.PaymentMethodDto;
 import dev.lkeleti.invotraxapp.dto.UpdatePaymentMethodCommand;
+import dev.lkeleti.invotraxapp.dto.ZipCodeDto;
 import dev.lkeleti.invotraxapp.service.PaymentMethodService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,6 +31,15 @@ public class PaymentMethodController {
     @ApiResponse(responseCode = "200", description = "Fizetési módok sikeresen listázva")
     public List<PaymentMethodDto> getAllPaymentMethods() {
         return paymentMethodService.getAllPaymentMethods();
+    }
+
+    @GetMapping("/active")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Összes aktív fizetési mód listázása",
+            description = "Visszaadja az összes fizetési mód listáját, de csak az aktívakat.")
+    @ApiResponse(responseCode = "200", description = "Fizetési mód sikeresen listázva")
+    public List<ZipCodeDto> getAllActivePaymentMethods() {
+        return paymentMethodService.getAllActivePaymentMethods();
     }
 
     @GetMapping("/{id}")
@@ -75,5 +85,27 @@ public class PaymentMethodController {
     @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben (validációs hiba)")
     public PaymentMethodDto createPaymentMethod(@RequestBody CreatePaymentMethodCommand command) {
         return paymentMethodService.createPaymentMethod(command);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Fizetési mód törlése",
+            description = "Fizetési mód törlése a megadott azonosító alapján (logikai törlés)."
+    )
+    @ApiResponse(responseCode = "204", description = "Fizetési mód sikeresen törölve")
+    @ApiResponse(responseCode = "404", description = "Törlendő fizetési mód nem található")
+    public void deletePaymentMethod(@PathVariable Long id) {
+        paymentMethodService.deletePaymentMethod(id);
+    }
+
+    @DeleteMapping("/undelete/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Fizetési mód törlésének megszüntetése",
+            description = "Fizetési mód visszaállítása aktív állapotba a megadott azonosító alapján."
+    )
+    @ApiResponse(responseCode = "200", description = "Fizetési mód sikeresen visszaállítva")
+    @ApiResponse(responseCode = "404", description = "Fizetési mód nem található")
+    public PaymentMethodDto unDeletePaymentMethod(@PathVariable Long id) {
+        return paymentMethodService.unDeletePaymentMethod(id);
     }
 }

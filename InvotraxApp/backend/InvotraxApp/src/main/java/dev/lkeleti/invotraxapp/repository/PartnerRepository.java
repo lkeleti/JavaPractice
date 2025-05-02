@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface PartnerRepository extends JpaRepository<Partner, Long> {
     List<Partner> findByDeletedIsFalse();
 
-    @Query("SELECT p FROM Partner p JOIN p.zipCode z WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.taxNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    @Query("SELECT p FROM Partner p JOIN p.zipCode z LEFT JOIN p.preferredPaymentMethod m WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.taxNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<Partner> searchByNameOrTaxNumber(@Param("searchTerm") String searchTerm, Pageable pageable);
 
     Optional<Partner> findByTaxNumber(String taxNumber);

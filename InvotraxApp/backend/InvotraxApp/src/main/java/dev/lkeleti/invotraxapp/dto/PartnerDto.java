@@ -28,7 +28,7 @@ public class PartnerDto {
     private String taxNumber;
     private String email;
     private String phoneNumber;
-    private String preferredPaymentMethod;
+    private PaymentMethodDto preferredPaymentMethod;
     private LocalDateTime createdAt;
     private BigDecimal balance;
     private Integer defaultPaymentDeadline;
