@@ -39,7 +39,7 @@ public class ProductCategoryService {
     public ProductCategoryDto createProductCategory(CreateProductCategoryCommand command) {
         ProductCategory productCategory = new ProductCategory();
         productCategory.setName(command.getName());
-        return modelMapper.map(productCategory, ProductCategoryDto.class);
+        return modelMapper.map(productCategoryRepository.save(productCategory), ProductCategoryDto.class);
     }
 
     @Transactional

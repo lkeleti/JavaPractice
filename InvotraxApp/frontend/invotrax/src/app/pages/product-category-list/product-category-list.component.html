@@ -1,0 +1,38 @@
+<h1>Termék kategóriák</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Keresés név szerint..." [(ngModel)]="searchTerm" />
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a routerLink="/master-data/product-categories/new" class="btn btn-primary">
+            Új kategória
+        </a>
+    </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border" role="status"></div>
+</div>
+
+<table *ngIf="!isLoading && !errorMessage" class="table table-striped">
+    <thead>
+        <tr>
+            <th>Megnevezés</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let cat of filteredCategories">
+            <td>{{ cat.name }}</td>
+            <td>
+                <a [routerLink]="['/master-data/product-categories/edit', cat.id]"
+                    class="btn btn-sm btn-outline-primary me-2">Szerkeszt</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

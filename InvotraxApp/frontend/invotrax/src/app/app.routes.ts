@@ -18,6 +18,10 @@ import { VatRateListComponent } from './pages/vat-rate-list/vat-rate-list.compon
 import { VatRateFormComponent } from './pages/vat-rate-form/vat-rate-form.component';
 import { PartnerFormComponent } from './pages/partner-form/partner-form.component';
 import { PaymentMethodFormComponent } from './pages/payment-method-form/payment-method-form.component';
+import { ProductTypeFormComponent } from './pages/product-type-form/product-type-form.component';
+import { ProductTypeListComponent } from './pages/product-type-list/product-type-list.component';
+import { ProductCategoryListComponent } from './pages/product-category-list/product-category-list.component';
+import { ProductCategoryFormComponent } from './pages/product-category-form/product-category-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -67,6 +71,12 @@ export const routes: Routes = [
       { path: 'payment-methods', component: PaymentMethodListComponent, title: 'Fizetési módok' },
       { path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új fizetési mód' },
       { path: 'payment-methods/edit/:id', component: PaymentMethodFormComponent, title: 'Fizetési mód szerkesztése' },
+      { path: 'product-types', component: ProductTypeListComponent, title: 'Terméktípusok' },
+      { path: 'product-types/new', component: ProductTypeFormComponent, title: 'Új terméktípus' },
+      { path: 'product-types/edit/:id', component: ProductTypeFormComponent, title: 'Terméktípus szerkesztése' },
+      { path: 'product-categories', component: ProductCategoryListComponent, title: 'Termék kategóriák' },
+      { path: 'product-categories/new', component: ProductCategoryFormComponent, title: 'Új termék kategória' },
+      { path: 'product-categories/edit/:id', component: ProductCategoryFormComponent, title: 'Termék kategória szerkesztése' },
       //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },
       // ... további törzsadat route-ok (categories, manufacturers, stb.)
     ],

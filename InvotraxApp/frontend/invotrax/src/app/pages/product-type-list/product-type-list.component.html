@@ -1,0 +1,44 @@
+<h1>Terméktípusok</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Keresés név szerint..." [(ngModel)]="searchTerm" />
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a routerLink="/master-data/product-types/new" class="btn btn-primary">
+            Új terméktípus
+        </a>
+    </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Betöltés...</span>
+    </div>
+</div>
+
+<table *ngIf="!isLoading && !errorMessage" class="table table-striped table-hover mt-3">
+    <thead>
+        <tr>
+            <th>Megnevezés</th>
+            <th>Készletet kezel</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let productType of filteredProductTypes">
+            <td>{{ productType.name }}</td>
+            <td>{{ productType.managesStock ? 'Igen' : 'Nem' }}</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary me-2"
+                    [routerLink]="['/master-data/product-types/edit', productType.id]">
+                    Szerkesztés
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
