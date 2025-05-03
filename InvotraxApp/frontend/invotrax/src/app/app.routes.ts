@@ -22,6 +22,8 @@ import { ProductTypeFormComponent } from './pages/product-type-form/product-type
 import { ProductTypeListComponent } from './pages/product-type-list/product-type-list.component';
 import { ProductCategoryListComponent } from './pages/product-category-list/product-category-list.component';
 import { ProductCategoryFormComponent } from './pages/product-category-form/product-category-form.component';
+import { InvoiceNumberSequenceListComponent } from './pages/invoice-number-sequence-list/invoice-number-sequence-list.component';
+import { InvoiceNumberSequenceFormComponent } from './pages/invoice-number-sequence-form/invoice-number-sequence-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -77,6 +79,9 @@ export const routes: Routes = [
       { path: 'product-categories', component: ProductCategoryListComponent, title: 'Termék kategóriák' },
       { path: 'product-categories/new', component: ProductCategoryFormComponent, title: 'Új termék kategória' },
       { path: 'product-categories/edit/:id', component: ProductCategoryFormComponent, title: 'Termék kategória szerkesztése' },
+      { path: 'invoice-number-sequences', component: InvoiceNumberSequenceListComponent, title: 'Számla sorszámok kategóriák' },
+      { path: 'invoice-number-sequences/new', component: InvoiceNumberSequenceFormComponent, title: 'Új számla sorszám' },
+      { path: 'invoice-number-sequences/edit/:id', component: InvoiceNumberSequenceFormComponent, title: 'Számla sorszám szerkesztése' },
       //{ path: 'payment-methods/new', component: PaymentMethodFormComponent, title: 'Új gyártó' },
       // ... további törzsadat route-ok (categories, manufacturers, stb.)
     ],

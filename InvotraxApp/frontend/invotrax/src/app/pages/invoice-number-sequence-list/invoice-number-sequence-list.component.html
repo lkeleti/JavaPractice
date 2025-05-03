@@ -1,0 +1,50 @@
+<h1>Számlasorszám szabályok</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Keresés prefix vagy típus szerint..."
+            [(ngModel)]="searchTerm">
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a routerLink="/master-data/invoice-number-sequences/new" class="btn btn-primary">Új sorszám szabály</a>
+    </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<table *ngIf="!isLoading && !errorMessage" class="table table-striped table-hover mt-3">
+    <thead>
+        <tr>
+            <th>Számla típus</th>
+            <th>Prefix</th>
+            <th>Utolsó szám</th>
+            <th>Műveletek</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="filteredSequences.length > 0; else noSequences">
+            <tr *ngFor="let seq of filteredSequences">
+                <td>{{ seq.invoiceType.name }}</td>
+                <td>{{ seq.invoicePrefix }}</td>
+                <td>{{ seq.lastNumber }}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning me-1"
+                        [routerLink]="['/master-data/invoice-number-sequences/edit', seq.id]">Szerkesztés</button>
+                </td>
+            </tr>
+        </ng-container>
+        <ng-template #noSequences>
+            <tr>
+                <td colspan="4" class="text-center">Nem találok sorszám szabályt.</td>
+            </tr>
+        </ng-template>
+    </tbody>
+</table>

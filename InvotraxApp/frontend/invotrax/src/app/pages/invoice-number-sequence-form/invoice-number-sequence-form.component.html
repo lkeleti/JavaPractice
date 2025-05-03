@@ -1,0 +1,52 @@
+<div class="paper-form container mt-4 p-4 shadow rounded border">
+    <h3 class="mb-4">
+        {{ isEditMode ? 'Sorszámgenerátor szerkesztése' : 'Új sorszámgenerátor rögzítése' }}
+    </h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+        <!-- Számlatípus kiválasztása -->
+        <div class="mb-3">
+            <label class="form-label">Számlatípus *</label>
+            <select class="form-select" formControlName="invoiceTypeId"
+                [class.is-invalid]="form.get('invoiceTypeId')?.invalid && form.get('invoiceTypeId')?.touched">
+                <option value="" disabled selected>-- Válassz --</option>
+                <option *ngFor="let type of invoiceTypes" [value]="type.id">
+                    {{ type.name }}
+                </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('invoiceTypeId')?.errors?.['required']">
+                A számlatípus kiválasztása kötelező.
+            </div>
+        </div>
+
+        <!-- Prefix -->
+        <div class="mb-3">
+            <label class="form-label">Prefix *</label>
+            <input class="form-control" formControlName="invoicePrefix"
+                [class.is-invalid]="form.get('invoicePrefix')?.invalid && form.get('invoicePrefix')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('invoicePrefix')?.errors?.['required']">
+                A prefix megadása kötelező.
+            </div>
+        </div>
+
+        <!-- Utolsó sorszám -->
+        <div class="mb-3">
+            <label class="form-label">Utolsó sorszám *</label>
+            <input type="number" class="form-control" formControlName="lastNumber"
+                [class.is-invalid]="form.get('lastNumber')?.invalid && form.get('lastNumber')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('lastNumber')?.errors?.['required']">
+                A sorszám megadása kötelező.
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('lastNumber')?.errors?.['min']">
+                Nem lehet negatív szám.
+            </div>
+        </div>
+
+        <!-- Gombok -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Mégsem</button>
+            <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+    </form>
+</div>
