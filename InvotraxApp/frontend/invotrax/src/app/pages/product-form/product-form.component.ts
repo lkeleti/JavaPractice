@@ -49,7 +49,6 @@ export class ProductFormComponent implements OnInit {
     this.id = this.route.snapshot.params['id'] ? +this.route.snapshot.params['id'] : null;
 
     this.initForm();
-
     this.loadSelectData();
 
     if (this.id) {
@@ -95,7 +94,10 @@ export class ProductFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const product: ProductDto = {
       ...this.form.getRawValue(),
@@ -141,6 +143,8 @@ export class ProductFormComponent implements OnInit {
       })
       .catch(() => { });
   }
+
+
 
   openBarcodeManager(): void {
     // Később implementálandó

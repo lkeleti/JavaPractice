@@ -1,134 +1,143 @@
 <div class="paper-form container mt-4 p-4 shadow rounded border">
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="product-form p-6 rounded-xl shadow-md space-y-4">
-        <h2 class="text-2xl font-bold">Termék adatai</h2>
+    <h3 class="mb-4">Termék adatai</h3>
 
-        <!-- Name -->
-        <div>
-            <label for="name">Név *</label>
-            <input id="name" type="text" formControlName="name" class="form-control" required />
-            <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-500">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <!-- Név -->
+        <div class="mb-3">
+            <label class="form-label">Név *</label>
+            <input class="form-control" formControlName="name"
+                [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('name')?.errors?.['required']">
                 A név megadása kötelező.
             </div>
         </div>
 
-        <!-- SKU -->
-        <div>
-            <label for="sku">Cikkszám (SKU) *</label>
-            <input id="sku" type="text" formControlName="sku" class="form-control" required />
-            <div *ngIf="form.get('sku')?.invalid && form.get('sku')?.touched" class="text-red-500">
+        <!-- Cikkszám -->
+        <div class="mb-3">
+            <label class="form-label">Cikkszám (SKU) *</label>
+            <input class="form-control" formControlName="sku"
+                [class.is-invalid]="form.get('sku')?.invalid && form.get('sku')?.touched" />
+            <div class="invalid-feedback" *ngIf="form.get('sku')?.errors?.['required']">
                 A cikkszám megadása kötelező.
             </div>
         </div>
 
-        <!-- Description -->
-        <div>
-            <label for="description">Leírás</label>
-            <textarea id="description" formControlName="description" class="form-control" rows="3"></textarea>
+        <!-- Leírás -->
+        <div class="mb-3">
+            <label class="form-label">Leírás</label>
+            <textarea class="form-control" formControlName="description" rows="3"></textarea>
         </div>
 
-        <!-- Product Type -->
-        <div>
-            <label for="productType">Termék típusa *</label>
-            <select id="productType" formControlName="productType" class="form-control">
+        <!-- Termék típusa -->
+        <div class="mb-3">
+            <label class="form-label">Termék típusa *</label>
+            <select class="form-select" formControlName="productType">
                 <option [ngValue]="null" disabled>-- Válassz termék típust --</option>
                 <option *ngFor="let type of productTypes" [ngValue]="type">{{ type.name }}</option>
             </select>
         </div>
 
-        <!-- Category -->
-        <div>
-            <label for="category">Kategória *</label>
-            <select id="category" formControlName="category" class="form-control">
+        <!-- Kategória -->
+        <div class="mb-3">
+            <label class="form-label">Kategória *</label>
+            <select class="form-select" formControlName="category">
                 <option [ngValue]="null" disabled>-- Válassz termék kategóriát --</option>
                 <option *ngFor="let cat of categories" [ngValue]="cat">{{ cat.name }}</option>
             </select>
         </div>
 
-        <!-- Manufacturer -->
-        <div>
-            <label>Gyártó *</label>
-            <div class="flex items-center gap-2">
-                <input type="text" class="form-control" [value]="form.value.manufacturer?.name" readonly />
-                <button type="button" (click)="openManufacturerLookup()" class="btn btn-secondary">Keresés</button>
+        <!-- Gyártó -->
+        <div class="mb-3">
+            <label class="form-label">Gyártó *</label>
+            <div class="input-group">
+                <input class="form-control" [value]="form.value.manufacturer?.name" readonly />
+                <button type="button" (click)="openManufacturerLookup()" class="btn btn-outline-secondary">
+                    Keresés
+                </button>
             </div>
         </div>
 
-        <!-- Prices -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-                <label>Nettó beszerzési ár</label>
-                <input type="number" formControlName="netPurchasePrice" class="form-control" />
+        <!-- Ár mezők -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label">Nettó beszerzési ár</label>
+                <input type="number" class="form-control" formControlName="netPurchasePrice" />
             </div>
-            <div>
-                <label>Bruttó beszerzési ár</label>
-                <input type="number" formControlName="grossPurchasePrice" class="form-control" />
+            <div class="col-md-3">
+                <label class="form-label">Bruttó beszerzési ár</label>
+                <input type="number" class="form-control" formControlName="grossPurchasePrice" />
             </div>
-            <div>
-                <label>Nettó eladási ár</label>
-                <input type="number" formControlName="netSellingPrice" class="form-control" />
+            <div class="col-md-3">
+                <label class="form-label">Nettó eladási ár</label>
+                <input type="number" class="form-control" formControlName="netSellingPrice" />
             </div>
-            <div>
-                <label>Bruttó eladási ár</label>
-                <input type="number" formControlName="grossSellingPrice" class="form-control" />
+            <div class="col-md-3">
+                <label class="form-label">Bruttó eladási ár</label>
+                <input type="number" class="form-control" formControlName="grossSellingPrice" />
             </div>
         </div>
 
-        <!-- Warranty -->
-        <div>
-            <label>Garancia (hónap)</label>
-            <input type="number" formControlName="warrantyPeriodMonths" class="form-control" />
+        <!-- Garancia -->
+        <div class="mb-3">
+            <label class="form-label">Garancia (hónap)</label>
+            <input type="number" class="form-control" formControlName="warrantyPeriodMonths" />
         </div>
 
-        <!-- Serial number required -->
-        <div class="flex items-center">
-            <label for="serialNumberRequired" class="mr-2">Szükséges gyári szám *</label>
-            <input type="checkbox" id="serialNumberRequired" formControlName="serialNumberRequired" />
+        <!-- Gyári szám szükséges -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" formControlName="serialNumberRequired"
+                id="serialNumberRequired" />
+            <label class="form-check-label" for="serialNumberRequired">Szükséges gyári szám *</label>
         </div>
 
-        <!-- Stock quantity (disabled) -->
-        <div>
-            <label>Készlet</label>
-            <input type="number" formControlName="stockQuantity" class="form-control" />
+        <!-- Készlet -->
+        <div class="mb-3">
+            <label class="form-label">Készlet</label>
+            <input type="number" class="form-control" formControlName="stockQuantity" />
         </div>
 
-        <!-- Unit -->
-        <div>
-            <label>Mértékegység *</label>
-            <input type="text" formControlName="unit" class="form-control" />
+        <!-- Mértékegység -->
+        <div class="mb-3">
+            <label class="form-label">Mértékegység *</label>
+            <input type="text" class="form-control" formControlName="unit" />
         </div>
 
-        <!-- Vat rate -->
-        <div>
-            <label>ÁFA kulcs *</label>
-            <select formControlName="vatRate" class="form-control">
+        <!-- ÁFA kulcs -->
+        <div class="mb-3">
+            <label class="form-label">ÁFA kulcs *</label>
+            <select class="form-select" formControlName="vatRate">
                 <option [ngValue]="null" disabled>-- Válassz Áfa kódot --</option>
-                <option *ngFor="let rate of vatRates" [ngValue]="rate">{{ rate.name }} ({{ rate.rate }}%)</option>
+                <option *ngFor="let rate of vatRates" [ngValue]="rate">
+                    {{ rate.name }} ({{ rate.rate }}%)
+                </option>
             </select>
         </div>
 
-        <!-- Deleted -->
-        <div class="flex items-center">
-            <label for="deleted" class="mr-2">Törölt?</label>
-            <input type="checkbox" id="deleted" formControlName="deleted" />
+        <!-- Törölt -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" formControlName="deleted" id="deleted" />
+            <label class="form-check-label" for="deleted">Törölt?</label>
         </div>
 
-        <!-- Barcodes -->
-        <div>
-            <label>Vonalkódok</label>
-            <button type="button" class="btn btn-outline" (click)="openBarcodeManager()">Kezelés</button>
+        <!-- Vonalkód kezelés -->
+        <div class="mb-3">
+            <label class="form-label d-block">Vonalkódok</label>
+            <button type="button" class="btn btn-outline-secondary" (click)="openBarcodeManager()">
+                Kezelés
+            </button>
         </div>
 
-        <!-- Serial numbers -->
-        <div>
-            <label>Gyári számok</label>
-            <button type="button" class="btn btn-outline" (click)="openSerialNumberManager()"
+        <!-- Gyári szám kezelés -->
+        <div class="mb-3">
+            <label class="form-label d-block">Gyári számok</label>
+            <button type="button" class="btn btn-outline-secondary" (click)="openSerialNumberManager()"
                 [disabled]="!form.value.serialNumberRequired">
                 Kezelés
             </button>
         </div>
 
-        <!-- Submit -->
-        <div class="pt-4">
+        <!-- Mentés -->
+        <div class="mt-4">
             <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Mentés</button>
         </div>
     </form>
