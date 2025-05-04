@@ -24,6 +24,7 @@ import { ProductCategoryListComponent } from './pages/product-category-list/prod
 import { ProductCategoryFormComponent } from './pages/product-category-form/product-category-form.component';
 import { InvoiceNumberSequenceListComponent } from './pages/invoice-number-sequence-list/invoice-number-sequence-list.component';
 import { InvoiceNumberSequenceFormComponent } from './pages/invoice-number-sequence-form/invoice-number-sequence-form.component';
+import { ProductFormComponent } from './pages/product-form/product-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -54,6 +55,8 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'products', pathMatch: 'full' }, // Alapértelmezett törzsadat
       { path: 'products', component: ProductListComponent, title: 'Termékek' },
+      { path: 'products/new', component: ProductFormComponent, title: 'Új termékek' },
+      { path: 'products/edit/:id', component: ProductFormComponent, title: 'Termék szerkesztése' },
       { path: 'partners', component: PartnerListComponent, title: 'Partnerek' },
       { path: 'partners/new', component: PartnerFormComponent, title: 'Új partnerek' },
       { path: 'partners/edit/:id', component: PartnerFormComponent, title: 'Partner szerkesztése' },
