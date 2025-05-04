@@ -21,6 +21,7 @@ export interface ProductDto {
     warrantyPeriodMonths: number;
     serialNumberRequired: boolean;
     stockQuantity: number;
+    unit: string;
     barcodes: BarcodeDto[];
     serialNumbers: SerialNumberDto[]
     vatRate: VatRateDto;

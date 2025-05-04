@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import { ProductDto } from '../models/product.dto'; // Tegyük fel, hogy van ilyen
 import { environment } from '../environments/environment.development';
 import { PaginatedProductsResponse } from '../models/paginated-response.dto';
+import { UpdateProductCommand } from '../models/update-product-command';
+import { CreateProductCommand } from '../models/create-product-command';
 
 @Injectable({
   providedIn: 'root'
@@ -47,13 +49,13 @@ export class ProductService {
     return this.http.get<ProductDto>(`${this.apiUrl}/products/${id}`);
   }
 
-  /*updatePartner(id: number, command: UpdatePartnerCommand): Observable<ProductDto> {
-      return this.http.put<ProductDto>(`${this.apiUrl}/products/${id}`, command);
+  updateProduct(id: number, command: UpdateProductCommand): Observable<ProductDto> {
+    return this.http.put<ProductDto>(`${this.apiUrl}/products/${id}`, command);
   }
 
-  createPartner(command: CreatePartnerCommand): Observable<ProductDto> {
-      return this.http.post<ProductDto>(`${this.apiUrl}/products`, command);
-  }*/
+  createProduct(command: CreateProductCommand): Observable<ProductDto> {
+    return this.http.post<ProductDto>(`${this.apiUrl}/products`, command);
+  }
 
 
   deleteProduct(id: number): Observable<void> {
