@@ -17,6 +17,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map } from 'rxjs';
 import { BarcodeManagerModalComponent } from '../barcode-manager-modal/barcode-manager-modal.component';
 import { BarcodeDto } from '../../models/barcode.dto';
+import { SerialNumberManagerModalComponent } from '../serial-number-manager-modal/serial-number-manager-modal.component';
+import { SerialNumberDto } from '../../models/serial-number.dto';
 
 @Component({
   selector: 'app-product-form',
@@ -26,6 +28,8 @@ import { BarcodeDto } from '../../models/barcode.dto';
 export class ProductFormComponent implements OnInit {
   form!: FormGroup;
   id!: number | null;
+
+  showSerialNumberModal = false;
 
   // Legördülő adatok
   categories: ProductCategoryDto[] = [];
@@ -146,8 +150,6 @@ export class ProductFormComponent implements OnInit {
       .catch(() => { });
   }
 
-
-
   openBarcodeManager(): void {
     const modalRef = this.modalService.open(BarcodeManagerModalComponent, {
       size: 'lg',
@@ -165,7 +167,19 @@ export class ProductFormComponent implements OnInit {
   }
 
   openSerialNumberManager(): void {
-    if (!this.form.value.serialNumberRequired) return;
-    console.log('Gyári szám kezelés még nincs kész.');
+    const modalRef = this.modalService.open(SerialNumberManagerModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: true
+    });
+
+    modalRef.componentInstance.initialserialNumbers = this.form.value.serialnumbers;
+
+    modalRef.result
+      .then((updatedSerialNumbers: SerialNumberDto[]) => {
+        this.form.get('serialNumbers')?.setValue(updatedSerialNumbers);
+      })
+      .catch(() => { });
   }
+
 }

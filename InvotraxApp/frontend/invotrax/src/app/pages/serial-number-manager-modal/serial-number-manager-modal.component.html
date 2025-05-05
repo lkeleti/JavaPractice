@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <h5 class="modal-title">Gyári számok kezelése</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="mb-3">
+        <input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Szűrés gyári számra...">
+    </div>
+
+    <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered table-hover mt-3 table-sm">
+            <thead>
+                <tr>
+                    <th>Gyári szám</th>
+                    <th style="width: 100px;">Használt</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let sn of filteredSerialNumbers; let i = index">
+                    <td>
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="sn.serial"
+                            (keydown)="onInputKeydown($event)" [id]="'serial-input-' + sn.id" [disabled]="sn.used">
+                    </td>
+
+                    <td class="text-center align-middle"> <span *ngIf="sn.used" class="badge bg-success"> Igen
+                        </span>
+                    </td>
+                </tr>
+                <tr *ngIf="filteredSerialNumbers.length === 0">
+                    <td colspan="2" class="text-center text-muted">Nincs a szűrésnek megfelelő gyári szám.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-secondary" type="button" (click)="dismiss()">Mégse</button>
+    <button class="btn btn-success" type="button" (click)="save()">Mentés</button>
+</div>

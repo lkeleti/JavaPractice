@@ -57,6 +57,17 @@
             </div>
         </div>
 
+        <!-- ÁFA kulcs -->
+        <div class="mb-3">
+            <label class="form-label">ÁFA kulcs *</label>
+            <select class="form-select" formControlName="vatRate">
+                <option [ngValue]="null" disabled>-- Válassz Áfa kódot --</option>
+                <option *ngFor="let rate of vatRates" [ngValue]="rate">
+                    {{ rate.name }} ({{ rate.rate }}%)
+                </option>
+            </select>
+        </div>
+
         <!-- Ár mezők -->
         <div class="row mb-3">
             <div class="col-md-3">
@@ -83,13 +94,6 @@
             <input type="number" class="form-control" formControlName="warrantyPeriodMonths" />
         </div>
 
-        <!-- Gyári szám szükséges -->
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" formControlName="serialNumberRequired"
-                id="serialNumberRequired" />
-            <label class="form-check-label" for="serialNumberRequired">Szükséges gyári szám *</label>
-        </div>
-
         <!-- Készlet -->
         <div class="mb-3">
             <label class="form-label">Készlet</label>
@@ -102,38 +106,42 @@
             <input type="text" class="form-control" formControlName="unit" />
         </div>
 
-        <!-- ÁFA kulcs -->
-        <div class="mb-3">
-            <label class="form-label">ÁFA kulcs *</label>
-            <select class="form-select" formControlName="vatRate">
-                <option [ngValue]="null" disabled>-- Válassz Áfa kódot --</option>
-                <option *ngFor="let rate of vatRates" [ngValue]="rate">
-                    {{ rate.name }} ({{ rate.rate }}%)
-                </option>
-            </select>
-        </div>
 
-        <!-- Törölt -->
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" formControlName="deleted" id="deleted" />
-            <label class="form-check-label" for="deleted">Törölt?</label>
-        </div>
-
-
-        <div class="mb-3">
+        <div class="row mb-3 align-items-center">
             <!-- Vonalkód kezelés -->
-            <label class="form-label d-block">Vonalkódok</label>
-            <button type="button" class="btn btn-outline-secondary" (click)="openBarcodeManager()">
-                Kezelés
-            </button>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-outline-secondary w-100" (click)="openBarcodeManager()">
+                    Vonalkódok
+                </button>
+            </div>
+
+            <!-- Gyári szám szükséges -->
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" formControlName="serialNumberRequired"
+                        id="serialNumberRequired" />
+                    <label class="form-check-label" for="serialNumberRequired">Szükséges gyári szám *</label>
+                </div>
+            </div>
 
             <!-- Gyári szám kezelés -->
-            <label class="form-label d-block">Gyári számok</label>
-            <button type="button" class="btn btn-outline-secondary" (click)="openSerialNumberManager()"
-                [disabled]="!form.value.serialNumberRequired">
-                Kezelés
-            </button>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-outline-secondary w-100" (click)="openSerialNumberManager()"
+                    [disabled]="!form.value.serialNumberRequired">
+                    Gyári számok
+                </button>
+            </div>
+
+            <!-- Törölt -->
+            <div class="col-md-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" formControlName="deleted" id="deleted" />
+                    <label class="form-check-label" for="deleted">Törölt?</label>
+                </div>
+            </div>
         </div>
+
+
 
         <!-- Mentés -->
         <div class="mt-4">
