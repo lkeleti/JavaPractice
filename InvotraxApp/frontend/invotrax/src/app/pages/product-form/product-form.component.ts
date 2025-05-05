@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import { EntityLookupModalComponent } from '../../shared/entity-lookup-modal/entity-lookup-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map } from 'rxjs';
+import { BarcodeManagerModalComponent } from '../barcode-manager-modal/barcode-manager-modal.component';
+import { BarcodeDto } from '../../models/barcode.dto';
 
 @Component({
   selector: 'app-product-form',
@@ -72,9 +74,9 @@ export class ProductFormComponent implements OnInit {
       productType: [null, Validators.required],
       category: [null, Validators.required],
       manufacturer: [null, Validators.required],
-      netPurchasePrice: [null],
-      grossPurchasePrice: [null],
-      netSellingPrice: [null],
+      netPurchasePrice: [{ value: null, disabled: true }],
+      grossPurchasePrice: [{ value: null, disabled: true }],
+      netSellingPrice: [{ value: null, disabled: true }],
       grossSellingPrice: [null],
       warrantyPeriodMonths: [null],
       serialNumberRequired: [false],
@@ -104,7 +106,7 @@ export class ProductFormComponent implements OnInit {
       id: this.id ?? undefined,
     };
 
-    const request$ = this.id
+    /*const request$ = this.id
       ? this.productService.updateProduct(product.id, product)
       : this.productService.createProduct(product);
 
@@ -114,7 +116,7 @@ export class ProductFormComponent implements OnInit {
         // hibakezelés
         console.error(err);
       },
-    });
+    });*/
   }
 
   openManufacturerLookup(): void {
@@ -147,8 +149,19 @@ export class ProductFormComponent implements OnInit {
 
 
   openBarcodeManager(): void {
-    // Később implementálandó
-    console.log('Vonalkód kezelés még nincs kész.');
+    const modalRef = this.modalService.open(BarcodeManagerModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: false
+    });
+
+    modalRef.componentInstance.initialBarcodes = this.form.value.barcodes;
+
+    modalRef.result
+      .then((updatedBarcodes: BarcodeDto[]) => {
+        this.form.get('barcodes')?.setValue(updatedBarcodes);
+      })
+      .catch(() => { });
   }
 
   openSerialNumberManager(): void {

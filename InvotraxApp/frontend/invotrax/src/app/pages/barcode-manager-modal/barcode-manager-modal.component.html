@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <h5 class="modal-title">Vonalkódok kezelése</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" [(ngModel)]="newBarcode" placeholder="Vonalkód hozzáadása">
+        <button class="btn btn-primary" (click)="addBarcode()">Hozzáadás</button>
+        <button class="btn btn-secondary" (click)="generateBarcode()"
+            [disabled]="hasGeneratedBarcode">Generálás</button>
+    </div>
+    <div *ngIf="errorMessage" class="text-danger mt-1">{{ errorMessage }}</div>
+
+    <table class="table table-bordered table-hover mt-4">
+        <thead>
+            <tr>
+                <th>Vonalkód</th>
+                <th>Generált</th>
+                <th style="width: 50px;">Törlés</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let barcode of barcodes; let i = index">
+                <td>{{ barcode.code }}</td>
+                <td>
+                    <span class="badge bg-secondary" *ngIf="barcode.isGenerated">Igen</span>
+                    <span class="badge bg-light text-dark" *ngIf="!barcode.isGenerated">Nem</span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" (click)="removeBarcode(i)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="dismiss()">Mégse</button>
+    <button type="button" class="btn btn-success" (click)="save()">Mentés</button>
+</div>

@@ -119,16 +119,15 @@
             <label class="form-check-label" for="deleted">Törölt?</label>
         </div>
 
-        <!-- Vonalkód kezelés -->
+
         <div class="mb-3">
+            <!-- Vonalkód kezelés -->
             <label class="form-label d-block">Vonalkódok</label>
             <button type="button" class="btn btn-outline-secondary" (click)="openBarcodeManager()">
                 Kezelés
             </button>
-        </div>
 
-        <!-- Gyári szám kezelés -->
-        <div class="mb-3">
+            <!-- Gyári szám kezelés -->
             <label class="form-label d-block">Gyári számok</label>
             <button type="button" class="btn btn-outline-secondary" (click)="openSerialNumberManager()"
                 [disabled]="!form.value.serialNumberRequired">
