@@ -182,4 +182,8 @@ export class ProductFormComponent implements OnInit {
       .catch(() => { });
   }
 
+  onCancel(): void {
+    this.router.navigate(['/master-data/products']);
+  }
+
 }
