@@ -1,4 +1,5 @@
-import Decimal from "decimal.js";
+import { BarcodeDto } from "./barcode.dto";
+import { SerialNumberDto } from "./serial-number.dto";
 
 export interface CreateProductCommand {
     name: string;
@@ -7,12 +8,12 @@ export interface CreateProductCommand {
     productTypeId: number;
     categoryId: number;
     manufacturerId: number;
-    netSellingPrice: Decimal;
-    grossSellingPrice: Decimal;
+    netSellingPrice: number;
+    grossSellingPrice: number;
     warrantyPeriodMonths: number;
-    stockQuantity: number;
     serialNumberRequired: boolean;
     vatRateId: number;
-    //Barcodes
-    //SerialNumbers
+    unit: string;
+    barcodes: BarcodeDto[];
+    serialNumbers: SerialNumberDto[];
 }

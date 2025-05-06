@@ -19,6 +19,8 @@ import { BarcodeManagerModalComponent } from '../barcode-manager-modal/barcode-m
 import { BarcodeDto } from '../../models/barcode.dto';
 import { SerialNumberManagerModalComponent } from '../serial-number-manager-modal/serial-number-manager-modal.component';
 import { SerialNumberDto } from '../../models/serial-number.dto';
+import { UpdateProductCommand } from '../../models/update-product-command';
+import { CreateProductCommand } from '../../models/create-product-command';
 
 @Component({
   selector: 'app-product-form',
@@ -29,8 +31,6 @@ export class ProductFormComponent implements OnInit {
   form!: FormGroup;
   id!: number | null;
 
-  showSerialNumberModal = false;
-
   // Legördülő adatok
   categories: ProductCategoryDto[] = [];
   vatRates: VatRateDto[] = [];
@@ -38,6 +38,9 @@ export class ProductFormComponent implements OnInit {
 
   // Betöltött entitás (edit módban)
   productToEdit!: ProductDto;
+
+  isLoading = false;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -52,23 +55,32 @@ export class ProductFormComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.id = this.route.snapshot.params['id'] ? +this.route.snapshot.params['id'] : null;
+    const idParam = this.route.snapshot.params['id'];
+    this.id = idParam ? +idParam : null;
 
     this.initForm();
     this.loadSelectData();
 
     if (this.id) {
+      this.isLoading = true;
       this.productService.findProductById(this.id).subscribe({
         next: (product) => {
           this.productToEdit = product;
-          this.form.patchValue(product);
+          this.patchFormWithProductData(product);
+          this.isLoading = false;
         },
-        error: () => {
-          // hibakezelés vagy visszairányítás
+        error: (err) => {
+          console.error("Error fetching product for edit:", err);
+          this.errorMessage = "Hiba történt a termék betöltése közben.";
+          this.isLoading = false;
         },
       });
     }
   }
+
+
+
+
 
   private initForm(): void {
     this.form = this.fb.group({
@@ -93,34 +105,137 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  private patchFormWithProductData(product: ProductDto): void {
+    this.form.patchValue({
+      name: product.name,
+      sku: product.sku,
+      description: product.description,
+      productType: product.productType,
+      category: product.category,
+      manufacturer: product.manufacturer,
+      netPurchasePrice: product.netPurchasePrice,
+      grossPurchasePrice: product.grossPurchasePrice,
+      netSellingPrice: product.netSellingPrice,
+      grossSellingPrice: product.grossSellingPrice,
+      warrantyPeriodMonths: product.warrantyPeriodMonths,
+      serialNumberRequired: product.serialNumberRequired,
+      stockQuantity: product.stockQuantity,
+      unit: product.unit,
+      vatRate: product.vatRate,
+      deleted: product.deleted,
+      barcodes: product.barcodes || [],
+      serialNumbers: product.serialNumbers || []
+    });
+  }
+
   private loadSelectData(): void {
-    this.productCategoryService.getProductCategories().subscribe((cats) => (this.categories = cats));
-    this.vatRateService.getVatRates().subscribe((rates) => (this.vatRates = rates));
-    this.productTypeService.getProductTypes().subscribe((types) => (this.productTypes = types));
+    this.productCategoryService.getProductCategories().subscribe((cats) => {
+      this.categories = cats;
+      if (this.id && this.productToEdit) { // Csak akkor próbáljon patchelni, ha van mit
+        this.form.get('category')?.setValue(this.categories.find(c => c.id === this.productToEdit?.category.id) || null);
+      }
+    });
+    this.vatRateService.getVatRates().subscribe((rates) => {
+      this.vatRates = rates;
+      if (this.id && this.productToEdit) {
+        this.form.get('vatRate')?.setValue(this.vatRates.find(vr => vr.id === this.productToEdit?.vatRate.id) || null);
+      }
+    });
+    this.productTypeService.getProductTypes().subscribe((types) => {
+      this.productTypes = types;
+      if (this.id && this.productToEdit) {
+        this.form.get('productType')?.setValue(this.productTypes.find(pt => pt.id === this.productToEdit?.productType.id) || null);
+      }
+    });
   }
 
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      console.warn('Form is invalid. Errors:', this.form.errors);
+      // Kiírhatjuk az egyes mezők hibáit is
+      Object.keys(this.form.controls).forEach(key => {
+        const controlErrors = this.form.get(key)?.errors;
+        if (controlErrors != null) {
+          console.warn('Control \'' + key + '\' errors: ' + JSON.stringify(controlErrors));
+        }
+      });
       return;
     }
+    this.isLoading = true;
+    this.errorMessage = null;
 
-    const product: ProductDto = {
-      ...this.form.getRawValue(),
-      id: this.id ?? undefined,
+    const formValues = this.form.getRawValue();
+
+    // Közös payload rész
+    const commonPayload = {
+      name: formValues.name,
+      sku: formValues.sku,
+      description: formValues.description || '', // Biztosítjuk, hogy string legyen
+      productTypeId: formValues.productType?.id,
+      categoryId: formValues.category?.id,
+      manufacturerId: formValues.manufacturer?.id,
+      netSellingPrice: Number(formValues.netSellingPrice) || 0, // Konvertálás number-re és null/undefined -> 0
+      grossSellingPrice: Number(formValues.grossSellingPrice) || 0, // Konvertálás number-re és null/undefined -> 0
+      warrantyPeriodMonths: formValues.warrantyPeriodMonths === null || formValues.warrantyPeriodMonths === undefined ? 0 : Number(formValues.warrantyPeriodMonths),
+      serialNumberRequired: formValues.serialNumberRequired,
+      vatRateId: formValues.vatRate?.id,
+      unit: formValues.unit,
+      barcodes: formValues.barcodes || [],
+      serialNumbers: formValues.serialNumbers || [],
     };
 
-    /*const request$ = this.id
-      ? this.productService.updateProduct(product.id, product)
-      : this.productService.createProduct(product);
+    if (this.id) {
+      // Update művelet
+      const updateCommand: UpdateProductCommand = {
+        ...commonPayload,
+        deleted: formValues.deleted, // Csak update-nél van
+      };
+      // Validáció, hogy a szükséges ID-k ne legyenek undefined
+      if (updateCommand.productTypeId === undefined || updateCommand.categoryId === undefined || updateCommand.manufacturerId === undefined || updateCommand.vatRateId === undefined) {
+        this.errorMessage = "Kérem válasszon terméktípust, kategóriát, gyártót és ÁFA kulcsot!";
+        this.isLoading = false;
+        return;
+      }
 
-    request$.subscribe({
-      next: () => this.router.navigate(['/products']),
-      error: (err) => {
-        // hibakezelés
-        console.error(err);
-      },
-    });*/
+      this.productService.updateProduct(this.id, updateCommand).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/master-data/products']);
+        },
+        error: (err) => {
+          console.error('Error updating product:', err);
+          this.errorMessage = err.error?.message || "Hiba történt a termék frissítése közben.";
+          this.isLoading = false;
+        },
+      });
+    } else {
+      // Create művelet
+      const createCommand: CreateProductCommand = {
+        ...commonPayload
+        // A 'deleted' mező itt nem kell
+      };
+      // Validáció, hogy a szükséges ID-k ne legyenek undefined
+      if (createCommand.productTypeId === undefined || createCommand.categoryId === undefined || createCommand.manufacturerId === undefined || createCommand.vatRateId === undefined) {
+        this.errorMessage = "Kérem válasszon terméktípust, kategóriát, gyártót és ÁFA kulcsot!";
+        this.isLoading = false;
+        return;
+      }
+
+      console.log(createCommand);
+
+      this.productService.createProduct(createCommand).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/master-data/products']);
+        },
+        error: (err) => {
+          console.error('Error creating product:', err);
+          this.errorMessage = err.error?.message || "Hiba történt a termék létrehozása közben.";
+          this.isLoading = false;
+        },
+      });
+    }
   }
 
   openManufacturerLookup(): void {
@@ -173,7 +288,7 @@ export class ProductFormComponent implements OnInit {
       keyboard: true
     });
 
-    modalRef.componentInstance.initialserialNumbers = this.form.value.serialnumbers;
+    modalRef.componentInstance.initialserialNumbers = this.form.value.serialNumbers;
 
     modalRef.result
       .then((updatedSerialNumbers: SerialNumberDto[]) => {
@@ -187,3 +302,28 @@ export class ProductFormComponent implements OnInit {
   }
 
 }
+/*
+{
+  "name": "Intel Core i5-14400F 10-Core 2.5GHz LGA1700 Box",
+  "sku": "BX8071514400F",
+  "description": "",
+  "productTypeId": 1,
+  "categoryId": 2,
+  "manufacturerId": 1,
+  "netSellingPrice": 0,
+  "grossSellingPrice": 0,
+  "warrantyPeriodMonths": 36,
+  "serialNumberRequired": false,
+  "barcodes": [
+    {
+      "id": 0,
+      "code": "5032037279147",
+      "isGenerated": false
+    }
+  ],
+  "serialNumbers": [],
+  "unit": "db",
+  "vatRateId": 1
+}
+
+*/
