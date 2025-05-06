@@ -22,6 +22,7 @@ public class Product {
     private String name;
     private String sku;
     private String description;
+    private String unit;
 
     @ManyToOne
     @JoinColumn(name = "product_type_id", nullable = false)

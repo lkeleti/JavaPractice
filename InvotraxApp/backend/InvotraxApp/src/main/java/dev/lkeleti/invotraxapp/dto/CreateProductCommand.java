@@ -15,6 +15,7 @@ public class CreateProductCommand {
     private String name;
     private String sku;
     private String description;
+    private String unit;
     private Long categoryId;
     private Long manufacturerId;
     private BigDecimal netPurchasePrice;

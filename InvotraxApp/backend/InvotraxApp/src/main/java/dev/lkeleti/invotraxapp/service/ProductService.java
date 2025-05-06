@@ -68,6 +68,7 @@ public class ProductService {
         product.setName(command.getName());
         product.setSku(command.getSku());
         product.setDescription(command.getDescription());
+        product.setUnit(command.getUnit());
         product.setCategory(productCategory);
         product.setManufacturer(manufacturer);
         product.setNetPurchasePrice(command.getNetPurchasePrice());
@@ -105,6 +106,7 @@ public class ProductService {
         product.setName(command.getName());
         product.setSku(command.getSku());
         product.setDescription(command.getDescription());
+        product.setUnit(command.getUnit());
         product.setCategory(productCategory);
         product.setManufacturer(manufacturer);
         product.setNetPurchasePrice(command.getNetPurchasePrice());

@@ -19,6 +19,7 @@ public class ProductDto {
     private String name;
     private String sku;
     private String description;
+    private String unit;
     private ProductCategoryDto category;
     private ManufacturerDto manufacturer;
     private BigDecimal netPurchasePrice;
