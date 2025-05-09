@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -58,10 +59,10 @@ public class Product {
     private int stockQuantity;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Barcode> barcodes;
+    private List<Barcode> barcodes  = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<SerialNumber> serialNumbers;
+    private List<SerialNumber> serialNumbers  = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "vat_rate_id")

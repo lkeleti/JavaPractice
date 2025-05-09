@@ -1,11 +1,8 @@
 package dev.lkeleti.invotraxapp.service;
 
 import dev.lkeleti.invotraxapp.model.*;
-import dev.lkeleti.invotraxapp.repository.VatRateRepository;
+import dev.lkeleti.invotraxapp.repository.*;
 import dev.lkeleti.invotraxapp.dto.*;
-import dev.lkeleti.invotraxapp.repository.ManufacturerRepository;
-import dev.lkeleti.invotraxapp.repository.ProductCategoryRepository;
-import dev.lkeleti.invotraxapp.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +26,9 @@ public class ProductService {
     private ProductCategoryRepository productCategoryRepository;
     private ManufacturerRepository manufacturerRepository;
     private ModelMapper modelMapper;
+    private ProductTypeRepository productTypeRepository;
+    private BarcodeRepository barcodeRepository;
+    private SerialNumberRepository serialNumberRepository;
 
     @Transactional(readOnly = true)
     public List<ProductDto> getAllProducts() {
@@ -64,6 +66,10 @@ public class ProductService {
         Manufacturer manufacturer = manufacturerRepository.findById(command.getManufacturerId()).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find Manufacturer!")
         );
+
+        ProductType productType = productTypeRepository.findById(command.getProductTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find Product Type!"));
+
         Product product = new Product();
         product.setName(command.getName());
         product.setSku(command.getSku());
@@ -71,16 +77,37 @@ public class ProductService {
         product.setUnit(command.getUnit());
         product.setCategory(productCategory);
         product.setManufacturer(manufacturer);
+        product.setProductType(productType);
         product.setNetPurchasePrice(command.getNetPurchasePrice());
         product.setGrossPurchasePrice(command.getGrossPurchasePrice());
         product.setNetSellingPrice(command.getNetSellingPrice());
         product.setGrossSellingPrice(command.getGrossSellingPrice());
         product.setWarrantyPeriodMonths(command.getWarrantyPeriodMonths());
         product.setSerialNumberRequired(command.isSerialNumberRequired());
-        product.setBarcodes(new ArrayList<>());
-        product.setSerialNumbers(new ArrayList<>());
         product.setStockQuantity(command.getStockQuantity());
         product.setVatRate(vatRate);
+
+        if (command.getBarcodes() != null) {
+            for (BarcodeDto barcodeDto : command.getBarcodes()) {
+                Barcode barcode = new Barcode();
+                barcode.setCode(barcodeDto.getCode());
+                barcode.setIsGenerated(barcodeDto.getIsGenerated());
+                barcode.setProduct(product);
+                barcode = barcodeRepository.save(barcode);
+                product.getBarcodes().add(barcode);
+            }
+        }
+
+        if (command.getSerialNumbers() != null) {
+            for (SerialNumberDto serialDto : command.getSerialNumbers()) {
+                SerialNumber serial = new SerialNumber();
+                serial.setSerial(serialDto.getSerial());
+                serial.setUsed(serialDto.isUsed());
+                serial.setProduct(product);
+                serial = serialNumberRepository.save(serial);
+                product.getSerialNumbers().add(serial);
+            }
+        }
 
         return modelMapper.map(productRepository.save(product), ProductDto.class);
     }
@@ -103,6 +130,9 @@ public class ProductService {
                 () -> new EntityNotFoundException("Cannot find Manufacturer!")
         );
 
+        ProductType productType = productTypeRepository.findById(command.getProductTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find Product Type!"));
+
         product.setName(command.getName());
         product.setSku(command.getSku());
         product.setDescription(command.getDescription());
@@ -117,8 +147,71 @@ public class ProductService {
         product.setSerialNumberRequired(command.isSerialNumberRequired());
         product.setStockQuantity(command.getStockQuantity());
         product.setVatRate(vatRate);
+        product.setProductType(productType);
+        product.setDeleted(command.isDeleted());
 
-        return modelMapper.map(product, ProductDto.class);
+        List<Barcode> existingBarcodes = new ArrayList<>(product.getBarcodes());
+        List<BarcodeDto> incomingBarcodes = command.getBarcodes();
+
+        existingBarcodes.forEach(existing -> {
+            boolean stillExists = incomingBarcodes.stream()
+                    .anyMatch(dto -> dto.getId() != 0 && dto.getId().equals(existing.getId()));
+            if (!stillExists) {
+                barcodeRepository.delete(existing);
+            }
+        });
+
+        for (BarcodeDto dto : incomingBarcodes) {
+            if (dto.getId() != 0) {
+                Barcode existing = existingBarcodes.stream()
+                        .filter(b -> b.getId().equals(dto.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existing != null) {
+                    existing.setCode(dto.getCode());
+                    existing.setIsGenerated(dto.getIsGenerated());
+                }
+            } else {
+                Barcode newBarcode = new Barcode();
+                newBarcode.setCode(dto.getCode());
+                newBarcode.setIsGenerated(dto.getIsGenerated());
+                newBarcode.setProduct(product);
+                barcodeRepository.save(newBarcode);
+            }
+        }
+
+
+        List<SerialNumber> existingSerialNumbers = new ArrayList<>(product.getSerialNumbers());
+        List<SerialNumberDto> incomingSerialNumbers = command.getSerialNumbers();
+
+        existingSerialNumbers.forEach(existing -> {
+            boolean stillExists = incomingSerialNumbers.stream()
+                    .anyMatch(dto -> dto.getId() != 0 && dto.getId().equals(existing.getId()));
+            if (!stillExists) {
+                serialNumberRepository.delete(existing);
+            }
+        });
+
+        for (SerialNumberDto dto : incomingSerialNumbers) {
+            if (dto.getId() != 0) {
+                SerialNumber existing = existingSerialNumbers.stream()
+                        .filter(s -> s.getId().equals(dto.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existing != null) {
+                    existing.setSerial(dto.getSerial());
+                }
+            } else {
+                SerialNumber newSerialNumber = new SerialNumber();
+                newSerialNumber.setSerial(dto.getSerial());
+                newSerialNumber.setUsed(false);
+                newSerialNumber.setProduct(product);
+                serialNumberRepository.save(newSerialNumber);
+            }
+        }
+        return modelMapper.map(productRepository.save(product), ProductDto.class);
     }
 
     @Transactional

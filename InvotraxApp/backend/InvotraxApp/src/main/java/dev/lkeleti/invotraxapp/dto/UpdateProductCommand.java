@@ -1,11 +1,13 @@
 package dev.lkeleti.invotraxapp.dto;
 
+import dev.lkeleti.invotraxapp.model.Barcode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,5 +28,8 @@ public class UpdateProductCommand {
     private boolean serialNumberRequired;
     private int stockQuantity;
     private Long vatRateId;
+    private long productTypeId;
     private boolean deleted;
+    private List<BarcodeDto> barcodes;
+    private List<SerialNumberDto> serialNumbers;
 }
