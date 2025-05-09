@@ -1,7 +1,6 @@
 package dev.lkeleti.invotraxapp.controller;
 
 import dev.lkeleti.invotraxapp.dto.CreateZipCodeCommand;
-import dev.lkeleti.invotraxapp.dto.ManufacturerDto;
 import dev.lkeleti.invotraxapp.dto.UpdateZipCodeCommand;
 import dev.lkeleti.invotraxapp.dto.ZipCodeDto;
 import dev.lkeleti.invotraxapp.service.ZipCodeService;

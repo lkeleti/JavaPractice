@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +25,11 @@ public class InventoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Összes bevételezés listázása",
-            description = "Visszaadja az összes bevételezés listáját.")
+    @Operation(summary = "Összes bevételezés listázása oldalakban (paging)",
+            description = "Visszaadja az összes bevételezés listáját oldalakban, page/size paraméterezéssel és irányítószámra, vagy városra történő kereséssel/szűkítéssel.")
     @ApiResponse(responseCode = "200", description = "Bevételezések sikeresen listázva")
-    public List<InventoryDto> getAllInventories() {
-        return inventoryService.getAllInventories();
+    public Page<InventoryDto> getAllInventories(Pageable pageable, @RequestParam(required = false) String searchTerm) {
+        return inventoryService.getAllInventories(pageable, searchTerm);
     }
 
     @GetMapping("/{id}")

@@ -11,6 +11,8 @@ import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,14 +29,21 @@ public class InventoryService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public List<InventoryDto> getAllInventories() {
+    public Page<InventoryDto> getAllInventories(Pageable pageable, String searchTerm) {
+        Page<Inventory> inventories;
+        if (searchTerm == null || searchTerm.isBlank()) {
+            inventories = inventoryRepository.findAll(pageable);
+        } else {
+            inventories = inventoryRepository.searchBySupplierNameOrSupplierTaxOrReceivedAtOrInvoiceNumber(searchTerm, pageable);
+        }
+
         Type targetListType = new TypeToken<List<InventoryDto>>(){}.getType();
-        return modelMapper.map(inventoryRepository.findAll(), targetListType);
+        return modelMapper.map(inventories, targetListType);
     }
 
     @Transactional(readOnly = true)
     public InventoryDto getInventoryById(Long id) {
-        return modelMapper.map(inventoryRepository.findById(id), InventoryDto.class);
+        return modelMapper.map(inventoryRepository.findByIdWithAllData(id), InventoryDto.class);
     }
 
     @Transactional
@@ -180,7 +189,6 @@ public class InventoryService {
                     if (uniqueSerials.size() != newItemCommand.getSerialNumbers().size()) {
                         throw new ValidationException("Duplicate serial numbers provided for product: " + product.getName());
                     }
-                    // TODO: Optimalizált DB ellenőrzés az összes új gyáriszámra egyszerre!
                     for (String serialStr : newItemCommand.getSerialNumbers()) {
                         if (serialNumberRepository.existsBySerial(serialStr)) {
                             throw new ValidationException("Serial number already exists: " + serialStr);
