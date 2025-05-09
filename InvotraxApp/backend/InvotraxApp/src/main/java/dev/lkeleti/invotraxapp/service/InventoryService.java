@@ -37,8 +37,7 @@ public class InventoryService {
             inventories = inventoryRepository.searchBySupplierNameOrSupplierTaxOrReceivedAtOrInvoiceNumber(searchTerm, pageable);
         }
 
-        Type targetListType = new TypeToken<List<InventoryDto>>(){}.getType();
-        return modelMapper.map(inventories, targetListType);
+        return inventories.map(inventory -> modelMapper.map(inventory, InventoryDto.class));
     }
 
     @Transactional(readOnly = true)

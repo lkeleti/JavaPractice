@@ -11,13 +11,15 @@ import java.util.Optional;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    @Query("SELECT i FROM Inventory i " +
-            "JOIN i.supplier s " +
+    @Query(value = "SELECT * FROM inventory i " +
+            "JOIN partner s ON i.supplier_id = s.id " +
             "WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "OR LOWER(s.taxNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "OR FUNCTION('DATE_FORMAT', s.receivedAt, '%Y.%m.%d') LIKE :searchTerm " +
-            "OR LOWER(s.invoiceNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+            "OR LOWER(s.tax_number) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "OR DATE_FORMAT(i.received_at, '%Y.%m.%d') LIKE :searchTerm " +
+            "OR LOWER(i.invoice_number) LIKE LOWER(CONCAT('%', :searchTerm, '%'))",
+            nativeQuery = true)
     Page<Inventory> searchBySupplierNameOrSupplierTaxOrReceivedAtOrInvoiceNumber(@Param("searchTerm") String searchTerm, Pageable pageable);
+
 
     @Query("SELECT i FROM Inventory i " +
             "LEFT JOIN FETCH i.supplier " +

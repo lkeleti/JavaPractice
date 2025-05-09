@@ -91,7 +91,7 @@ export class BarcodeManagerModalComponent {
           this.errorMessage = 'A generált vonalkód már szerepel a listában.';
         } else {
           this.barcodes.push({
-            id: -1,
+            id: 0,
             code: generated,
             isGenerated: true
           });

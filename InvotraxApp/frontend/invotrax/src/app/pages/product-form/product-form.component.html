@@ -31,7 +31,7 @@
         <!-- Termék típusa -->
         <div class="mb-3">
             <label class="form-label">Termék típusa *</label>
-            <select class="form-select" formControlName="productType">
+            <select class="form-select" formControlName="productType" [compareWith]="compareById">
                 <option [ngValue]="null" disabled>-- Válassz termék típust --</option>
                 <option *ngFor="let type of productTypes" [ngValue]="type">{{ type.name }}</option>
             </select>
@@ -40,7 +40,7 @@
         <!-- Kategória -->
         <div class="mb-3">
             <label class="form-label">Kategória *</label>
-            <select class="form-select" formControlName="category">
+            <select class="form-select" formControlName="category" [compareWith]="compareById">
                 <option [ngValue]="null" disabled>-- Válassz termék kategóriát --</option>
                 <option *ngFor="let cat of categories" [ngValue]="cat">{{ cat.name }}</option>
             </select>
@@ -60,7 +60,7 @@
         <!-- ÁFA kulcs -->
         <div class="mb-3">
             <label class="form-label">ÁFA kulcs *</label>
-            <select class="form-select" formControlName="vatRate">
+            <select class="form-select" formControlName="vatRate" [compareWith]="compareById">
                 <option [ngValue]="null" disabled>-- Válassz Áfa kódot --</option>
                 <option *ngFor="let rate of vatRates" [ngValue]="rate">
                     {{ rate.name }} ({{ rate.rate }}%)
@@ -79,12 +79,13 @@
                 <input type="number" class="form-control" formControlName="grossPurchasePrice" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Nettó eladási ár</label>
-                <input type="number" class="form-control" formControlName="netSellingPrice" />
+                <label class="form-label">Bruttó eladási ár</label>
+                <input type="number" class="form-control" formControlName="grossSellingPrice"
+                    (input)="calculateNetPrice()" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Bruttó eladási ár</label>
-                <input type="number" class="form-control" formControlName="grossSellingPrice" />
+                <label class="form-label">Nettó eladási ár</label>
+                <input type="number" class="form-control" formControlName="netSellingPrice" readonly />
             </div>
         </div>
 

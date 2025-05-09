@@ -301,29 +301,16 @@ export class ProductFormComponent implements OnInit {
     this.router.navigate(['/master-data/products']);
   }
 
-}
-/*
-{
-  "name": "Intel Core i5-14400F 10-Core 2.5GHz LGA1700 Box",
-  "sku": "BX8071514400F",
-  "description": "",
-  "productTypeId": 1,
-  "categoryId": 2,
-  "manufacturerId": 1,
-  "netSellingPrice": 0,
-  "grossSellingPrice": 0,
-  "warrantyPeriodMonths": 36,
-  "serialNumberRequired": false,
-  "barcodes": [
-    {
-      "id": 0,
-      "code": "5032037279147",
-      "isGenerated": false
-    }
-  ],
-  "serialNumbers": [],
-  "unit": "db",
-  "vatRateId": 1
-}
+  calculateNetPrice(): void {
+    const grossPrice = this.form.get('grossSellingPrice')?.value;
+    const vatRate = this.form.get('vatRate')?.value?.rate; // ÁFA kulcs elérése
 
-*/
+    if (grossPrice && vatRate) {
+      const netPrice = grossPrice / (1 + vatRate / 100);
+      this.form.patchValue({ netSellingPrice: netPrice.toFixed(2) }); // Két tizedesjegyre kerekítve
+    }
+  }
+  compareById(o1: { id: number }, o2: { id: number }): boolean {
+    return o1 && o2 ? o1.id === o2.id : o1 === o2;
+  }
+}
