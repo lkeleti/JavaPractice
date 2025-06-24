@@ -2,8 +2,6 @@ import { InvoiceTypeListComponent } from './pages/invoice-type-list/invoice-type
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { InvoicingComponent } from './pages/invoicing/invoicing.component';
-import { InventoryReceiptListComponent } from './pages/inventory-receipt-list/inventory-receipt-list.component';
-import { InventoryReceiptFormComponent } from './pages/inventory-receipt-form/inventory-receipt-form.component';
 import { ProductListComponent } from './pages/product-list/product-list.component';
 import { PartnerListComponent } from './pages/partner-list/partner-list.component';
 import { QueryPageComponent } from './pages/query-page/query-page.component';
@@ -25,6 +23,8 @@ import { ProductCategoryFormComponent } from './pages/product-category-form/prod
 import { InvoiceNumberSequenceListComponent } from './pages/invoice-number-sequence-list/invoice-number-sequence-list.component';
 import { InvoiceNumberSequenceFormComponent } from './pages/invoice-number-sequence-form/invoice-number-sequence-form.component';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
+import { InventoryListComponent } from './pages/inventory-list/inventory-list.component';
+import { InventoryFormComponent } from './pages/inventory-form/inventory-form.component';
 
 export const routes: Routes = [
   // Alapértelmezett átirányítás a számlázásra
@@ -35,18 +35,18 @@ export const routes: Routes = [
     title: 'Számlázás - InvotraxApp',
   }, // title hozzáadása jó gyakorlat
   {
-    path: 'inventory-receipts',
-    component: InventoryReceiptListComponent,
+    path: 'inventories',
+    component: InventoryListComponent,
     title: 'Bevételezések',
   },
   {
-    path: 'inventory-receipts/new',
-    component: InventoryReceiptFormComponent,
+    path: 'inventories/new',
+    component: InventoryFormComponent,
     title: 'Új Bevételezés',
   },
   {
-    path: 'inventory-receipts/edit/:id',
-    component: InventoryReceiptFormComponent,
+    path: 'inventories/edit/:id',
+    component: InventoryFormComponent,
     title: 'Bevételezés Szerkesztése',
   }, // :id paraméter
   {

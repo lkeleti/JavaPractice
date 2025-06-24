@@ -1,3 +1,4 @@
+import { InventoryDto } from "./inventory.dto";
 import { ManufacturerDto } from "./manufacturer.dto";
 import { PartnerDto } from "./partner.dto";
 import { ProductDto } from "./product.dto";
@@ -18,4 +19,5 @@ export type PaginatedManufacturersResponse = Page<ManufacturerDto>;
 export type PaginatedZipCodesResponse = Page<ZipCodeDto>;
 export type PaginatedPartnersResponse = Page<PartnerDto>;
 export type PaginatedProductsResponse = Page<ProductDto>;
+export type PaginatedInventoriesResponse = Page<InventoryDto>;
 
