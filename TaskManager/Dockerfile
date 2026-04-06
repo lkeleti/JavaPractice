@@ -1,0 +1,1 @@
+docker run -d -e MYSQL_DATABASE=taskmanager -e MYSQL_USER=taskmanager -e MYSQL_PASSWORD=taskmanager -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -p 3306:3306 --name taskmanager-mariadb mariadb
