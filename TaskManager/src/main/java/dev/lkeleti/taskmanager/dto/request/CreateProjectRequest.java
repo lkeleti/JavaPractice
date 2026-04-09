@@ -1,21 +1,20 @@
-package dev.lkeleti.taskmanager.dto.response;
+package dev.lkeleti.taskmanager.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class ProjectResponse {
-    private Long id;
+public class CreateProjectRequest {
+
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String description;
-    private LocalDateTime createdAt;
-    private List<Long> userIds;
 }
