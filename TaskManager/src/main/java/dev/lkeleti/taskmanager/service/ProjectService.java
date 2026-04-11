@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ProjectService {
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
     private ModelMapper modelMapper;
     private final UserRepository userRepository;
 

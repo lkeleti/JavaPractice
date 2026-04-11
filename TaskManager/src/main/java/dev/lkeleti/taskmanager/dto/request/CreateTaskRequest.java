@@ -1,24 +1,29 @@
-package dev.lkeleti.taskmanager.dto.response;
+package dev.lkeleti.taskmanager.dto.request;
 
-import dev.lkeleti.taskmanager.entity.Status;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class TaskResponse {
-    private Long id;
+public class CreateTaskRequest {
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String description;
-    private Status status;
+    @Future
     private LocalDate dueDate;
-    private LocalDateTime createdAt;
+    @Nullable
     private Long assigneeId;
+    @NotNull
     private Long projectId;
 }
