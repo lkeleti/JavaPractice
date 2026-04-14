@@ -91,9 +91,16 @@ public class TaskService {
                 () -> new EntityNotFoundException("Cannot find task with id: " + id)
         );
 
-        task.setTitle(command.getTitle());
-        task.setDescription(command.getDescription());
-        task.setDueDate(command.getDueDate());
+        if (command.getTitle() != null) {
+            task.setTitle(command.getTitle());
+        }
+        if (command.getDescription() != null) {
+            task.setDescription(command.getDescription());
+        }
+
+        if (command.getDueDate() != null) {
+            task.setDueDate(command.getDueDate());
+        }
 
         return mapToResponse(taskRepository.save(task));
     }
@@ -103,6 +110,10 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find task with id: " + id)
         );
+
+        if (command.getStatus() == null) {
+            throw new IllegalArgumentException("Cannot change status of task to null");
+        }
 
         if (Math.abs(task.getStatus().getOrder() - command.getStatus().getOrder()) != 1) {
             throw new IllegalArgumentException("Cannot change status of task to status: " + command.getStatus());
@@ -117,6 +128,10 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find task with id: " + id)
         );
+
+         if (command.getAssigneeId() == null) {
+            throw new IllegalArgumentException("assigneeId cannot be null");
+        }
 
         User user = userRepository.findById(command.getAssigneeId()).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find user with id: " + command.getAssigneeId())
