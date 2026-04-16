@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,25 +25,7 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> {
-                    UserResponse response = modelMapper.map(user, UserResponse.class);
-
-                    response.setProjectIds(
-                            user.getProjects()
-                                    .stream()
-                                    .map(Project::getId)
-                                    .toList()
-                    );
-
-                    response.setTaskIds(
-                            user.getTasks()
-                                    .stream()
-                                    .map(Task::getId)
-                                    .toList()
-                    );
-
-                    return response;
-                })
+                .map(this::mapToResponse)
                 .toList();
     }
 
@@ -51,61 +35,55 @@ public class UserService {
                 () -> new EntityNotFoundException("Cannot find user with id: " + id)
         );
 
-        UserResponse response = modelMapper.map(user, UserResponse.class);
-
-        response.setProjectIds(
-                user.getProjects()
-                        .stream()
-                        .map(Project::getId)
-                        .toList()
-        );
-
-        response.setTaskIds(
-                user.getTasks()
-                        .stream()
-                        .map(Task::getId)
-                        .toList()
-        );
-
-        return response;
+        return mapToResponse(user);
     }
 
     @Transactional
     public UserResponse createUser(CreateUserRequest command) {
         User user = new User();
+        if (command.getName() == null || command.getName().isEmpty()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        if (command.getEmail() == null || command.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
         user.setName(command.getName());
         user.setEmail(command.getEmail());
-        return modelMapper.map(userRepository.save(user), UserResponse.class);
+        return mapToResponse(userRepository.save(user));
     }
 
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("A törölni kívánt felhasználó nem létezik.");
+            throw new EntityNotFoundException("Cannot find user with id: " + id);
         }
         userRepository.deleteById(id);
     }
+
     @Transactional(readOnly = true)
     public UserResponse getUserByEmail(String email) {
          User user = userRepository.findByEmail(email).orElseThrow(
                  () -> new EntityNotFoundException("Cannot find user with email: " + email)
          );
+        return mapToResponse(user);
+    }
+
+    private UserResponse mapToResponse(User user) {
         UserResponse response = modelMapper.map(user, UserResponse.class);
 
-        response.setProjectIds(
-                user.getProjects()
-                        .stream()
-                        .map(Project::getId)
-                        .toList()
-        );
+        response.setProjectIds(new ArrayList<>());
+        if (user.getProjects() != null) {
+            for (Project project : user.getProjects()) {
+                response.getProjectIds().add(project.getId());
+            }
+        }
 
-        response.setTaskIds(
-                user.getTasks()
-                        .stream()
-                        .map(Task::getId)
-                        .toList()
-        );
-
+        response.setTaskIds(new ArrayList<>());
+        if (user.getTasks() != null) {
+            for (Task task : user.getTasks()) {
+                response.getTaskIds().add(task.getId());
+            }
+        }
         return response;
     }
 }
