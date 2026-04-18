@@ -1,7 +1,6 @@
 package dev.lkeleti.taskmanager.service;
 
 import dev.lkeleti.taskmanager.dto.request.CreateUserRequest;
-import dev.lkeleti.taskmanager.dto.response.TaskResponse;
 import dev.lkeleti.taskmanager.dto.response.UserResponse;
 import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Status;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Test User Service")
 
-public class UserServiceTest {
+class UserServiceTest {
     @Mock
     UserRepository userRepository;
 
@@ -285,6 +284,24 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Create new user name is whitespace error")
+    void testCreateUserNameWhitespace_Error() {
+
+        // Arrange (Előkészítés)
+
+        // Act (Végrehajtás)
+        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(new CreateUserRequest("   ", "John.Doe@email.com"));
+        });
+
+
+        // Assert (Ellenőrzés)
+        assertEquals("Name is required", exception.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
     @DisplayName("Create new user email is null error")
     void testCreateUserEmailNull_Error() {
 
@@ -311,6 +328,24 @@ public class UserServiceTest {
         // Act (Végrehajtás)
         IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
             userService.createUser(new CreateUserRequest("John Doe", ""));
+        });
+
+
+        // Assert (Ellenőrzés)
+        assertEquals("Email is required", exception.getMessage());
+
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    @DisplayName("Create new user email is whitespace error")
+    void testCreateUserEmailWhitespace_Error() {
+
+        // Arrange (Előkészítés)
+
+        // Act (Végrehajtás)
+        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(new CreateUserRequest("John Doe", "   "));
         });
 
 

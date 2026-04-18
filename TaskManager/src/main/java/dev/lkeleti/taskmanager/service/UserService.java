@@ -41,10 +41,10 @@ public class UserService {
     @Transactional
     public UserResponse createUser(CreateUserRequest command) {
         User user = new User();
-        if (command.getName() == null || command.getName().isEmpty()) {
+        if (command.getName() == null || command.getName().isEmpty() || command.getName().isBlank()) {
             throw new IllegalArgumentException("Name is required");
         }
-        if (command.getEmail() == null || command.getEmail().isEmpty()) {
+        if (command.getEmail() == null || command.getEmail().isEmpty() || command.getEmail().isBlank()) {
             throw new IllegalArgumentException("Email is required");
         }
         user.setName(command.getName());

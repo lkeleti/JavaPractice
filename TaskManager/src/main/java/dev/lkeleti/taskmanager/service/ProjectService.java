@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,17 +27,7 @@ public class ProjectService {
 
         return projectRepository.findAll()
                 .stream()
-                .map(project -> {
-                    ProjectResponse response = modelMapper.map(project, ProjectResponse.class);
-
-                    response.setUserIds(
-                            project.getUsers()
-                                    .stream()
-                                    .map(User::getId)
-                                    .toList()
-                    );
-                    return response;
-                })
+                .map(this::mapToResponse)
                 .toList();
     }
 
@@ -45,28 +36,27 @@ public class ProjectService {
         Project project = projectRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Cannot find project with id: " + id)
         );
-        ProjectResponse response = modelMapper.map(project, ProjectResponse.class);
-        response.setUserIds(
-                project.getUsers()
-                        .stream()
-                        .map(User::getId)
-                        .toList()
-        );
-        return response;
+        return mapToResponse(project);
     }
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest command) {
         Project project = new Project();
+        if (command.getName() == null || command.getName().isEmpty() || command.getName().isBlank()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        if (command.getDescription() == null || command.getDescription().isEmpty() || command.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Description is required");
+        }
         project.setName(command.getName());
         project.setDescription(command.getDescription());
-        return modelMapper.map(projectRepository.save(project), ProjectResponse.class);
+        return mapToResponse(projectRepository.save(project));
     }
 
     @Transactional
     public void deleteProject(Long id) {
         if (!projectRepository.existsById(id)) {
-            throw new EntityNotFoundException("A törölni kívánt projekt nem létezik.");
+            throw new EntityNotFoundException("Cannot find project with id: " + id);
         }
         projectRepository.deleteById(id);
     }
@@ -81,8 +71,16 @@ public class ProjectService {
                 () -> new EntityNotFoundException("Cannot find user with id: " + userId)
         );
 
-        if (project.getUsers().contains(user)) {
+        if (project.getUsers() != null && project.getUsers().contains(user)) {
             throw new IllegalStateException("A felhasználó már hozzá van rendelve a projekthez.");
+        }
+
+        if (project.getUsers() == null) {
+            project.setUsers(new ArrayList<>());
+        }
+
+        if (user.getProjects() == null) {
+            user.setProjects(new ArrayList<>());
         }
 
         project.getUsers().add(user);
@@ -90,14 +88,19 @@ public class ProjectService {
         projectRepository.save(project);
         userRepository.save(user);
 
+        return mapToResponse(project);
+    }
+    
+    private ProjectResponse mapToResponse(Project project) {
         ProjectResponse response = modelMapper.map(project, ProjectResponse.class);
-        response.setUserIds(
-                project.getUsers()
-                        .stream()
-                        .map(User::getId)
-                        .toList()
-        );
+
+        response.setUserIds(new ArrayList<>());
+        if (project.getUsers() != null) {
+            for (User user : project.getUsers()) {
+                response.getUserIds().add(user.getId());
+            }
+        }
+
         return response;
     }
-
 }

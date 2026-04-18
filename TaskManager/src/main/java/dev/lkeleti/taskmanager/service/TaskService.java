@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -65,11 +66,23 @@ public class TaskService {
             }
         }
 
+        if (command.getTitle() == null ||  command.getTitle().isEmpty() || command.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Title is required");
+        }
+
+        if (command.getDescription() == null ||  command.getDescription().isEmpty() || command.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Description is required");
+        }
+
+        if (command.getDueDate() == null || command.getDueDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Due date is required");
+        }
+
         task.setAssignee(user);
         task.setStatus(Status.getFirst());
+        task.setTitle(command.getTitle());
         task.setDescription(command.getDescription());
         task.setDueDate(command.getDueDate());
-        task.setTitle(command.getTitle());
 
         if (user != null) {
             user.getTasks().add(task);
@@ -91,14 +104,14 @@ public class TaskService {
                 () -> new EntityNotFoundException("Cannot find task with id: " + id)
         );
 
-        if (command.getTitle() != null) {
+        if (command.getTitle() != null && !command.getTitle().isBlank()) {
             task.setTitle(command.getTitle());
         }
-        if (command.getDescription() != null) {
+        if (command.getDescription() != null && !command.getDescription().isBlank()) {
             task.setDescription(command.getDescription());
         }
 
-        if (command.getDueDate() != null) {
+        if (command.getDueDate() != null && !command.getDueDate().isAfter(LocalDate.now())) {
             task.setDueDate(command.getDueDate());
         }
 
