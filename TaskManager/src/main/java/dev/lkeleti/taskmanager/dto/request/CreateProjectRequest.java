@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class CreateProjectRequest {
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Description is required")
     private String description;
 }

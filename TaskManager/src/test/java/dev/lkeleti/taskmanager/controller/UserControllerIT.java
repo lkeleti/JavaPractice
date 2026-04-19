@@ -2,6 +2,7 @@ package dev.lkeleti.taskmanager.controller;
 
 import dev.lkeleti.taskmanager.dto.request.CreateUserRequest;
 import dev.lkeleti.taskmanager.dto.response.UserResponse;
+import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.User;
 import dev.lkeleti.taskmanager.exception.ErrorResponse;
 import dev.lkeleti.taskmanager.repository.UserRepository;
@@ -148,6 +149,9 @@ class UserControllerIT {
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
+        assertThat(userRepository.findAll())
+                .extracting(User::getId)
+                .doesNotContain(savedUserOne.getId());
     }
 
     @Test

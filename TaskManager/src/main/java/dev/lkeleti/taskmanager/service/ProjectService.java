@@ -50,6 +50,7 @@ public class ProjectService {
         }
         project.setName(command.getName());
         project.setDescription(command.getDescription());
+        project.setUsers(new ArrayList<>());
         return mapToResponse(projectRepository.save(project));
     }
 

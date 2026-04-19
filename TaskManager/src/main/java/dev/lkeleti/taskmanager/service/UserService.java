@@ -49,6 +49,8 @@ public class UserService {
         }
         user.setName(command.getName());
         user.setEmail(command.getEmail());
+        user.setProjects(new ArrayList<>());
+        user.setTasks(new ArrayList<>());
         return mapToResponse(userRepository.save(user));
     }
 
