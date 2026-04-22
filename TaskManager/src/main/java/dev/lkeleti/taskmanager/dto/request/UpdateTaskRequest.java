@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class UpdateTaskRequest {
-    @NotEmpty
+    @NotEmpty(message = "Title is required")
     private String title;
-    @NotEmpty
+    @NotEmpty(message = "Description is required")
     private String description;
-    @Future
+    @Future(message = "Invalid due date")
     private LocalDate dueDate;
 }

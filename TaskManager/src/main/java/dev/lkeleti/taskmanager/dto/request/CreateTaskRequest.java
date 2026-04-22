@@ -16,14 +16,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CreateTaskRequest {
-    @NotEmpty
+    @NotEmpty(message = "Title is required")
     private String title;
-    @NotEmpty
+    @NotEmpty(message = "Description is required")
     private String description;
-    @Future
+    @Future(message = "Invalid due date")
     private LocalDate dueDate;
     @Nullable
     private Long assigneeId;
-    @NotNull
+    @NotNull(message = "Project ID is required")
     private Long projectId;
 }

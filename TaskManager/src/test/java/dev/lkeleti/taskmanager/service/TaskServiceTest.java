@@ -9,6 +9,7 @@ import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Status;
 import dev.lkeleti.taskmanager.entity.Task;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.ProjectRepository;
 import dev.lkeleti.taskmanager.repository.TaskRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
@@ -216,7 +217,7 @@ public class TaskServiceTest {
                 .thenReturn(Optional.of(user));
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception = assertThrows(ValidationErrorException.class, () -> {
             taskService.createTask(createTaskWithUserRequest);
         });
 
@@ -595,7 +596,7 @@ public class TaskServiceTest {
 
 
         // Act
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception = assertThrows(ValidationErrorException.class, () -> {
             taskService.changeStatus(EXISTING_TASK_ID,new UpdateTaskStatusRequest(Status.DONE));
         });
 
@@ -615,7 +616,7 @@ public class TaskServiceTest {
 
 
         // Act
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception = assertThrows(ValidationErrorException.class, () -> {
             taskService.changeStatus(EXISTING_TASK_ID,new UpdateTaskStatusRequest(Status.TODO));
         });
 
@@ -635,7 +636,7 @@ public class TaskServiceTest {
 
 
         // Act
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception = assertThrows(ValidationErrorException.class, () -> {
             taskService.changeStatus(EXISTING_TASK_ID,new UpdateTaskStatusRequest(null));
         });
 
@@ -731,7 +732,7 @@ public class TaskServiceTest {
                 .thenReturn(Optional.of(user));
 
         // Act
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception = assertThrows(ValidationErrorException.class, () -> {
             taskService.assigneeTask(EXISTING_TASK_ID,new AssigneeTaskRequest(EXISTING_USER_ID));
         });
 

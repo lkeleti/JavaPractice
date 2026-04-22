@@ -9,6 +9,7 @@ import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Status;
 import dev.lkeleti.taskmanager.entity.Task;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.ProjectRepository;
 import dev.lkeleti.taskmanager.repository.TaskRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
@@ -62,20 +63,20 @@ public class TaskService {
                     () -> new EntityNotFoundException("Cannot find user with id: " + command.getAssigneeId())
             );
             if (!project.getUsers().contains(user)) {
-                throw new IllegalArgumentException("userId=" + command.getAssigneeId() + " is not part of projectId=" + project.getId());
+                throw new ValidationErrorException("userId=" + command.getAssigneeId() + " is not part of projectId=" + project.getId());
             }
         }
 
         if (command.getTitle() == null ||  command.getTitle().isEmpty() || command.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Title is required");
+            throw new ValidationErrorException("title: Title is required");
         }
 
         if (command.getDescription() == null ||  command.getDescription().isEmpty() || command.getDescription().isBlank()) {
-            throw new IllegalArgumentException("Description is required");
+            throw new ValidationErrorException("description: Description is required");
         }
 
         if (command.getDueDate() == null || command.getDueDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Due date is required");
+            throw new ValidationErrorException("dueDate: Due date is required");
         }
 
         task.setAssignee(user);
@@ -125,11 +126,11 @@ public class TaskService {
         );
 
         if (command.getStatus() == null) {
-            throw new IllegalArgumentException("Cannot change status of task to null");
+            throw new ValidationErrorException("Cannot change status of task to null");
         }
 
         if (Math.abs(task.getStatus().getOrder() - command.getStatus().getOrder()) != 1) {
-            throw new IllegalArgumentException("Cannot change status of task to status: " + command.getStatus());
+            throw new ValidationErrorException("Cannot change status of task to status: " + command.getStatus());
         }
 
         task.setStatus(command.getStatus());
@@ -143,7 +144,7 @@ public class TaskService {
         );
 
          if (command.getAssigneeId() == null) {
-            throw new IllegalArgumentException("assigneeId cannot be null");
+            throw new ValidationErrorException("assigneeId cannot be null");
         }
 
         User user = userRepository.findById(command.getAssigneeId()).orElseThrow(
@@ -152,7 +153,7 @@ public class TaskService {
 
         Project project = task.getProject();
         if (!project.getUsers().contains(user)) {
-            throw new IllegalArgumentException("Cannot assign task to user, because user not part of the project. user: " + command.getAssigneeId());
+            throw new ValidationErrorException("Cannot assign task to user, because user not part of the project. user: " + command.getAssigneeId());
         }
 
         if (task.getAssignee() != null) {

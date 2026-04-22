@@ -12,6 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateTaskStatusRequest {
-    @NotNull
+    @NotNull(message="Cannot change status of task to null")
     private Status status;
 }

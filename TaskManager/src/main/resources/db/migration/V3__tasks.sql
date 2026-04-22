@@ -3,7 +3,7 @@ CREATE TABLE `task` (
   `created_at` datetime(6) DEFAULT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `project_id` bigint(20) NOT NULL,
-  `user_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `status` enum('DONE','IN_PROGRESS','TODO') DEFAULT NULL,

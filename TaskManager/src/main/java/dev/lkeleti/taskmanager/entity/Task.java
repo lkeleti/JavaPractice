@@ -29,7 +29,7 @@ public class Task {
     @CreationTimestamp
     private LocalDateTime createdAt;
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User assignee;
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
