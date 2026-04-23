@@ -6,6 +6,7 @@ import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Status;
 import dev.lkeleti.taskmanager.entity.Task;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -254,7 +255,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest(null, "John.Doe@email.com"));
         });
 
@@ -272,7 +273,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest("", "John.Doe@email.com"));
         });
 
@@ -290,7 +291,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest("   ", "John.Doe@email.com"));
         });
 
@@ -308,7 +309,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest("John Doe", null));
         });
 
@@ -326,7 +327,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest("John Doe", ""));
         });
 
@@ -344,7 +345,7 @@ class UserServiceTest {
         // Arrange (Előkészítés)
 
         // Act (Végrehajtás)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             userService.createUser(new CreateUserRequest("John Doe", "   "));
         });
 

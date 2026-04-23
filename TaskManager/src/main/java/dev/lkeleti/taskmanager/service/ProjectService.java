@@ -4,6 +4,7 @@ import dev.lkeleti.taskmanager.dto.request.CreateProjectRequest;
 import dev.lkeleti.taskmanager.dto.response.ProjectResponse;
 import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.ProjectRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,10 +44,10 @@ public class ProjectService {
     public ProjectResponse createProject(CreateProjectRequest command) {
         Project project = new Project();
         if (command.getName() == null || command.getName().isEmpty() || command.getName().isBlank()) {
-            throw new IllegalArgumentException("Name is required");
+            throw new ValidationErrorException("Name is required");
         }
         if (command.getDescription() == null || command.getDescription().isEmpty() || command.getDescription().isBlank()) {
-            throw new IllegalArgumentException("Description is required");
+            throw new ValidationErrorException("Description is required");
         }
         project.setName(command.getName());
         project.setDescription(command.getDescription());

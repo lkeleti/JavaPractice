@@ -6,6 +6,7 @@ import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Status;
 import dev.lkeleti.taskmanager.entity.Task;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.ProjectRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -251,7 +252,7 @@ class ProjectServiceTest {
     void testCreateUserNameNull_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest(null, "This is a new project"));
         });
 
@@ -267,7 +268,7 @@ class ProjectServiceTest {
     void testCreateUserNameEmpty_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest("", "This is a new project"));
         });
 
@@ -283,7 +284,7 @@ class ProjectServiceTest {
     void testCreateUserNameWhitespace_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest("   ", "This is a new project"));
         });
 
@@ -299,7 +300,7 @@ class ProjectServiceTest {
     void testCreateUserDescriptionNull_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest("New project", null));
         });
 
@@ -315,7 +316,7 @@ class ProjectServiceTest {
     void testCreateUserDescriptionEmpty_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest("New project", ""));
         });
 
@@ -331,7 +332,7 @@ class ProjectServiceTest {
     void testCreateUserDescriptionWhitespace_Error() {
 
         // Arrange (Előkészítés)
-        IllegalArgumentException exception  = assertThrows(IllegalArgumentException.class, () -> {
+        ValidationErrorException exception  = assertThrows(ValidationErrorException.class, () -> {
             projectService.createProject(new CreateProjectRequest("New project", "    "));
         });
 

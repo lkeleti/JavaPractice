@@ -6,6 +6,7 @@ import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.User;
 import dev.lkeleti.taskmanager.exception.ErrorResponse;
 import dev.lkeleti.taskmanager.repository.ProjectRepository;
+import dev.lkeleti.taskmanager.repository.TaskRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +39,9 @@ class ProjectControllerIT {
     private ProjectRepository projectRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private Project savedProjectOne;
@@ -45,6 +49,7 @@ class ProjectControllerIT {
 
     @BeforeEach
     void setUp() {
+        taskRepository.deleteAllInBatch();
         userRepository.deleteAll();
         projectRepository.deleteAll();
 

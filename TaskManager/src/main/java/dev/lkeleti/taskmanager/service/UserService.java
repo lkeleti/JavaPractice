@@ -5,6 +5,7 @@ import dev.lkeleti.taskmanager.dto.response.UserResponse;
 import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.Task;
 import dev.lkeleti.taskmanager.entity.User;
+import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -42,10 +43,10 @@ public class UserService {
     public UserResponse createUser(CreateUserRequest command) {
         User user = new User();
         if (command.getName() == null || command.getName().isEmpty() || command.getName().isBlank()) {
-            throw new IllegalArgumentException("Name is required");
+            throw new ValidationErrorException("Name is required");
         }
         if (command.getEmail() == null || command.getEmail().isEmpty() || command.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new ValidationErrorException("Email is required");
         }
         user.setName(command.getName());
         user.setEmail(command.getEmail());
