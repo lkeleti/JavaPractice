@@ -28,6 +28,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 @AutoConfigureRestTestClient
 @DisplayName("ProjectController IT")
 class ProjectControllerIT {
+
     @LocalServerPort
     private int port;
 
@@ -45,21 +46,36 @@ class ProjectControllerIT {
 
     private Project savedProjectOne;
 
+    private RestTestClient userClient;
+    private RestTestClient adminClient;
+
     @BeforeEach
     void setUp() {
         taskRepository.deleteAllInBatch();
         userRepository.deleteAll();
         projectRepository.deleteAll();
 
-        savedProjectOne = projectRepository.save(new Project(null,"Project 01","This is project 1", LocalDateTime.now(),new ArrayList<>()));
-        projectRepository.save(new Project(null,"Project 02","This is project 2", LocalDateTime.now(),new ArrayList<>()));
+        savedProjectOne = projectRepository.save(new Project(null, "Project 01", "This is project 1", LocalDateTime.now(), new ArrayList<>()));
+        projectRepository.save(new Project(null, "Project 02", "This is project 2", LocalDateTime.now(), new ArrayList<>()));
+
+        String baseUrl = "http://localhost:%d".formatted(port);
+
+        userClient = restTestClient.mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("user", "password"))
+                .build();
+
+        adminClient = restTestClient.mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("admin", "admin"))
+                .build();
     }
 
     @Test
     @DisplayName("Get all projects successfully")
     void getAllProjects_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        userClient.get()
+                .uri("/api/projects")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -77,8 +93,8 @@ class ProjectControllerIT {
     void getAllProjects_Empty() {
         projectRepository.deleteAll();
 
-        restTestClient.get()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        userClient.get()
+                .uri("/api/projects")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -89,12 +105,11 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Get project by id successfully")
     void getProjectById_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/projects/%d".formatted(port, savedProjectOne.getId()))
+        userClient.get()
+                .uri("/api/projects/%d".formatted(savedProjectOne.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {})
                 .value(project -> {
                     assertThat(project).isNotNull();
                     assertThat(project.getName()).isEqualTo("Project 01");
@@ -104,8 +119,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Get project by id returns not found error")
     void getProjectById_Error() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/projects/%d".formatted(port, 999999))
+        userClient.get()
+                .uri("/api/projects/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -119,13 +134,12 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Create project successfully")
     void createProject_Success() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        adminClient.post()
+                .uri("/api/projects")
                 .body(new CreateProjectRequest("New Project", "This is a new project"))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {})
                 .value(project -> {
                     assertThat(project).isNotNull();
                     assertThat(project.getName()).isEqualTo("New Project");
@@ -133,6 +147,7 @@ class ProjectControllerIT {
                     assertThat(project.getCreatedAt()).isNotNull();
                     assertThat(project.getUserIds()).isEmpty();
                 });
+
         assertThat(projectRepository.findAll())
                 .extracting(Project::getName)
                 .contains("New Project");
@@ -141,8 +156,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Create project with null name returns validation error")
     void createProjectNameNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        adminClient.post()
+                .uri("/api/projects")
                 .body(new CreateProjectRequest(null, "New project"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -157,8 +172,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Create project with empty name returns validation error")
     void createProjectNameEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        adminClient.post()
+                .uri("/api/projects")
                 .body(new CreateProjectRequest("", "New project"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -173,8 +188,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Create project with null description returns validation error")
     void createProjectDescriptionNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        adminClient.post()
+                .uri("/api/projects")
                 .body(new CreateProjectRequest("New project", null))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -189,8 +204,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Create project with empty description returns validation error")
     void createProjectDescriptionEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects".formatted(port))
+        adminClient.post()
+                .uri("/api/projects")
                 .body(new CreateProjectRequest("New project", ""))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -205,11 +220,12 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Delete project by id successfully")
     void deleteProjectById_Success() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/projects/%d".formatted(port, savedProjectOne.getId()))
+        adminClient.delete()
+                .uri("/api/projects/%d".formatted(savedProjectOne.getId()))
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
+
         assertThat(projectRepository.findAll())
                 .extracting(Project::getId)
                 .doesNotContain(savedProjectOne.getId());
@@ -219,8 +235,8 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Delete project by id returns not found error")
     void deleteProjectById_Error() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/projects/%d".formatted(port, 999999))
+        adminClient.delete()
+                .uri("/api/projects/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -234,13 +250,13 @@ class ProjectControllerIT {
     @Test
     @DisplayName("Assign user to project successfully")
     void assignUserToProject_Success() {
-        User user = userRepository.save(new User(null, "John Doe", "John.Doe@email.com",null,null,null));
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects/%d/users/%d".formatted(port, savedProjectOne.getId(), user.getId()))
+        User user = userRepository.save(new User(null, "John Doe", "John.Doe@email.com", null, null, null));
+
+        adminClient.post()
+                .uri("/api/projects/%d/users/%d".formatted(savedProjectOne.getId(), user.getId()))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<ProjectResponse>() {})
                 .value(project -> {
                     assertThat(project).isNotNull();
                     assertThat(project.getName()).isEqualTo(savedProjectOne.getName());
@@ -251,10 +267,10 @@ class ProjectControllerIT {
     }
 
     @Test
-    @DisplayName("Assign non exits user to project error")
+    @DisplayName("Assign non exists user to project error")
     void assignNonExistsUserToProject_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects/%d/users/%d".formatted(port, savedProjectOne.getId(), 999999))
+        adminClient.post()
+                .uri("/api/projects/%d/users/999999".formatted(savedProjectOne.getId()))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -266,11 +282,12 @@ class ProjectControllerIT {
     }
 
     @Test
-    @DisplayName("Assign user to non exits project error")
+    @DisplayName("Assign user to non exists project error")
     void assignUserToNonExistsProject_Error() {
-        User user = userRepository.save(new User(null, "John Doe", "John.Doe@email.com",null,new ArrayList<>(),new ArrayList<>()));
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects/%d/users/%d".formatted(port, 999999, user.getId()))
+        User user = userRepository.save(new User(null, "John Doe", "John.Doe@email.com", null, new ArrayList<>(), new ArrayList<>()));
+
+        adminClient.post()
+                .uri("/api/projects/999999/users/%d".formatted(user.getId()))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -282,7 +299,7 @@ class ProjectControllerIT {
     }
 
     @Test
-    @DisplayName("Assign user already assign to project error")
+    @DisplayName("Assign user already assigned to project error")
     void assignUserAlreadyAssignToProject_Error() {
         User user = userRepository.save(
                 new User(null, "John Doe", "John.Doe@email.com", null, new ArrayList<>(), new ArrayList<>())
@@ -302,8 +319,8 @@ class ProjectControllerIT {
         project = projectRepository.save(project);
         userRepository.save(user);
 
-        restTestClient.post()
-                .uri("http://localhost:%d/api/projects/%d/users/%d".formatted(port, project.getId(), user.getId()))
+        adminClient.post()
+                .uri("/api/projects/%d/users/%d".formatted(project.getId(), user.getId()))
                 .exchange()
                 .expectStatus().isEqualTo(CONFLICT)
                 .expectBody(ErrorResponse.class)

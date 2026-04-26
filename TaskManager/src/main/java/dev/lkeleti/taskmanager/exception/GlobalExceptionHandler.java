@@ -124,4 +124,17 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now().toString()
         );
     }
+
+    @ExceptionHandler(org.springframework.security.authorization.AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
+            org.springframework.security.authorization.AuthorizationDeniedException ex) {
+        log.warn("ACCESS_DENIED: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        "Access denied",
+                        HttpStatus.FORBIDDEN.value(),
+                        "FORBIDDEN",
+                        LocalDateTime.now().toString()
+                ));
+    }
 }

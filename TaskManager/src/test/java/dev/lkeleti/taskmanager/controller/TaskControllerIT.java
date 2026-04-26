@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureRestTestClient
 @DisplayName("TaskController IT")
 class TaskControllerIT {
+
     @LocalServerPort
     private int port;
 
@@ -52,20 +53,25 @@ class TaskControllerIT {
     private Project savedProject;
     private User savedUser;
 
+    private RestTestClient userClient;
+    private RestTestClient adminClient;
+
     @BeforeEach
     void setUp() {
         taskRepository.deleteAllInBatch();
         userRepository.deleteAll();
         projectRepository.deleteAll();
 
-        savedProject = new Project(null,"Project 01", "This is project 1",LocalDateTime.now(),new ArrayList<>());
-        savedUser = new User(null,"User01","User01@email.com",LocalDateTime.now(),new ArrayList<>(), new ArrayList<>());
+        savedProject = new Project(null, "Project 01", "This is project 1", LocalDateTime.now(), new ArrayList<>());
+        savedUser = new User(null, "User01", "User01@email.com", LocalDateTime.now(), new ArrayList<>(), new ArrayList<>());
         savedUser = userRepository.save(savedUser);
 
         savedProject.getUsers().add(savedUser);
         savedUser.getProjects().add(savedProject);
-        Task taskOne = new Task(null, "Task 01", "This is task 1", Status.TODO, LocalDate.now().plusDays(5), LocalDateTime.now(), null,null);
-        Task taskTwo = new Task(null, "Task 02", "This is task 2", Status.TODO, LocalDate.now().plusDays(5), LocalDateTime.now(), null,null);
+
+        Task taskOne = new Task(null, "Task 01", "This is task 1", Status.TODO, LocalDate.now().plusDays(5), LocalDateTime.now(), null, null);
+        Task taskTwo = new Task(null, "Task 02", "This is task 2", Status.TODO, LocalDate.now().plusDays(5), LocalDateTime.now(), null, null);
+
         savedUser.getTasks().add(taskOne);
         savedUser.getTasks().add(taskTwo);
         taskOne.setAssignee(savedUser);
@@ -78,13 +84,25 @@ class TaskControllerIT {
 
         savedTaskOne = taskRepository.save(taskOne);
         taskRepository.save(taskTwo);
+
+        String baseUrl = "http://localhost:%d".formatted(port);
+
+        userClient = restTestClient.mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("user", "password"))
+                .build();
+
+        adminClient = restTestClient.mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("admin", "admin"))
+                .build();
     }
 
     @Test
     @DisplayName("Get all tasks successfully")
     void getAllTasks_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        userClient.get()
+                .uri("/api/tasks")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -102,8 +120,8 @@ class TaskControllerIT {
     void getAllTasks_Empty() {
         taskRepository.deleteAllInBatch();
 
-        restTestClient.get()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        userClient.get()
+                .uri("/api/tasks")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -114,12 +132,11 @@ class TaskControllerIT {
     @Test
     @DisplayName("Get task by id successfully")
     void getTaskById_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        userClient.get()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Task 01");
@@ -129,8 +146,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Get task by id returns not found error")
     void getTaskById_Error() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, 999999))
+        userClient.get()
+                .uri("/api/tasks/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -144,21 +161,21 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task without user successfully")
     void createTaskWithoutUser_Success() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("New Task", "This is a new task", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("New Task");
                     assertThat(task.getDescription()).isEqualTo("This is a new task");
                     assertThat(task.getCreatedAt()).isNotNull();
                     assertThat(task.getAssigneeId()).isNull();
-                    assertThat(task.getProjectId()).isEqualTo (savedProject.getId());
+                    assertThat(task.getProjectId()).isEqualTo(savedProject.getId());
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getTitle)
                 .contains("New Task");
@@ -167,21 +184,21 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with user successfully")
     void createTaskWithUser_Success() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("New Task", "This is a new task", LocalDate.now().plusDays(100), savedUser.getId(), savedProject.getId()))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("New Task");
                     assertThat(task.getDescription()).isEqualTo("This is a new task");
                     assertThat(task.getCreatedAt()).isNotNull();
                     assertThat(task.getAssigneeId()).isEqualTo(savedUser.getId());
-                    assertThat(task.getProjectId()).isEqualTo (savedProject.getId());
+                    assertThat(task.getProjectId()).isEqualTo(savedProject.getId());
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getTitle)
                 .contains("New Task");
@@ -190,8 +207,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with null title returns validation error")
     void createTaskTitleNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest(null, "This is a new task", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -206,8 +223,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with empty title returns validation error")
     void createTaskTitleEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("", "This is a new task", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -222,8 +239,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with whitespace title returns validation error")
     void createTaskTitleWhitespace_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("   ", "This is a new task", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -236,10 +253,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Create task with null decription returns validation error")
+    @DisplayName("Create task with null description returns validation error")
     void createTaskDecriptionNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", null, LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -252,10 +269,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Create task with empty decription returns validation error")
+    @DisplayName("Create task with empty description returns validation error")
     void createTaskDecriptionEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -268,10 +285,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Create task with whitespace decription returns validation error")
+    @DisplayName("Create task with whitespace description returns validation error")
     void createTaskDecriptionWhitespace_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "   ", LocalDate.now().plusDays(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -286,8 +303,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with non exists user returns error")
     void createTaskNonExists_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "This is task 1", LocalDate.now().plusDays(100), 999999L, savedProject.getId()))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -302,9 +319,10 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with user not part of project returns error")
     void createTaskUserNotPartOfProject_Error() {
-        User user = userRepository.save(new User(null, "New User", "New.User@email.com",LocalDateTime.now(), null, null));
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        User user = userRepository.save(new User(null, "New User", "New.User@email.com", LocalDateTime.now(), null, null));
+
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "This is task 1", LocalDate.now().plusDays(100), user.getId(), savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -319,8 +337,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Create task with null due date returns validation error")
     void createTaskDueDateNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "This is task 1", null, null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -333,10 +351,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Create task with before due date returns validation error")
+    @DisplayName("Create task with past due date returns validation error")
     void createTaskDueDateBefore_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/tasks".formatted(port))
+        adminClient.post()
+                .uri("/api/tasks")
                 .body(new CreateTaskRequest("Task 01", "This is task 1", LocalDate.now().minusYears(100), null, savedProject.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -351,11 +369,12 @@ class TaskControllerIT {
     @Test
     @DisplayName("Delete task by id successfully")
     void deleteTaskById_Success() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.delete()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getId)
                 .doesNotContain(savedTaskOne.getId());
@@ -363,10 +382,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Delete project by id returns not found error")
+    @DisplayName("Delete non exists task by id returns not found error")
     void deleteNonExistsTaskById_Error() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, 999999))
+        adminClient.delete()
+                .uri("/api/tasks/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -380,19 +399,19 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task successfully")
     void updateTask_Success() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", "This is an updated task", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Updated Task");
                     assertThat(task.getDescription()).isEqualTo("This is an updated task");
                     assertThat(task.getCreatedAt()).isNotNull();
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getTitle)
                 .contains("Updated Task");
@@ -401,8 +420,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update non exists task error")
     void updateNonExistsTask_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, 999999L))
+        adminClient.put()
+                .uri("/api/tasks/999999")
                 .body(new UpdateTaskRequest("Updated Task", "This is an updated task", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -417,8 +436,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task with null title returns validation error")
     void updateTaskNullTitle_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest(null, "This is an updated task", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -433,8 +452,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task with empty title returns validation error")
     void updateTaskEmptyTitle_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("", "This is an updated task", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -449,19 +468,19 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task with whitespace title keeps original title")
     void updateTaskWhitespaceTitle_Success() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("    ", "This is an updated task", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Task 01");
                     assertThat(task.getDescription()).isEqualTo("This is an updated task");
                     assertThat(task.getCreatedAt()).isNotNull();
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getTitle)
                 .contains("Task 01");
@@ -470,8 +489,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task with null description returns validation error")
     void updateTaskNullDescription_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", null, LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -486,8 +505,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Update task with empty description returns validation error")
     void updateTaskEmptyDescription_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", "", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -500,52 +519,52 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Update task with whitespace description success")
+    @DisplayName("Update task with whitespace description keeps original description")
     void updateTaskWhitespaceDescription_Success() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", "    ", LocalDate.now().plusYears(1)))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Updated Task");
                     assertThat(task.getDescription()).isEqualTo("This is task 1");
                     assertThat(task.getCreatedAt()).isNotNull();
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getDescription)
                 .contains("This is task 1");
     }
 
     @Test
-    @DisplayName("Update task with null due date success")
+    @DisplayName("Update task with null due date keeps original due date")
     void updateTaskDueDateNull_Success() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", "    ", null))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Updated Task");
                     assertThat(task.getDescription()).isEqualTo("This is task 1");
                     assertThat(task.getDueDate()).isEqualTo(savedTaskOne.getDueDate());
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getDueDate)
                 .contains(savedTaskOne.getDueDate());
     }
 
     @Test
-    @DisplayName("Update task with before due date returns validation error")
+    @DisplayName("Update task with past due date returns validation error")
     void updateTaskDueDateBefore_Error() {
-        restTestClient.put()
-                .uri("http://localhost:%d/api/tasks/%d".formatted(port, savedTaskOne.getId()))
+        adminClient.put()
+                .uri("/api/tasks/%d".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskRequest("Updated Task", "    ", LocalDate.now().minusYears(1)))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -558,20 +577,20 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Change task status success")
+    @DisplayName("Change task status successfully")
     void changeTaskStatus_Success() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/status".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/status".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskStatusRequest(Status.IN_PROGRESS))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Task 01");
                     assertThat(task.getStatus()).isEqualTo(Status.IN_PROGRESS);
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(Task::getStatus)
                 .contains(Status.IN_PROGRESS);
@@ -580,8 +599,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Change non exists task status error")
     void changeNonExistsTaskStatus_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/status".formatted(port, 999999L))
+        adminClient.patch()
+                .uri("/api/tasks/999999/status")
                 .body(new UpdateTaskStatusRequest(Status.IN_PROGRESS))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -596,8 +615,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Change task status to null error")
     void changeTaskStatusToNull_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/status".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/status".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskStatusRequest(null))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -610,10 +629,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Change task status to invalid error")
+    @DisplayName("Change task status to invalid status error")
     void changeTaskStatusToInvalid_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/status".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/status".formatted(savedTaskOne.getId()))
                 .body(new UpdateTaskStatusRequest(Status.DONE))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -626,24 +645,24 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Assign user to task success")
+    @DisplayName("Assign user to task successfully")
     void assignUserToTask_Success() {
         Task taskTmp = taskRepository.findById(savedTaskOne.getId()).get();
         taskTmp.setAssignee(null);
         taskRepository.save(taskTmp);
 
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/assignee".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/assignee".formatted(savedTaskOne.getId()))
                 .body(new AssigneeTaskRequest(savedUser.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<TaskResponse>() {
-                })
+                .expectBody(new ParameterizedTypeReference<TaskResponse>() {})
                 .value(task -> {
                     assertThat(task).isNotNull();
                     assertThat(task.getTitle()).isEqualTo("Task 01");
                     assertThat(task.getAssigneeId()).isEqualTo(savedUser.getId());
                 });
+
         assertThat(taskRepository.findAll())
                 .extracting(task -> task.getAssignee().getId())
                 .contains(savedUser.getId());
@@ -652,8 +671,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Assign user to non exists task error")
     void assignUserToNonExistsTask_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/assignee".formatted(port, 999999L))
+        adminClient.patch()
+                .uri("/api/tasks/999999/assignee")
                 .body(new AssigneeTaskRequest(savedUser.getId()))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -666,10 +685,10 @@ class TaskControllerIT {
     }
 
     @Test
-    @DisplayName("Assign non exist user to task error")
+    @DisplayName("Assign non exists user to task error")
     void assignNonExistsUserToTask_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/assignee".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/assignee".formatted(savedTaskOne.getId()))
                 .body(new AssigneeTaskRequest(999999L))
                 .exchange()
                 .expectStatus().isNotFound()
@@ -684,8 +703,8 @@ class TaskControllerIT {
     @Test
     @DisplayName("Assign null user to task error")
     void assignNullUserToTask_Error() {
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/assignee".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/assignee".formatted(savedTaskOne.getId()))
                 .body(new AssigneeTaskRequest(null))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -706,8 +725,8 @@ class TaskControllerIT {
         savedUser.setProjects(null);
         userRepository.save(savedUser);
 
-        restTestClient.patch()
-                .uri("http://localhost:%d/api/tasks/%d/assignee".formatted(port, savedTaskOne.getId()))
+        adminClient.patch()
+                .uri("/api/tasks/%d/assignee".formatted(savedTaskOne.getId()))
                 .body(new AssigneeTaskRequest(savedUser.getId()))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -719,4 +738,3 @@ class TaskControllerIT {
                 });
     }
 }
-

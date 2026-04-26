@@ -4,6 +4,8 @@ import dev.lkeleti.taskmanager.dto.request.CreateUserRequest;
 import dev.lkeleti.taskmanager.dto.response.UserResponse;
 import dev.lkeleti.taskmanager.entity.User;
 import dev.lkeleti.taskmanager.exception.ErrorResponse;
+import dev.lkeleti.taskmanager.repository.ProjectRepository;
+import dev.lkeleti.taskmanager.repository.TaskRepository;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,22 +36,46 @@ class UserControllerIT {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
     private User savedUserOne;
+
+    private RestTestClient userClient;
+    private RestTestClient adminClient;
 
     @BeforeEach
     void setUp() {
+        taskRepository.deleteAllInBatch();
         userRepository.deleteAll();
+        projectRepository.deleteAll();
 
         savedUserOne = userRepository.save(new User(null,"John Doe","John.Doe@email.com", LocalDateTime.now(),null,null));
         userRepository.save(new User(null,"Joe Doe","Joe.Doe@email.com", LocalDateTime.now(),null,null));
+
+        String baseUrl = "http://localhost:%d".formatted(port);
+
+        userClient = restTestClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("user", "password"))
+                .build();
+
+        adminClient = restTestClient
+                .mutate()
+                .baseUrl(baseUrl)
+                .defaultHeaders(h -> h.setBasicAuth("admin", "admin"))
+                .build();
     }
 
     @Test
     @DisplayName("Get all users successfully")
     void getAllUsers_Success() {
-
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users?page=0&size=10&sortBy=id".formatted(port))
+        userClient.get()
+                .uri("/api/users?page=0&size=10&sortBy=id")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -65,11 +91,9 @@ class UserControllerIT {
     @Test
     @DisplayName("Get all users successfully, but the list is empty")
     void getAllUser_Empty() {
-
         userRepository.deleteAll();
-
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users?page=0&size=10&sortBy=id".formatted(port))
+        userClient.get()
+                .uri("/api/users?page=0&size=10&sortBy=id")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -80,8 +104,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Get user by id successfully")
     void getUserById_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users/id/%d".formatted(port, savedUserOne.getId()))
+        userClient.get()
+                .uri("/api/users/id/%d".formatted(savedUserOne.getId()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(new ParameterizedTypeReference<UserResponse>() {
@@ -95,8 +119,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Get user by id returns not found error")
     void getUserById_Error() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users/id/%d".formatted(port, 999999))
+        userClient.get()
+                .uri("/api/users/id/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -110,8 +134,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Get user by email successfully")
     void getUserByEmail_Success() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users/email/%s".formatted(port, savedUserOne.getEmail()))
+        userClient.get()
+                .uri("/api/users/email/%s".formatted(savedUserOne.getEmail()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(new ParameterizedTypeReference<UserResponse>() {
@@ -125,8 +149,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Get user by email returns not found error")
     void getUserByEmail_Error() {
-        restTestClient.get()
-                .uri("http://localhost:%d/api/users/email/%s".formatted(port, "nonexist@email.com"))
+        userClient.get()
+                .uri("/api/users/email/nonexist@email.com")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -140,8 +164,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Delete user by id successfully")
     void deleteUserById_Success() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/users/%d".formatted(port, savedUserOne.getId()))
+        adminClient.delete()
+                .uri("/api/users/%d".formatted(savedUserOne.getId()))
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
@@ -153,8 +177,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Delete user by id returns not found error")
     void deleteUserById_Error() {
-        restTestClient.delete()
-                .uri("http://localhost:%d/api/users/%d".formatted(port, 999999))
+        adminClient.delete()
+                .uri("/api/users/999999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class)
@@ -168,8 +192,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user successfully")
     void createUser_Success() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("New User", "New.User@email.com"))
                 .exchange()
                 .expectStatus().isCreated()
@@ -191,8 +215,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with null name returns validation error")
     void createUserNameNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest(null, "New.User@email.com"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -207,8 +231,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with empty name returns validation error")
     void createUserNameEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("", "New.User@email.com"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -223,8 +247,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with whitespace name returns validation error")
     void createUserNameWhitespace_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("   ", "New.User@email.com"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -239,8 +263,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with null email returns validation error")
     void createUserEmailNull_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("New User", null))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -255,8 +279,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with empty email returns validation error")
     void createUserEmailEmpty_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("New User", ""))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -271,8 +295,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with whitespace email returns validation error")
     void createUserEmailWhitespace_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("New User", "     "))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -287,8 +311,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with invalid email format returns validation error")
     void createUserEmailBadFormat_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("New User", "New.Useremail.com"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -303,8 +327,8 @@ class UserControllerIT {
     @Test
     @DisplayName("Create user with existing email returns bad request error")
     void createUser_EmailAlreadyExists_Error() {
-        restTestClient.post()
-                .uri("http://localhost:%d/api/users".formatted(port))
+        adminClient.post()
+                .uri("/api/users")
                 .body(new CreateUserRequest("John Doe", "John.Doe@email.com"))
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -315,5 +339,7 @@ class UserControllerIT {
                     assertThat(error.getError()).isEqualTo("BAD_REQUEST");
                 });
     }
+
+
 }
 
