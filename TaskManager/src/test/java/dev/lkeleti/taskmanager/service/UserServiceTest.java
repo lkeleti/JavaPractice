@@ -17,11 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,93 +68,75 @@ class UserServiceTest {
     @Test
     @DisplayName("Find all users successfully")
     void testFindAllUsers_Success() {
-        project.getUsers().add(savedUserOne);
-        task.setAssignee(savedUserOne);
-        savedUserOne.getTasks().add(task);
-        savedUserOne.getProjects().add(project);
 
-        // Arrange
-        when(userRepository.findAll())
-                .thenReturn(List.of(savedUserOne, savedUserTwo));
+        when(userRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedUserOne, savedUserTwo)));
 
-        when(modelMapper.map(savedUserOne, UserResponse.class))
-                .thenReturn(userOneResponse);
+        when(modelMapper.map(any(User.class), eq(UserResponse.class)))
+                .thenAnswer(invocation -> {
+                    User user = invocation.getArgument(0);
+                    if (user.getId().equals(EXISTING_USER_ONE_ID)) return userOneResponse;
+                    return userTwoResponse;
+                });
 
-        when(modelMapper.map(savedUserTwo, UserResponse.class))
-                .thenReturn(userTwoResponse);
+        Page<UserResponse> result = userService.getAllUsers(0, 10, "id");
 
-        // Act
-        List<UserResponse> result = userService.getAllUsers();
-
-        // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
 
-        assertEquals(EXISTING_USER_ONE_ID, result.get(0).getId());
-        assertEquals("John Doe", result.get(0).getName());
-        assertEquals("John.Doe@email.com", result.get(0).getEmail());
-        assertEquals(100L, result.get(0).getProjectIds().getFirst());
-        assertEquals(200L, result.get(0).getTaskIds().getFirst());
+        assertEquals(EXISTING_USER_ONE_ID, result.getContent().get(0).getId());
+        assertEquals("John Doe", result.getContent().get(0).getName());
+        assertEquals("John.Doe@email.com", result.getContent().get(0).getEmail());
 
-        assertEquals(EXISTING_USER_TWO_ID, result.get(1).getId());
-        assertEquals("Joe Doe", result.get(1).getName());
-        assertEquals("Joe.Doe@email.com", result.get(1).getEmail());
+        assertEquals(EXISTING_USER_TWO_ID, result.getContent().get(1).getId());
+        assertEquals("Joe Doe", result.getContent().get(1).getName());
+        assertEquals("Joe.Doe@email.com", result.getContent().get(1).getEmail());
 
-        verify(userRepository).findAll();
-        verify(modelMapper, times(2)).map(any(User.class), eq(UserResponse.class));
+        verify(userRepository).findAll(any(Pageable.class));
+        verify(modelMapper, times(2))
+                .map(any(User.class), eq(UserResponse.class));
     }
 
     @Test
-    @DisplayName("Find all users successfully")
+    @DisplayName("Find all users successfully - empty result")
     void testFindAllUsersEmpty_Success() {
-        // Arrange
-        when(userRepository.findAll())
-                .thenReturn(Collections.emptyList());
 
-        // Act
-        List<UserResponse> result = userService.getAllUsers();
+        when(userRepository.findAll(any(Pageable.class)))
+                .thenReturn(Page.empty());
 
-        // Assert
+        Page<UserResponse> result = userService.getAllUsers(0, 10, "id");
+
         assertNotNull(result);
-        assertEquals(0, result.size());
+        assertEquals(0, result.getContent().size());
+        assertTrue(result.isEmpty());
 
-        verify(userRepository).findAll();
+        verify(userRepository).findAll(any(Pageable.class));
     }
 
     @Test
     @DisplayName("Find all users, no projects and no tasks successfully")
     void testFindAllUsersNoProjectNoTask_Success() {
-        // Arrange
-        when(userRepository.findAll())
-                .thenReturn(List.of(savedUserOne, savedUserTwo));
 
-        when(modelMapper.map(savedUserOne, UserResponse.class))
-                .thenReturn(userOneResponse);
+        when(userRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedUserOne, savedUserTwo)));
 
-        when(modelMapper.map(savedUserTwo, UserResponse.class))
-                .thenReturn(userTwoResponse);
+        when(modelMapper.map(any(User.class), eq(UserResponse.class)))
+                .thenReturn(userOneResponse, userTwoResponse);
 
-        // Act
-        List<UserResponse> result = userService.getAllUsers();
+        Page<UserResponse> result = userService.getAllUsers(0, 10, "id");
 
-        // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
 
-        assertEquals(EXISTING_USER_ONE_ID, result.get(0).getId());
-        assertEquals("John Doe", result.get(0).getName());
-        assertEquals("John.Doe@email.com", result.get(0).getEmail());
-        assertEquals(0, result.get(0).getProjectIds().size());
-        assertEquals(0, result.get(0).getTaskIds().size());
+        assertEquals(0, result.getContent().get(0).getProjectIds().size());
+        assertEquals(0, result.getContent().get(0).getTaskIds().size());
 
-        assertEquals(EXISTING_USER_TWO_ID, result.get(1).getId());
-        assertEquals("Joe Doe", result.get(1).getName());
-        assertEquals("Joe.Doe@email.com", result.get(1).getEmail());
-        assertEquals(0, result.get(1).getProjectIds().size());
-        assertEquals(0, result.get(1).getTaskIds().size());
+        assertEquals(0, result.getContent().get(1).getProjectIds().size());
+        assertEquals(0, result.getContent().get(1).getTaskIds().size());
 
-        verify(userRepository).findAll();
-        verify(modelMapper, times(2)).map(any(User.class), eq(UserResponse.class));
+        verify(userRepository).findAll(any(Pageable.class));
+        verify(modelMapper, times(2))
+                .map(any(User.class), eq(UserResponse.class));
     }
 
     @Test

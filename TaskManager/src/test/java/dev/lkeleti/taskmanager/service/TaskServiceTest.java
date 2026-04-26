@@ -22,11 +22,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +38,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Test Task Service")
-public class TaskServiceTest {
+class TaskServiceTest {
     @Mock
     private TaskRepository taskRepository;
     @Mock
@@ -277,8 +279,8 @@ public class TaskServiceTest {
     void testFindAllTasks_Success() {
 
         // Arrange
-        when(taskRepository.findAll())
-                .thenReturn(List.of(savedTaskWithUser, savedTaskWithoutUser));
+        when(taskRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedTaskWithUser, savedTaskWithoutUser)));
 
         when(modelMapper.map(savedTaskWithUser, TaskResponse.class))
                 .thenReturn(taskWithUserResponse);
@@ -287,19 +289,19 @@ public class TaskServiceTest {
                 .thenReturn(taskWithoutUserResponse);
 
         // Act
-        List<TaskResponse> result = taskService.getAllTasks();
+        Page<TaskResponse> result = taskService.getAllTasks(0, 10, "id");
 
         // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
 
-        assertEquals(EXISTING_PROJECT_ID, result.get(0).getProjectId());
-        assertEquals(EXISTING_USER_ID, result.get(0).getAssigneeId());
+        assertEquals(EXISTING_PROJECT_ID, result.getContent().get(0).getProjectId());
+        assertEquals(EXISTING_USER_ID, result.getContent().get(0).getAssigneeId());
 
-        assertEquals(EXISTING_PROJECT_ID, result.get(1).getProjectId());
-        assertNull(result.get(1).getAssigneeId());
+        assertEquals(EXISTING_PROJECT_ID, result.getContent().get(1).getProjectId());
+        assertNull(result.getContent().get(1).getAssigneeId());
 
-        verify(taskRepository).findAll();
+        verify(taskRepository).findAll(any(Pageable.class));
         verify(modelMapper, times(2)).map(any(Task.class), eq(TaskResponse.class));
     }
 
@@ -308,17 +310,17 @@ public class TaskServiceTest {
     void testFindAllTasksEmpty_Success() {
 
         // Arrange
-        when(taskRepository.findAll())
-                .thenReturn(Collections.emptyList());
+        when(taskRepository.findAll(any(Pageable.class)))
+                .thenReturn(Page.empty());
 
         // Act
-        List<TaskResponse> result = taskService.getAllTasks();
+        Page<TaskResponse> result = taskService.getAllTasks(0, 10, "id");
 
         // Assert
         assertNotNull(result);
-        assertEquals(0, result.size());
+        assertEquals(0, result.getContent().size());
 
-        verify(taskRepository).findAll();
+        verify(taskRepository).findAll(any(Pageable.class));
     }
 
     @Test

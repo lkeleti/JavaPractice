@@ -9,7 +9,12 @@ import dev.lkeleti.taskmanager.exception.ValidationErrorException;
 import dev.lkeleti.taskmanager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,56 +23,94 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public Page<UserResponse> getAllUsers(int page, int size, String sortBy) {
+
+        log.info("Fetching users page={}, size={}, sortBy={}", page, size, sortBy);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(sortBy)
+        );
+
+        Page<UserResponse> result = userRepository.findAll(pageable)
+                .map(this::mapToResponse);
+
+        log.debug("Fetched {} users (total elements: {})",
+                result.getNumberOfElements(),
+                result.getTotalElements());
+
+        return result;
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Cannot find user with id: " + id)
-        );
+        log.info("Fetching user by id={}", id);
 
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            log.warn("User not found with id={}", id);
+            return new EntityNotFoundException("Cannot find user with id: " + id);
+        });
+
+        log.debug("User found: id={}, email={}", user.getId(), user.getEmail());
         return mapToResponse(user);
     }
 
     @Transactional
     public UserResponse createUser(CreateUserRequest command) {
-        User user = new User();
-        if (command.getName() == null || command.getName().isEmpty() || command.getName().isBlank()) {
+        log.debug("Creating user: {}", command);
+
+        if (command.getName() == null || command.getName().isBlank()) {
+            log.warn("User creation failed - invalid name");
             throw new ValidationErrorException("Name is required");
         }
-        if (command.getEmail() == null || command.getEmail().isEmpty() || command.getEmail().isBlank()) {
+
+        if (command.getEmail() == null || command.getEmail().isBlank()) {
+            log.warn("User creation failed - invalid email");
             throw new ValidationErrorException("Email is required");
         }
+
+        User user = new User();
         user.setName(command.getName());
         user.setEmail(command.getEmail());
         user.setProjects(new ArrayList<>());
         user.setTasks(new ArrayList<>());
-        return mapToResponse(userRepository.save(user));
+
+        User saved = userRepository.save(user);
+        log.info("User created with id={}, email={}", saved.getId(), saved.getEmail());
+
+        return mapToResponse(saved);
     }
 
     @Transactional
     public void deleteUser(Long id) {
+        log.info("Deleting user with id={}", id);
+
         if (!userRepository.existsById(id)) {
+            log.warn("User not found for deletion with id={}", id);
             throw new EntityNotFoundException("Cannot find user with id: " + id);
         }
+
         userRepository.deleteById(id);
+        log.info("User deleted with id={}", id);
     }
 
     @Transactional(readOnly = true)
     public UserResponse getUserByEmail(String email) {
-         User user = userRepository.findByEmail(email).orElseThrow(
-                 () -> new EntityNotFoundException("Cannot find user with email: " + email)
-         );
+        log.info("Fetching user by email={}", email);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("User not found with email={}", email);
+            return new EntityNotFoundException("Cannot find user with email: " + email);
+        });
+
+        log.debug("User found: id={}, email={}", user.getId(), user.getEmail());
         return mapToResponse(user);
     }
 

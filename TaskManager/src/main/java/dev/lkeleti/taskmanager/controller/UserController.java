@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @AllArgsConstructor
+@Slf4j
 @Tag(name = "Műveletek a felhasználókkal")
 public class UserController {
     private UserService userService;
@@ -28,8 +31,18 @@ public class UserController {
     @Operation(summary = "Összes felhasználó listázása",
             description = "Visszaadja az összes felhasználó listáját.")
     @ApiResponse(responseCode = "200", description = "Felhasználók sikeresen listázva")
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    public Page<UserResponse> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+
+        log.info("GET /users - Fetching all users");
+        Page<UserResponse> result = userService.getAllUsers(page, size, sortBy);
+        log.debug("Fetched {} users (total elements: {})",
+                result.getNumberOfElements(),
+                result.getTotalElements());
+        return result;
     }
 
     @GetMapping("/id/{id}")
@@ -39,7 +52,10 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Felhasználó sikeresen lekérdezve")
     @ApiResponse(responseCode = "404", description = "Felhasználó nem található")
     public UserResponse getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+        log.info("GET /users/{} - Fetching user by id", id);
+        UserResponse result = userService.getUserById(id);
+        log.debug("GET /users/{} - User found", id);
+        return result;
     }
 
     @GetMapping("/email/{email}")
@@ -49,7 +65,10 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Felhasználó sikeresen lekérdezve")
     @ApiResponse(responseCode = "404", description = "Felhasználó nem található")
     public UserResponse getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+        log.info("GET /users/email/{} - Fetching user by email", email);
+        UserResponse result = userService.getUserByEmail(email);
+        log.debug("GET /users/email/{} - User found", email);
+        return result;
     }
 
     @PostMapping
@@ -66,7 +85,10 @@ public class UserController {
     @ApiResponse(responseCode = "201", description = "Felhasználó sikeresen létrehozva")
     @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben (validációs hiba)")
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest command) {
-        return userService.createUser(command);
+        log.info("POST /users - Creating user with email={}", command.getEmail());
+        UserResponse result = userService.createUser(command);
+        log.info("POST /users - User created with id={}", result.getId());
+        return result;
     }
 
     @DeleteMapping("/{id}")
@@ -77,7 +99,9 @@ public class UserController {
     @ApiResponse(responseCode = "204", description = "Felhasználó sikeresen törölve")
     @ApiResponse(responseCode = "404", description = "Törlendő felhasználó nem található")
     public void deleteUser(@PathVariable Long id) {
+        log.info("DELETE /users/{} - Deleting user", id);
         userService.deleteUser(id);
+        log.info("DELETE /users/{} - User deleted", id);
     }
 
 }

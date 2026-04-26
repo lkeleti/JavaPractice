@@ -16,7 +16,6 @@ import dev.lkeleti.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,7 +26,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,7 +49,6 @@ class TaskControllerIT {
     private UserRepository userRepository;
 
     private Task savedTaskOne;
-    private Task savedTaskTwo;
     private Project savedProject;
     private User savedUser;
 
@@ -80,7 +77,7 @@ class TaskControllerIT {
         userRepository.save(savedUser);
 
         savedTaskOne = taskRepository.save(taskOne);
-        savedTaskTwo = taskRepository.save(taskTwo);
+        taskRepository.save(taskTwo);
     }
 
     @Test
@@ -90,13 +87,12 @@ class TaskControllerIT {
                 .uri("http://localhost:%d/api/tasks".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<TaskResponse>>() {
-                })
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(2)
+                .jsonPath("$.content[*].title")
                 .value(tasks -> {
-                    assertThat(tasks).isNotNull();
-                    assertThat(tasks).hasSize(2);
-                    assertThat(tasks)
-                            .extracting(TaskResponse::getTitle)
+                    assertThat((Iterable<String>) tasks)
                             .containsExactlyInAnyOrder("Task 01", "Task 02");
                 });
     }
@@ -110,11 +106,9 @@ class TaskControllerIT {
                 .uri("http://localhost:%d/api/tasks".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<TaskResponse>>() {})
-                .value(tasks -> {
-                    assertThat(tasks).isNotNull();
-                    assertThat(tasks).isEmpty();
-                });
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(0);
     }
 
     @Test
@@ -167,7 +161,7 @@ class TaskControllerIT {
                 });
         assertThat(taskRepository.findAll())
                 .extracting(Task::getTitle)
-                .contains("New Task");;
+                .contains("New Task");
     }
 
     @Test

@@ -2,7 +2,6 @@ package dev.lkeleti.taskmanager.controller;
 
 import dev.lkeleti.taskmanager.dto.request.CreateUserRequest;
 import dev.lkeleti.taskmanager.dto.response.UserResponse;
-import dev.lkeleti.taskmanager.entity.Project;
 import dev.lkeleti.taskmanager.entity.User;
 import dev.lkeleti.taskmanager.exception.ErrorResponse;
 import dev.lkeleti.taskmanager.repository.UserRepository;
@@ -17,7 +16,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,30 +35,29 @@ class UserControllerIT {
     private UserRepository userRepository;
 
     private User savedUserOne;
-    private User savedUserTwo;
 
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
 
         savedUserOne = userRepository.save(new User(null,"John Doe","John.Doe@email.com", LocalDateTime.now(),null,null));
-        savedUserTwo = userRepository.save(new User(null,"Joe Doe","Joe.Doe@email.com", LocalDateTime.now(),null,null));
+        userRepository.save(new User(null,"Joe Doe","Joe.Doe@email.com", LocalDateTime.now(),null,null));
     }
 
     @Test
     @DisplayName("Get all users successfully")
     void getAllUsers_Success() {
+
         restTestClient.get()
-                .uri("http://localhost:%d/api/users".formatted(port))
+                .uri("http://localhost:%d/api/users?page=0&size=10&sortBy=id".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<UserResponse>>() {
-                })
-                .value(users -> {
-                    assertThat(users).isNotNull();
-                    assertThat(users).hasSize(2);
-                    assertThat(users)
-                            .extracting(UserResponse::getName)
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(2)
+                .jsonPath("$.content[*].name")
+                .value(names -> {
+                    assertThat((Iterable<String>) names)
                             .containsExactlyInAnyOrder("John Doe", "Joe Doe");
                 });
     }
@@ -68,17 +65,16 @@ class UserControllerIT {
     @Test
     @DisplayName("Get all users successfully, but the list is empty")
     void getAllUser_Empty() {
+
         userRepository.deleteAll();
 
         restTestClient.get()
-                .uri("http://localhost:%d/api/users".formatted(port))
+                .uri("http://localhost:%d/api/users?page=0&size=10&sortBy=id".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<UserResponse>>() {})
-                .value(users -> {
-                    assertThat(users).isNotNull();
-                    assertThat(users).isEmpty();
-                });
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(0);
     }
 
     @Test

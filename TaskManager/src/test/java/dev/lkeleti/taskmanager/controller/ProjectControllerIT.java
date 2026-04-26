@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -45,7 +44,6 @@ class ProjectControllerIT {
     private UserRepository userRepository;
 
     private Project savedProjectOne;
-    private Project savedProjectTwo;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +52,7 @@ class ProjectControllerIT {
         projectRepository.deleteAll();
 
         savedProjectOne = projectRepository.save(new Project(null,"Project 01","This is project 1", LocalDateTime.now(),new ArrayList<>()));
-        savedProjectTwo = projectRepository.save(new Project(null,"Project 02","This is project 2", LocalDateTime.now(),new ArrayList<>()));
+        projectRepository.save(new Project(null,"Project 02","This is project 2", LocalDateTime.now(),new ArrayList<>()));
     }
 
     @Test
@@ -64,13 +62,12 @@ class ProjectControllerIT {
                 .uri("http://localhost:%d/api/projects".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<ProjectResponse>>() {
-                })
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(2)
+                .jsonPath("$.content[*].name")
                 .value(projects -> {
-                    assertThat(projects).isNotNull();
-                    assertThat(projects).hasSize(2);
-                    assertThat(projects)
-                            .extracting(ProjectResponse::getName)
+                    assertThat((Iterable<String>) projects)
                             .containsExactlyInAnyOrder("Project 01", "Project 02");
                 });
     }
@@ -84,11 +81,9 @@ class ProjectControllerIT {
                 .uri("http://localhost:%d/api/projects".formatted(port))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<List<ProjectResponse>>() {})
-                .value(projects -> {
-                    assertThat(projects).isNotNull();
-                    assertThat(projects).isEmpty();
-                });
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(0);
     }
 
     @Test

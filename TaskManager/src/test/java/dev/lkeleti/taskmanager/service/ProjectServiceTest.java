@@ -18,11 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,8 +80,8 @@ class ProjectServiceTest {
         user.getProjects().add(savedProjectTwo);
 
         // Arrange
-        when(projectRepository.findAll())
-                .thenReturn(List.of(savedProjectOne, savedProjectTwo));
+        when(projectRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedProjectOne, savedProjectTwo)));
 
         when(modelMapper.map(savedProjectOne, ProjectResponse.class))
                 .thenReturn(projectOneResponse);
@@ -88,23 +90,23 @@ class ProjectServiceTest {
                 .thenReturn(projectTwoResponse);
 
         // Act
-        List<ProjectResponse> result = projectService.getAllProjects();
+        Page<ProjectResponse> result = projectService.getAllProjects(0, 10, "id");
 
         // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
 
-        assertEquals(EXISTING_PROJECT_ONE_ID, result.get(0).getId());
-        assertEquals("Project 01", result.get(0).getName());
-        assertEquals("This is project 1", result.get(0).getDescription());
-        assertEquals(1, result.get(0).getUserIds().size());
-        assertEquals(100L, result.get(0).getUserIds().get(0));
+        assertEquals(EXISTING_PROJECT_ONE_ID, result.getContent().get(0).getId());
+        assertEquals("Project 01", result.getContent().get(0).getName());
+        assertEquals("This is project 1", result.getContent().get(0).getDescription());
+        assertEquals(1, result.getContent().get(0).getUserIds().size());
+        assertEquals(100L, result.getContent().get(0).getUserIds().get(0));
 
-        assertEquals(EXISTING_PROJECT_TWO_ID, result.get(1).getId());
-        assertEquals("Project 02", result.get(1).getName());
-        assertEquals("This is project 2", result.get(1).getDescription());
+        assertEquals(EXISTING_PROJECT_TWO_ID, result.getContent().get(1).getId());
+        assertEquals("Project 02", result.getContent().get(1).getName());
+        assertEquals("This is project 2", result.getContent().get(1).getDescription());
 
-        verify(projectRepository).findAll();
+        verify(projectRepository).findAll(any(Pageable.class));
         verify(modelMapper, times(2)).map(any(Project.class), eq(ProjectResponse.class));
     }
 
@@ -112,25 +114,25 @@ class ProjectServiceTest {
     @DisplayName("Find all projects, but empty successfully")
     void testFindAllProjectsEmpty_Success() {
         // Arrange
-        when(projectRepository.findAll())
-                .thenReturn(Collections.emptyList());
+        when(projectRepository.findAll(any(Pageable.class)))
+                .thenReturn(Page.empty());
 
         // Act
-        List<ProjectResponse> result = projectService.getAllProjects();
+        Page<ProjectResponse> result = projectService.getAllProjects(0, 10, "id");
 
         // Assert
         assertNotNull(result);
-        assertEquals(0, result.size());
+        assertEquals(0, result.getContent().size());
 
-        verify(projectRepository).findAll();
+        verify(projectRepository).findAll(any(Pageable.class));
     }
 
     @Test
     @DisplayName("Find all projects, no user successfully")
     void testFindAllProjectsNoUser_Success() {
         // Arrange
-        when(projectRepository.findAll())
-                .thenReturn(List.of(savedProjectOne, savedProjectTwo));
+        when(projectRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedProjectOne, savedProjectTwo)));
 
         when(modelMapper.map(savedProjectOne, ProjectResponse.class))
                 .thenReturn(projectOneResponse);
@@ -139,23 +141,23 @@ class ProjectServiceTest {
                 .thenReturn(projectTwoResponse);
 
         // Act
-        List<ProjectResponse> result = projectService.getAllProjects();
+        Page<ProjectResponse> result = projectService.getAllProjects(0, 10, "id");
 
         // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
 
-        assertEquals(EXISTING_PROJECT_ONE_ID, result.get(0).getId());
-        assertEquals("Project 01", result.get(0).getName());
-        assertEquals("This is project 1", result.get(0).getDescription());
-        assertEquals(0, result.get(0).getUserIds().size());
+        assertEquals(EXISTING_PROJECT_ONE_ID, result.getContent().get(0).getId());
+        assertEquals("Project 01", result.getContent().get(0).getName());
+        assertEquals("This is project 1", result.getContent().get(0).getDescription());
+        assertEquals(0, result.getContent().get(0).getUserIds().size());
 
-        assertEquals(EXISTING_PROJECT_TWO_ID, result.get(1).getId());
-        assertEquals("Project 02", result.get(1).getName());
-        assertEquals("This is project 2", result.get(1).getDescription());
-        assertEquals(0, result.get(1).getUserIds().size());
+        assertEquals(EXISTING_PROJECT_TWO_ID, result.getContent().get(1).getId());
+        assertEquals("Project 02", result.getContent().get(1).getName());
+        assertEquals("This is project 2", result.getContent().get(1).getDescription());
+        assertEquals(0, result.getContent().get(1).getUserIds().size());
 
-        verify(projectRepository).findAll();
+        verify(projectRepository).findAll(any(Pageable.class));
         verify(modelMapper, times(2)).map(any(Project.class), eq(ProjectResponse.class));
     }
 
