@@ -31,4 +31,13 @@ public class AccountingConfig {
 
     @ManyToOne
     private GLAccount vatReceivableAccount;  // 466
+
+    @ManyToOne
+    private GLAccount vat27Account;
+
+    @ManyToOne
+    private GLAccount vat5Account;
+
+    @ManyToOne
+    private GLAccount vat0Account;
 }

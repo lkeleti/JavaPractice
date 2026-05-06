@@ -1,4 +1,4 @@
-package dev.lkeleti.ledgerflow.service;
+package dev.lkeleti.ledgerflow.service.helper;
 
 import dev.lkeleti.ledgerflow.entity.Allocation;
 import dev.lkeleti.ledgerflow.entity.Invoice;

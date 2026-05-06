@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ledger_entry")
@@ -22,24 +20,15 @@ public class LedgerEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
-
-    private String description;
+    @ManyToOne(optional = false)
+    private JournalEntry journalEntry;
 
     @ManyToOne(optional = false)
-    private GLAccount debitAccount;
-
-    @ManyToOne(optional = false)
-    private GLAccount creditAccount;
+    private GLAccount account;
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private BigDecimal debit = BigDecimal.ZERO;
 
-    @ManyToOne
-    private Invoice invoice;
-
-    @ManyToOne
-    private MoneyTransaction moneyTransaction;
-
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private BigDecimal credit = BigDecimal.ZERO;
 }

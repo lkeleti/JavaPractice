@@ -25,13 +25,17 @@ public class InvoiceVatSummary {
     @ManyToOne(optional = false)
     private Invoice invoice;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private VatCode vatCode;
 
+    @Column(nullable = false)
     private BigDecimal netAmount;
+
+    @Column(nullable = false)
     private BigDecimal vatAmount;
-    private BigDecimal grossAmount;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+
 }

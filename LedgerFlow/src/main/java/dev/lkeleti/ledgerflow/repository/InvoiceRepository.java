@@ -12,4 +12,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
         SELECT i FROM Invoice i
         WHERE i.status IN ('NYITOTT', 'RESZBEN_FIZETETT')
         """) List<Invoice> findOpenInvoices();
+
+    List<Invoice> findByPartnerId(Long partnerId);
 }

@@ -1,7 +1,7 @@
-package dev.lkeleti.ledgerflow.service;
+package dev.lkeleti.ledgerflow.service.helper;
 
 import dev.lkeleti.ledgerflow.entity.Invoice;
-import dev.lkeleti.ledgerflow.entity.InvoiceCategory;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceCategory;
 import org.springframework.stereotype.Component;
 
 @Component

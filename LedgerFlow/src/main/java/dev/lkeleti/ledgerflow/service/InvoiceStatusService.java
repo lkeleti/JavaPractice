@@ -2,7 +2,7 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.entity.Allocation;
 import dev.lkeleti.ledgerflow.entity.Invoice;
-import dev.lkeleti.ledgerflow.entity.InvoiceStatus;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceStatus;
 import dev.lkeleti.ledgerflow.repository.AllocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

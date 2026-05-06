@@ -2,6 +2,7 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.entity.Invoice;
 import dev.lkeleti.ledgerflow.repository.InvoiceRepository;
+import dev.lkeleti.ledgerflow.service.helper.InvoiceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

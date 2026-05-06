@@ -10,16 +10,29 @@ import java.util.List;
 
 public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> {
     @Query("""
-        SELECT new hu.yourpackage.TrialBalanceRow(
-        l.account.number,
-        l.account.name,
-        SUM(l.debit),
-        SUM(l.credit)
-        )
-        FROM LedgerEntry l
-        WHERE l.date BETWEEN :from AND :to
-        GROUP BY l.account.number, l.account.name
-        ORDER BY l.account.number
+    SELECT new dev.lkeleti.ledgerflow.dto.TrialBalanceRow(
+        le.account.id,
+        le.account.number,
+        le.account.name,
+        SUM(le.debit),
+        SUM(le.credit)
+    )
+        FROM LedgerEntry le
+        WHERE le.journalEntry.date BETWEEN :from AND :to
+        GROUP BY le.account.id, le.account.number, le.account.name
+        ORDER BY le.account.number
     """)
     List<TrialBalanceRow> getTrialBalance(LocalDate from, LocalDate to);
+
+    @Query("""
+    SELECT l FROM LedgerEntry l
+    WHERE l.account.id = :accountId
+    AND l.journalEntry.date BETWEEN :from AND :to
+    ORDER BY l.journalEntry.date, l.id
+    """)
+    List<LedgerEntry> findByAccount(
+            Long accountId,
+            LocalDate from,
+            LocalDate to
+    );
 }

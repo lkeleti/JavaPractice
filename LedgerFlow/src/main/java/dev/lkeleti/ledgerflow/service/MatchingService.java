@@ -1,6 +1,8 @@
 package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.entity.*;
+import dev.lkeleti.ledgerflow.entity.enums.MatchType;
+import dev.lkeleti.ledgerflow.model.MatchingResult;
 import dev.lkeleti.ledgerflow.repository.AllocationRepository;
 import dev.lkeleti.ledgerflow.repository.InvoiceRepository;
 import lombok.RequiredArgsConstructor;

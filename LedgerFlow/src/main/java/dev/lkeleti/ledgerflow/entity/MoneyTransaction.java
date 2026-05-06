@@ -1,5 +1,6 @@
 package dev.lkeleti.ledgerflow.entity;
 
+import dev.lkeleti.ledgerflow.entity.enums.MoneyDirection;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

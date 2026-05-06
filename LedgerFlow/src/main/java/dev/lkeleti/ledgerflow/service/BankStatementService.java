@@ -1,6 +1,7 @@
 package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.entity.*;
+import dev.lkeleti.ledgerflow.entity.enums.MoneyDirection;
 import dev.lkeleti.ledgerflow.repository.BankStatementLineRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

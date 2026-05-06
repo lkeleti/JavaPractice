@@ -4,18 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
-public class TrialBalanceRow {
+public class PartnerLedgerRow {
 
-    private Long accountId;
-    private String accountNumber;
-    private String accountName;
+    private LocalDate date;
+    private String reference;
+    private String description;
     private BigDecimal debit;
     private BigDecimal credit;
-
-    public BigDecimal getBalance() {
-        return debit.subtract(credit);
-    }
+    private BigDecimal balance;
 }

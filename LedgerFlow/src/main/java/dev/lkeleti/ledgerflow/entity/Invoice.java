@@ -1,5 +1,9 @@
 package dev.lkeleti.ledgerflow.entity;
 
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceCategory;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceNature;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceStatus;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
