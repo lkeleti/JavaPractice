@@ -1,6 +1,6 @@
 package dev.lkeleti.ledgerflow.model;
 
-import dev.lkeleti.ledgerflow.dto.AgingRow;
+import dev.lkeleti.ledgerflow.dto.report.AgingRow;
 import dev.lkeleti.ledgerflow.entity.enums.AgingBucket;
 
 import java.math.BigDecimal;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,24 +26,31 @@ public class MoneyTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    private MoneyDirection direction; // BE, KI
+    @Column(nullable = false)
+    private MoneyDirection direction;
 
     @ManyToOne(optional = false)
     private FinancialAccount financialAccount;
 
     private String description;
 
-    // bank importhoz
+    // bank import azonosító
     private String externalId;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "moneyTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "moneyTransaction",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Allocation> allocations = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-package dev.lkeleti.ledgerflow.dto;
+package dev.lkeleti.ledgerflow.dto.report;
 
 import dev.lkeleti.ledgerflow.entity.enums.AgingBucket;
 import lombok.AllArgsConstructor;

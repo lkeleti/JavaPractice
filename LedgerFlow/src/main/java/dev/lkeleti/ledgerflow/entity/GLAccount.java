@@ -14,27 +14,39 @@ import java.time.LocalDateTime;
 @Table(name = "gl_account")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class GLAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String number; // lehet "311" vagy "911"
+    // pl. 311, 454, 911
+    @Column(nullable = false, unique = true)
+    private String number;
 
     @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private GLAccountType type; // ESZKÖZ, FORRÁS, KÖLTSÉG, BEVÉTEL
+    @Column(nullable = false)
+    private GLAccountType type;
 
+    // ÁFA-hoz kapcsolódik-e
     private boolean vatRelated;
+
+    // partner kartonhoz kapcsolódik-e
     private boolean customerRelated;
+
     private boolean supplierRelated;
-    
+
+    // könyvelhető-e közvetlenül
+    private boolean bookable = true;
+
+    // aktív-e
+    private boolean active = true;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

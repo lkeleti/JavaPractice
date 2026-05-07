@@ -1,6 +1,6 @@
 package dev.lkeleti.ledgerflow.service;
 
-import dev.lkeleti.ledgerflow.dto.AgingRow;
+import dev.lkeleti.ledgerflow.dto.report.AgingRow;
 import dev.lkeleti.ledgerflow.model.AgingAccumulator;
 import dev.lkeleti.ledgerflow.entity.enums.AgingBucket;
 import dev.lkeleti.ledgerflow.entity.Allocation;

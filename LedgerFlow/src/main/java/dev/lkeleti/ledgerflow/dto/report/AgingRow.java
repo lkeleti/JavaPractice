@@ -1,4 +1,4 @@
-package dev.lkeleti.ledgerflow.dto;
+package dev.lkeleti.ledgerflow.dto.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -13,19 +13,30 @@ import java.time.LocalDateTime;
 @Table(name = "payment_method")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class PaymentMethod {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name; // pl: Átutalás, Készpénz
+    // pl: Átutalás
+    @Column(nullable = false, unique = true)
+    private String name;
+
+    // pl: TRANSFER
+    @Column(nullable = false, unique = true)
+    private String code;
+
+    // pénzmozgást generál-e
+    private boolean financial = true;
+
+    // készpénzes-e
+    private boolean cash;
+
+    private boolean active = true;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    private boolean deleted = false;
 }

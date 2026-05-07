@@ -1,7 +1,7 @@
 package dev.lkeleti.ledgerflow.service;
 
-import dev.lkeleti.ledgerflow.dto.OpenItemDto;
-import dev.lkeleti.ledgerflow.dto.PartnerLedgerRow;
+import dev.lkeleti.ledgerflow.dto.report.OpenItemDto;
+import dev.lkeleti.ledgerflow.dto.report.PartnerLedgerRow;
 import dev.lkeleti.ledgerflow.entity.Allocation;
 import dev.lkeleti.ledgerflow.entity.Invoice;
 import dev.lkeleti.ledgerflow.repository.AllocationRepository;

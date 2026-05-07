@@ -6,26 +6,45 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "vat_code")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class VatCode {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String code; // pl: A27, A5, AM, TAM, EU, EXPORT
+    // pl.: AAM, 27%, 5%, EU, FORDITOTT
+    @Column(nullable = false, unique = true)
+    private String code;
 
+    // pl.: Belföldi 27%
+    @Column(nullable = false)
     private String name;
 
+    // 27.00 / 5.00 / 0.00
+    @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal rate;
 
     @Enumerated(EnumType.STRING)
-    private VatType type; // NORMAL, EXEMPT, REVERSE, OUT_OF_SCOPE
+    @Column(nullable = false)
+    private VatType type;
+
+    // levonható-e
+    private boolean deductible;
+
+    // aktív-e
+    private boolean active = true;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }

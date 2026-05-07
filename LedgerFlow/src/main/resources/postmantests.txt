@@ -1,0 +1,256 @@
+POST /api/gl-accounts
+311 - vevők
+
+{
+  "number": "311",
+  "name": "Belföldi vevők",
+  "type": "ESZKOZ",
+  "customerRelated": true,
+  "bookable": true
+}
+
+454 - szállítók
+{
+  "number": "454",
+  "name": "Belföldi szállítók",
+  "type": "FORRAS",
+  "supplierRelated": true,
+  "bookable": true
+}
+
+911 - árbevétel
+{
+  "number": "911",
+  "name": "Belföldi értékesítés árbevétele",
+  "type": "BEVETEL",
+  "bookable": true
+}
+
+511 - Anyagköltség
+{
+  "number": "511",
+  "name": "Anyagköltség",
+  "type": "KOLTSEG",
+  "bookable": true
+}
+
+467 - Fizetendő áfa
+{
+  "number": "467",
+  "name": "Fizetendő ÁFA",
+  "type": "FORRAS",
+  "vatRelated": true,
+  "bookable": true
+}
+
+466 - Levonható áfa
+{
+  "number": "466",
+  "name": "Levonható ÁFA",
+  "type": "ESZKOZ",
+  "vatRelated": true,
+  "bookable": true
+}
+
+384 - Bank
+{
+  "number": "384",
+  "name": "OTP bankszámla",
+  "type": "ESZKOZ",
+  "bookable": true
+}
+
+POST /api/vat-codes
+
+27%-os Áfa
+{
+  "code": "27%",
+  "name": "Belföldi 27%",
+  "rate": 27.00,
+  "type": "NORMAL",
+  "deductible": true
+}
+
+POST /api/accounting-config
+
+{
+  "revenueAccountId": 1,
+  "expenseAccountId": 2,
+  "vatPayableAccountId": 3,
+  "vatReceivableAccountId": 4
+}
+
+POST /api/financial-accounts
+
+OTP bankszámla
+
+{
+  "name": "OTP főszámla",
+  "type": "BANK",
+  "accountNumber": "11700000-11111111",
+  "iban": "HU121170000011111111",
+  "swift": "OTPVHUHB",
+  "glAccountId": 7
+}
+
+POST /api/partners
+
+Vevő partner
+
+{
+  "name": "Teszt Kft",
+  "privatePerson": false,
+  "postalCode": "1111",
+  "city": "Budapest",
+  "streetName": "Fő",
+  "streetType": "utca",
+  "houseNumber": "10",
+  "taxNumber": "12345678-1-42",
+  "customerAccountId": 1,
+  "supplierAccountId": 2,
+  "paymentDeadlineDays": 8,
+  "email": "info@teszt.hu",
+  "phone": "+3612345678"
+}
+
+Szállító partner
+{
+  "name": "Minta Szállító Kft",
+  "privatePerson": false,
+  "postalCode": "1111",
+  "city": "Budapest",
+  "streetName": "Fő",
+  "streetType": "utca",
+  "houseNumber": "10",
+  "taxNumber": "12345678-1-42",
+  "customerAccountId": 1,
+  "supplierAccountId": 2,
+  "paymentDeadlineDays": 8,
+  "email": "info@teszt.hu",
+  "phone": "+3612345678"
+}
+
+POST /api/payment-methods
+Átutalás
+
+{
+  "name": "Átutalás",
+  "code": "TRANSFER",
+  "financial": true,
+  "cash": false
+}
+
+Készpénz
+
+{
+  "name": "Készpénz",
+  "code": "CASH",
+  "financial": true,
+  "cash": true
+}
+
+Bankkártya
+
+{
+  "name": "Bankkártya",
+  "code": "CARD",
+  "financial": true,
+  "cash": false
+}
+
+Kompenzáció
+
+{
+  "name": "Kompenzáció",
+  "code": "OFFSET",
+  "financial": false,
+  "cash": false
+}
+
+
+
+
+POST /api/invoices
+VEVŐ SZÁMLA
+
+{
+  "invoiceNumber": "VEVO-2026-0001",
+  "type": "VEVO",
+  "partnerId": 1,
+  "issueDate": "2026-05-07",
+  "performanceDate": "2026-05-07",
+  "paymentDueDate": "2026-05-15",
+  "netTotal": 100000,
+  "grossTotal": 127000,
+  "vatSummaries": [
+    {
+      "vatCodeId": 1,
+      "netAmount": 100000,
+      "vatAmount": 27000
+    }
+  ]
+}
+
+SZÁLLÍTÓ SZÁMLA
+{
+  "invoiceNumber": "SZALL-2026-0001",
+  "type": "SZALLITO",
+  "partnerId": 2,
+  "issueDate": "2026-05-07",
+  "performanceDate": "2026-05-07",
+  "paymentDueDate": "2026-05-20",
+  "netTotal": 50000,
+  "grossTotal": 63500,
+  "vatSummaries": [
+    {
+      "vatCodeId": 1,
+      "netAmount": 50000,
+      "vatAmount": 13500
+    }
+  ]
+}
+
+POST /api/money-transactions
+
+BANKI JÓVÁÍRÁS (vevő fizet)
+{
+  "date": "2026-05-10",
+  "amount": 127000,
+  "direction": "BE",
+  "financialAccountId": 1,
+  "description": "VEVO-2026-0001 utalás",
+  "externalId": "BANK-0001",
+  "allocations": [
+    {
+      "invoiceId": 1,
+      "amount": 127000
+    }
+  ]
+}
+
+BANKI TERHELÉS (szállító fizetés)
+{
+  "date": "2026-05-12",
+  "amount": 63500,
+  "direction": "KI",
+  "financialAccountId": 1,
+  "description": "SZALL-2026-0001 utalás",
+  "externalId": "BANK-0002",
+  "allocations": [
+    {
+      "invoiceId": 2,
+      "amount": 63500
+    }
+  ]
+}
+
+Trial Balance
+GET /api/reports/trial-balance
+Partner karton
+GET /api/partner-ledger/1
+Aging
+GET /api/reports/aging
+
+
+
+

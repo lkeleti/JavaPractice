@@ -1,0 +1,141 @@
+package dev.lkeleti.ledgerflow.service;
+
+import dev.lkeleti.ledgerflow.dto.request.PartnerCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.PartnerUpdateRequest;
+import dev.lkeleti.ledgerflow.entity.GLAccount;
+import dev.lkeleti.ledgerflow.entity.Partner;
+import dev.lkeleti.ledgerflow.entity.PaymentMethod;
+import dev.lkeleti.ledgerflow.repository.GLAccountRepository;
+import dev.lkeleti.ledgerflow.repository.PartnerRepository;
+import dev.lkeleti.ledgerflow.repository.PaymentMethodRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PartnerService {
+
+    private final PartnerRepository partnerRepository;
+    private final GLAccountRepository glAccountRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    @Transactional
+    public Partner create(PartnerCreateRequest request) {
+
+        Partner partner = new Partner();
+
+        map(request, partner);
+
+        return partnerRepository.save(partner);
+    }
+
+    @Transactional(readOnly = true)
+    public Partner getById(Long id) {
+
+        return partnerRepository.findById(id)
+                .filter(p -> !p.isDeleted())
+                .orElseThrow(() -> new RuntimeException("Partner not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Partner> getAll() {
+
+        return partnerRepository.findAll()
+                .stream()
+                .filter(p -> !p.isDeleted())
+                .toList();
+    }
+
+    @Transactional
+    public Partner update(Long id, PartnerUpdateRequest request) {
+
+        Partner partner = getById(id);
+
+        map(request, partner);
+
+        return partnerRepository.save(partner);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+
+        Partner partner = getById(id);
+
+        partner.setDeleted(true);
+
+        partnerRepository.save(partner);
+    }
+
+    // =========================
+    // MAPPING
+    // =========================
+
+    private void map(PartnerCreateRequest request, Partner partner) {
+
+        partner.setName(request.getName());
+        partner.setPrivatePerson(request.isPrivatePerson());
+
+        partner.setPostalCode(request.getPostalCode());
+        partner.setCity(request.getCity());
+        partner.setDistrict(request.getDistrict());
+        partner.setStreetName(request.getStreetName());
+        partner.setStreetType(request.getStreetType());
+        partner.setHouseNumber(request.getHouseNumber());
+        partner.setBuilding(request.getBuilding());
+        partner.setStaircase(request.getStaircase());
+        partner.setFloor(request.getFloor());
+        partner.setDoor(request.getDoor());
+        partner.setPlotNumber(request.getPlotNumber());
+
+        partner.setTaxNumber(request.getTaxNumber());
+
+        if (request.getCustomerAccountId() != null) {
+
+            GLAccount account = glAccountRepository.findById(
+                    request.getCustomerAccountId()
+            ).orElseThrow(() ->
+                    new RuntimeException("Customer account not found"));
+
+            partner.setCustomerAccount(account);
+        }
+
+        if (request.getSupplierAccountId() != null) {
+
+            GLAccount account = glAccountRepository.findById(
+                    request.getSupplierAccountId()
+            ).orElseThrow(() ->
+                    new RuntimeException("Supplier account not found"));
+
+            partner.setSupplierAccount(account);
+        }
+
+        if (request.getPaymentMethodId() != null) {
+
+            PaymentMethod paymentMethod =
+                    paymentMethodRepository.findById(
+                            request.getPaymentMethodId()
+                    ).orElseThrow(() ->
+                            new RuntimeException("Payment method not found"));
+
+            partner.setPaymentMethod(paymentMethod);
+        }
+
+        partner.setBankAccountNumber(request.getBankAccountNumber());
+        partner.setIban(request.getIban());
+        partner.setSwift(request.getSwift());
+
+        partner.setPaymentDeadlineDays(
+                request.getPaymentDeadlineDays() != null
+                        ? request.getPaymentDeadlineDays()
+                        : 0
+        );
+
+        partner.setEmail(request.getEmail());
+        partner.setPhone(request.getPhone());
+
+        partner.setNote(request.getNote());
+    }
+}

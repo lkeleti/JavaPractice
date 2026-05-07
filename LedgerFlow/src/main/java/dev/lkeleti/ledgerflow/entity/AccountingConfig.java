@@ -1,10 +1,6 @@
 package dev.lkeleti.ledgerflow.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,30 +10,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class AccountingConfig {
 
     @Id
-    private Long id = 1L; // singleton
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    // 91
     @ManyToOne
-    private GLAccount revenueAccount;        // pl. 91
+    private GLAccount revenueAccount;
 
+    // 51
     @ManyToOne
-    private GLAccount expenseAccount;        // pl. 51
+    private GLAccount expenseAccount;
 
+    // 467
     @ManyToOne
-    private GLAccount vatPayableAccount;     // 467
+    private GLAccount vatPayableAccount;
 
+    // 466
     @ManyToOne
-    private GLAccount vatReceivableAccount;  // 466
-
-    @ManyToOne
-    private GLAccount vat27Account;
-
-    @ManyToOne
-    private GLAccount vat5Account;
-
-    @ManyToOne
-    private GLAccount vat0Account;
+    private GLAccount vatReceivableAccount;
 }

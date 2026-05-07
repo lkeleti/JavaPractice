@@ -1,7 +1,7 @@
 package dev.lkeleti.ledgerflow.service;
 
-import dev.lkeleti.ledgerflow.dto.LedgerRowDto;
-import dev.lkeleti.ledgerflow.dto.TrialBalanceRow;
+import dev.lkeleti.ledgerflow.dto.report.LedgerRowDto;
+import dev.lkeleti.ledgerflow.dto.report.TrialBalanceRow;
 import dev.lkeleti.ledgerflow.entity.GLAccount;
 import dev.lkeleti.ledgerflow.entity.JournalEntry;
 import dev.lkeleti.ledgerflow.entity.LedgerEntry;

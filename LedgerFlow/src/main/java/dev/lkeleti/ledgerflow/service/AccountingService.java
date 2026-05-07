@@ -24,11 +24,15 @@ public class AccountingService {
     // =========================
 
     private AccountingConfig getConfig() {
-        return configRepo.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Accounting config not found"));
+
+        return configRepo.findTopByOrderByIdAsc()
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Accounting config not found"
+                        ));
     }
 
-    // =========================
+        // =========================
     // INVOICE
     // =========================
 

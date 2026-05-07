@@ -1,16 +1,15 @@
 package dev.lkeleti.ledgerflow.repository;
 
-import dev.lkeleti.ledgerflow.dto.TrialBalanceRow;
+import dev.lkeleti.ledgerflow.dto.report.TrialBalanceRow;
 import dev.lkeleti.ledgerflow.entity.LedgerEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDate;
 import java.util.List;
 
 public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, Long> {
     @Query("""
-    SELECT new dev.lkeleti.ledgerflow.dto.TrialBalanceRow(
+    SELECT new dev.lkeleti.ledgerflow.dto.report.TrialBalanceRow(
         le.account.id,
         le.account.number,
         le.account.name,

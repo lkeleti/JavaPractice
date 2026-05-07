@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "financial_account")
@@ -19,11 +22,27 @@ public class FinancialAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // pl: OTP főszámla
+    @Column(nullable = false)
     private String name;
 
+    // bankszámla / pénztár / cash / stb
     @Enumerated(EnumType.STRING)
-    private FinancialAccountType type; // BANK, PENZTAR
+    @Column(nullable = false)
+    private FinancialAccountType type;
 
+    // bankszámlaszám
+    private String accountNumber;
+
+    private String iban;
+    private String swift;
+
+    // kapcsolt főkönyvi számla (pl. 384)
     @ManyToOne(optional = false)
     private GLAccount glAccount;
+
+    private boolean active = true;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }
