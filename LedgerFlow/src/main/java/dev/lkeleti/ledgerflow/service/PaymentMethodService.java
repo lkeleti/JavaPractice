@@ -1,7 +1,12 @@
 package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.PaymentMethodCreateRequest;
+import dev.lkeleti.ledgerflow.dto.response.PaymentMethodResponse;
 import dev.lkeleti.ledgerflow.entity.PaymentMethod;
+import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
+import dev.lkeleti.ledgerflow.exception.ErrorMessage;
+import dev.lkeleti.ledgerflow.exception.NotFoundException;
+import dev.lkeleti.ledgerflow.mapper.PaymentMethodMapper;
 import dev.lkeleti.ledgerflow.repository.PaymentMethodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +19,13 @@ import java.util.List;
 public class PaymentMethodService {
 
     private final PaymentMethodRepository repository;
+    private final PaymentMethodMapper mapper;
 
     @Transactional
-    public PaymentMethod create(PaymentMethodCreateRequest request) {
+    public PaymentMethodResponse create(PaymentMethodCreateRequest request) {
 
         if (repository.existsByCode(request.getCode())) {
-            throw new RuntimeException("PaymentMethod code already exists");
+            throw new BusinessValidationException(ErrorMessage.PAYMENT_METHOD_ALREADY_EXISTS);
         }
 
         PaymentMethod pm = new PaymentMethod();
@@ -28,42 +34,77 @@ public class PaymentMethodService {
         pm.setCode(request.getCode());
         pm.setFinancial(request.isFinancial());
         pm.setCash(request.isCash());
+        pm.setActive(true);
 
-        return repository.save(pm);
+        return mapper.toResponse(repository.save(pm));
     }
 
     @Transactional(readOnly = true)
-    public PaymentMethod get(Long id) {
+    public PaymentMethodResponse get(Long id) {
 
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("PaymentMethod not found"));
+        PaymentMethod pm = repository.findById(id)
+                .filter(PaymentMethod::isActive)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.PAYMENT_METHOD_NOT_FOUND)
+                );
+
+        return mapper.toResponse(pm);
     }
 
     @Transactional(readOnly = true)
-    public List<PaymentMethod> getAll() {
-        return repository.findAll();
+    public List<PaymentMethodResponse> getAll() {
+        return repository.findAll()
+                .stream()
+                .filter(PaymentMethod::isActive)
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentMethodResponse> getAllIncludingDeleted() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Transactional
-    public PaymentMethod update(Long id, PaymentMethodCreateRequest request) {
+    public PaymentMethodResponse update(Long id, PaymentMethodCreateRequest request) {
 
-        PaymentMethod pm = get(id);
+        PaymentMethod pm = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.PAYMENT_METHOD_NOT_FOUND)
+                );
 
         pm.setName(request.getName());
         pm.setCode(request.getCode());
         pm.setFinancial(request.isFinancial());
         pm.setCash(request.isCash());
 
-        return repository.save(pm);
+        return mapper.toResponse(repository.save(pm));
     }
 
     @Transactional
     public void delete(Long id) {
 
-        PaymentMethod pm = get(id);
+        PaymentMethod pm = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.PAYMENT_METHOD_NOT_FOUND)
+                );
 
         pm.setActive(false);
-
         repository.save(pm);
+    }
+
+    @Transactional
+    public PaymentMethodResponse restore(Long id) {
+
+        PaymentMethod pm = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.PAYMENT_METHOD_NOT_FOUND)
+                );
+
+        pm.setActive(true);
+        return mapper.toResponse(repository.save(pm));
     }
 }

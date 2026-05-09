@@ -21,8 +21,10 @@ public enum ErrorMessage {
     ALLOCATION_NOT_FOUND("ALLOCATION_NOT_FOUND", "Az allokáció nem található"),
     INVOICE_NOT_FOUND("INVOICE_NOT_FOUND", "A számla nem található"),
 
+    PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "A fizetési mód nem található"),
+    PAYMENT_METHOD_ALREADY_EXISTS("PAYMENT_METHOD_ALREADY_EXISTS", "A fizetési mód kódja már létezik"),
 
-    PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "Payment method not found"),
+
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation error"),
     BUSINESS_ERROR("BUSINESS_ERROR", "Business validation error");
 
