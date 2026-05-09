@@ -13,6 +13,8 @@ public enum ErrorMessage {
     ACCOUNTING_CONFIG_ALREADY_EXISTS("ACCOUNTING_CONFIG_ALREADY_EXISTS", "Már létezik könyvelési beállítás, új nem hozható létre"),
     GL_ACCOUNT_NOT_FOUND("GL_ACCOUNT_NOT_FOUND", "A megadott főkönyvi számla nem található"),
 
+    FINANCIAL_ACCOUNT_NOT_FOUND("FINANCIAL_ACCOUNT_NOT_FOUND", "A pénzügyi számla nem található"),
+
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "Payment method not found"),
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation error"),
     BUSINESS_ERROR("BUSINESS_ERROR", "Business validation error");
