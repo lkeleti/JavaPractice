@@ -1,8 +1,12 @@
 package dev.lkeleti.ledgerflow.service;
 
+import dev.lkeleti.ledgerflow.dto.request.AllocationRequest;
+import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionCreateRequest;
+import dev.lkeleti.ledgerflow.dto.response.MoneyTransactionResponse;
 import dev.lkeleti.ledgerflow.entity.*;
 import dev.lkeleti.ledgerflow.entity.enums.MoneyDirection;
 import dev.lkeleti.ledgerflow.repository.BankStatementLineRepository;
+import dev.lkeleti.ledgerflow.repository.MoneyTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,7 @@ public class BankStatementService {
 
     private final BankStatementLineRepository lineRepository;
     private final MoneyTransactionService txService;
+    private final MoneyTransactionRepository txRepository;
 
     @Transactional
     public void processLine(Long lineId, Invoice invoice) {
@@ -27,30 +32,35 @@ public class BankStatementService {
             throw new IllegalStateException("Már feldolgozott tétel");
         }
 
-        // 1. MoneyTransaction építés
-        MoneyTransaction tx = new MoneyTransaction();
-        tx.setDate(line.getDate());
-        tx.setAmount(line.getAmount().abs());
-        tx.setDirection(line.getAmount().compareTo(BigDecimal.ZERO) > 0
-                ? MoneyDirection.BE
-                : MoneyDirection.KI);
-        tx.setFinancialAccount(line.getBankStatement().getAccount());
-        tx.setDescription(line.getDescription());
+        // 1. MoneyTransactionCreateRequest építése
+        MoneyTransactionCreateRequest request = new MoneyTransactionCreateRequest();
+        request.setDate(line.getDate());
+        request.setAmount(line.getAmount().abs());
+        request.setDirection(
+                line.getAmount().compareTo(BigDecimal.ZERO) > 0
+                        ? MoneyDirection.BE
+                        : MoneyDirection.KI
+        );
+        request.setFinancialAccountId(line.getBankStatement().getAccount().getId());
+        request.setDescription(line.getDescription());
 
-        // 2. Allocation
-        Allocation allocation = new Allocation();
-        allocation.setInvoice(invoice);
-        allocation.setAmount(tx.getAmount());
-        allocation.setMoneyTransaction(tx);
+        // 2. AllocationRequest
+        AllocationRequest ar = new AllocationRequest();
+        ar.setInvoiceId(invoice.getId());
+        ar.setAmount(request.getAmount());
 
-        tx.setAllocations(List.of(allocation));
+        request.setAllocations(List.of(ar));
 
-        // 3. Transaction feldolgozás (delegálás!)
-        MoneyTransaction savedTx = txService.createTransaction(tx);
+        // 3. Tranzakció létrehozása (DTO)
+        MoneyTransactionResponse savedTx = txService.create(request);
 
-        // 4. Line frissítés
+        // 4. ENTITÁS visszakérése
+        MoneyTransaction txEntity = txRepository.findById(savedTx.getId())
+                .orElseThrow();
+
+        // 5. BankStatementLine frissítése
         line.setProcessed(true);
-        line.setMoneyTransaction(savedTx);
+        line.setMoneyTransaction(txEntity);
 
         lineRepository.save(line);
     }
