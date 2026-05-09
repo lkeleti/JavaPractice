@@ -41,11 +41,12 @@ public class MoneyTransaction {
 
     private String description;
 
-    // bank import azonosító
     private String externalId;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private boolean deleted = false;
 
     @OneToMany(
             mappedBy = "moneyTransaction",

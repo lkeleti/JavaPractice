@@ -17,6 +17,10 @@ public enum ErrorMessage {
 
     GL_ACCOUNT_ALREADY_EXISTS("GL_ACCOUNT_ALREADY_EXISTS", "A főkönyvi számla már létezik"),
 
+    MONEY_TRANSACTION_NOT_FOUND("MONEY_TRANSACTION_NOT_FOUND", "A pénzügyi tranzakció nem található"),
+    ALLOCATION_NOT_FOUND("ALLOCATION_NOT_FOUND", "Az allokáció nem található"),
+    INVOICE_NOT_FOUND("INVOICE_NOT_FOUND", "A számla nem található"),
+
 
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "Payment method not found"),
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation error"),
