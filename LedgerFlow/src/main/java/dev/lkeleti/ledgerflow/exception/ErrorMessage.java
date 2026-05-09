@@ -15,6 +15,9 @@ public enum ErrorMessage {
 
     FINANCIAL_ACCOUNT_NOT_FOUND("FINANCIAL_ACCOUNT_NOT_FOUND", "A pénzügyi számla nem található"),
 
+    GL_ACCOUNT_ALREADY_EXISTS("GL_ACCOUNT_ALREADY_EXISTS", "A főkönyvi számla már létezik"),
+
+
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "Payment method not found"),
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation error"),
     BUSINESS_ERROR("BUSINESS_ERROR", "Business validation error");
