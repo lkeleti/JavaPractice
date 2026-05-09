@@ -2,9 +2,11 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.PartnerCreateRequest;
 import dev.lkeleti.ledgerflow.dto.request.PartnerUpdateRequest;
+import dev.lkeleti.ledgerflow.dto.response.PartnerResponse;
 import dev.lkeleti.ledgerflow.entity.GLAccount;
 import dev.lkeleti.ledgerflow.entity.Partner;
 import dev.lkeleti.ledgerflow.entity.PaymentMethod;
+import dev.lkeleti.ledgerflow.mapper.PartnerMapper;
 import dev.lkeleti.ledgerflow.repository.GLAccountRepository;
 import dev.lkeleti.ledgerflow.repository.PartnerRepository;
 import dev.lkeleti.ledgerflow.repository.PaymentMethodRepository;
@@ -21,59 +23,75 @@ public class PartnerService {
     private final PartnerRepository partnerRepository;
     private final GLAccountRepository glAccountRepository;
     private final PaymentMethodRepository paymentMethodRepository;
-
-    @Transactional
-    public Partner create(PartnerCreateRequest request) {
-
-        Partner partner = new Partner();
-
-        map(request, partner);
-
-        return partnerRepository.save(partner);
-    }
+    private final PartnerMapper partnerMapper;
 
     @Transactional(readOnly = true)
-    public Partner getById(Long id) {
+    public List<PartnerResponse> getAll() {
 
-        return partnerRepository.findById(id)
-                .filter(p -> !p.isDeleted())
-                .orElseThrow(() -> new RuntimeException("Partner not found"));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Partner> getAll() {
-
-        return partnerRepository.findAll()
+        return
+                partnerRepository.findAll()
                 .stream()
                 .filter(p -> !p.isDeleted())
+                .map(partnerMapper::toResponse)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PartnerResponse getById(Long id) {
+
+        return partnerRepository.findById(id)
+                .filter(p -> !p.isDeleted())
+                .map(partnerMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Partner not found"));
+    }
+
     @Transactional
-    public Partner update(Long id, PartnerUpdateRequest request) {
+    public PartnerResponse create(PartnerCreateRequest request) {
 
-        Partner partner = getById(id);
+        Partner partner = new Partner();
 
-        map(request, partner);
+        validateAndModify(request, partner);
 
-        return partnerRepository.save(partner);
+        return partnerMapper.toResponse(partnerRepository.save(partner));
+    }
+
+    @Transactional
+    public PartnerResponse update(Long id, PartnerUpdateRequest request) {
+
+        Partner partner = partnerRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Partner not found")
+        );
+
+        validateAndModify(request, partner);
+
+        return partnerMapper.toResponse(partnerRepository.save(partner));
     }
 
     @Transactional
     public void delete(Long id) {
 
-        Partner partner = getById(id);
-
+        Partner partner = partnerRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Partner not found")
+        );
         partner.setDeleted(true);
-
         partnerRepository.save(partner);
     }
 
+    @Transactional
+    public PartnerResponse restore(Long id) {
+
+        Partner partner = partnerRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Partner not found")
+        );
+        partner.setDeleted(false);
+        return partnerMapper.toResponse(partnerRepository.save(partner));
+    }
+
     // =========================
-    // MAPPING
+    // Validate
     // =========================
 
-    private void map(PartnerCreateRequest request, Partner partner) {
+    private void validateAndModify(PartnerCreateRequest request, Partner partner) {
 
         partner.setName(request.getName());
         partner.setPrivatePerson(request.isPrivatePerson());

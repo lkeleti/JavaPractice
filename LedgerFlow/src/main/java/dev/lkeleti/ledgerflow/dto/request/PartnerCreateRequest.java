@@ -42,4 +42,5 @@ public class PartnerCreateRequest {
     private String phone;
 
     private String note;
+
 }
