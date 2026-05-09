@@ -2,122 +2,124 @@ package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.AccountingConfigRequest;
 import dev.lkeleti.ledgerflow.dto.response.AccountingConfigResponse;
-import dev.lkeleti.ledgerflow.entity.AccountingConfig;
-import dev.lkeleti.ledgerflow.entity.GLAccount;
+import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.service.AccountingConfigService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounting-config")
 @RequiredArgsConstructor
+@Tag(
+        name = "Accounting Config API",
+        description = "Könyvelési beállítások lekérése, létrehozása és módosítása (egyetlen konfigurációs rekord)"
+)
 public class AccountingConfigController {
 
     private final AccountingConfigService service;
 
+    // ---------------------------------------------------------
+    // GET
+    // ---------------------------------------------------------
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Könyvelési beállítások lekérése",
+            description = "Visszaadja az aktuális könyvelési beállításokat. Ha nincs konfiguráció, hibát ad vissza."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Sikeres lekérés",
+                    content = @Content(schema = @Schema(implementation = AccountingConfigResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "A könyvelési beállítás nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
     public AccountingConfigResponse get() {
-
-        AccountingConfig config = service.get();
-
-        if (config == null) {
-            return null;
-        }
-
-        return map(config);
+        return service.get();
     }
 
+
+    // ---------------------------------------------------------
+    // CREATE
+    // ---------------------------------------------------------
     @PostMapping
-    public AccountingConfigResponse save(
-            @RequestBody AccountingConfigRequest request
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Könyvelési beállítás létrehozása",
+            description = "Létrehozza a könyvelési beállításokat a megadott adatok alapján. " +
+                    "Ha már létezik konfiguráció, hibát ad vissza."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "A beállítás sikeresen létrehozva",
+                    content = @Content(schema = @Schema(implementation = AccountingConfigResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Érvénytelen adatok a kérésben",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "A megadott számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Már létezik könyvelési beállítás, új nem hozható létre",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public AccountingConfigResponse create(
+            @Valid @RequestBody AccountingConfigRequest request
     ) {
-
-        return map(service.save(request));
+        return service.create(request);
     }
 
+    // ---------------------------------------------------------
+    // UPDATE
+    // ---------------------------------------------------------
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Könyvelési beállítás módosítása",
+            description = "Frissíti a meglévő könyvelési beállításokat a megadott adatok alapján. " +
+                    "Ha nincs konfiguráció, hibát ad vissza."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "A beállítás sikeresen frissítve",
+                    content = @Content(schema = @Schema(implementation = AccountingConfigResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Érvénytelen adatok a kérésben",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "A könyvelési beállítás vagy a megadott számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
     public AccountingConfigResponse update(
-            @RequestBody AccountingConfigRequest request
+            @Valid @RequestBody AccountingConfigRequest request
     ) {
-
-        return map(service.save(request));
-    }
-
-    // =========================
-    // MAPPER
-    // =========================
-
-    private AccountingConfigResponse map(
-            AccountingConfig config
-    ) {
-
-        AccountingConfigResponse response =
-                new AccountingConfigResponse();
-
-        response.setId(config.getId());
-
-        mapAccount(
-                config.getRevenueAccount(),
-                response,
-                "revenue"
-        );
-
-        mapAccount(
-                config.getExpenseAccount(),
-                response,
-                "expense"
-        );
-
-        mapAccount(
-                config.getVatPayableAccount(),
-                response,
-                "vatPayable"
-        );
-
-        mapAccount(
-                config.getVatReceivableAccount(),
-                response,
-                "vatReceivable"
-        );
-
-        return response;
-    }
-
-    private void mapAccount(
-            GLAccount account,
-            AccountingConfigResponse response,
-            String type
-    ) {
-
-        if (account == null) {
-            return;
-        }
-
-        switch (type) {
-
-            case "revenue" -> {
-                response.setRevenueAccountId(account.getId());
-                response.setRevenueAccountNumber(account.getNumber());
-                response.setRevenueAccountName(account.getName());
-            }
-
-            case "expense" -> {
-                response.setExpenseAccountId(account.getId());
-                response.setExpenseAccountNumber(account.getNumber());
-                response.setExpenseAccountName(account.getName());
-            }
-
-            case "vatPayable" -> {
-                response.setVatPayableAccountId(account.getId());
-                response.setVatPayableAccountNumber(account.getNumber());
-                response.setVatPayableAccountName(account.getName());
-            }
-
-            case "vatReceivable" -> {
-                response.setVatReceivableAccountId(account.getId());
-                response.setVatReceivableAccountNumber(account.getNumber());
-                response.setVatReceivableAccountName(account.getName());
-            }
-        }
+        return service.update(request);
     }
 }
