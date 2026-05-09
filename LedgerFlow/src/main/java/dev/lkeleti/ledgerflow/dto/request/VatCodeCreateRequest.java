@@ -1,6 +1,7 @@
 package dev.lkeleti.ledgerflow.dto.request;
 
 import dev.lkeleti.ledgerflow.entity.enums.VatType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,19 +13,25 @@ import java.math.BigDecimal;
 @Setter
 public class VatCodeCreateRequest {
 
-    @NotBlank
+    @Schema(description = "ÁFA kód", example = "27%")
+    @NotBlank(message = "A kód megadása kötelező")
     private String code;
 
-    @NotBlank
+    @Schema(description = "ÁFA kód megnevezése", example = "Belföldi 27%")
+    @NotBlank(message = "A név megadása kötelező")
     private String name;
 
-    @NotNull
+    @Schema(description = "ÁFA kulcs értéke", example = "27.00")
+    @NotNull(message = "Az ÁFA kulcs megadása kötelező")
     private BigDecimal rate;
 
-    @NotNull
+    @Schema(description = "ÁFA típus", example = "STANDARD")
+    @NotNull(message = "Az ÁFA típus megadása kötelező")
     private VatType type;
 
+    @Schema(description = "Levonható-e", example = "true")
     private boolean deductible;
 
+    @Schema(description = "Aktív-e", example = "true")
     private boolean active = true;
 }

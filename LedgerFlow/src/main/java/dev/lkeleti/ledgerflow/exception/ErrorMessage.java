@@ -24,6 +24,8 @@ public enum ErrorMessage {
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "A fizetési mód nem található"),
     PAYMENT_METHOD_ALREADY_EXISTS("PAYMENT_METHOD_ALREADY_EXISTS", "A fizetési mód kódja már létezik"),
 
+    VAT_CODE_NOT_FOUND("VAT_CODE_NOT_FOUND", "Az ÁFA kód nem található"),
+    VAT_CODE_ALREADY_EXISTS("VAT_CODE_ALREADY_EXISTS", "Az ÁFA kód már létezik"),
 
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation error"),
     BUSINESS_ERROR("BUSINESS_ERROR", "Business validation error");

@@ -23,15 +23,12 @@ public class VatCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // pl.: AAM, 27%, 5%, EU, FORDITOTT
     @Column(nullable = false, unique = true)
     private String code;
 
-    // pl.: Belföldi 27%
     @Column(nullable = false)
     private String name;
 
-    // 27.00 / 5.00 / 0.00
     @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal rate;
 
@@ -39,11 +36,11 @@ public class VatCode {
     @Column(nullable = false)
     private VatType type;
 
-    // levonható-e
     private boolean deductible;
 
-    // aktív-e
     private boolean active = true;
+
+    private boolean deleted = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

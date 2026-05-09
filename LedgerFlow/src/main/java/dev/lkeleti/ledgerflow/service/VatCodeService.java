@@ -2,7 +2,12 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.VatCodeCreateRequest;
 import dev.lkeleti.ledgerflow.dto.request.VatCodeUpdateRequest;
+import dev.lkeleti.ledgerflow.dto.response.VatCodeResponse;
 import dev.lkeleti.ledgerflow.entity.VatCode;
+import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
+import dev.lkeleti.ledgerflow.exception.ErrorMessage;
+import dev.lkeleti.ledgerflow.exception.NotFoundException;
+import dev.lkeleti.ledgerflow.mapper.VatCodeMapper;
 import dev.lkeleti.ledgerflow.repository.VatCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,74 +20,96 @@ import java.util.List;
 public class VatCodeService {
 
     private final VatCodeRepository repository;
+    private final VatCodeMapper mapper;
 
     @Transactional
-    public VatCode create(VatCodeCreateRequest request) {
+    public VatCodeResponse create(VatCodeCreateRequest request) {
 
         if (repository.existsByCode(request.getCode())) {
-            throw new IllegalStateException(
-                    "Vat code already exists"
-            );
+            throw new BusinessValidationException(ErrorMessage.VAT_CODE_ALREADY_EXISTS);
         }
 
-        VatCode vatCode = new VatCode();
+        VatCode v = new VatCode();
 
-        map(request, vatCode);
+        v.setCode(request.getCode());
+        v.setName(request.getName());
+        v.setRate(request.getRate());
+        v.setType(request.getType());
+        v.setDeductible(request.isDeductible());
+        v.setActive(request.isActive());
+        v.setDeleted(false);
 
-        return repository.save(vatCode);
+        return mapper.toResponse(repository.save(v));
     }
 
     @Transactional(readOnly = true)
-    public VatCode getById(Long id) {
+    public VatCodeResponse getById(Long id) {
 
-        return repository.findById(id)
+        VatCode v = repository.findById(id)
+                .filter(vc -> !vc.isDeleted())
                 .orElseThrow(() ->
-                        new RuntimeException("Vat code not found"));
+                        new NotFoundException(ErrorMessage.VAT_CODE_NOT_FOUND)
+                );
+
+        return mapper.toResponse(v);
     }
 
     @Transactional(readOnly = true)
-    public List<VatCode> getAll() {
+    public List<VatCodeResponse> getAll() {
+        return repository.findAll()
+                .stream()
+                .filter(v -> !v.isDeleted())
+                .map(mapper::toResponse)
+                .toList();
+    }
 
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public List<VatCodeResponse> getAllIncludingDeleted() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Transactional
-    public VatCode update(
-            Long id,
-            VatCodeUpdateRequest request
-    ) {
+    public VatCodeResponse update(Long id, VatCodeUpdateRequest request) {
 
-        VatCode vatCode = getById(id);
+        VatCode v = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.VAT_CODE_NOT_FOUND)
+                );
 
-        map(request, vatCode);
+        v.setCode(request.getCode());
+        v.setName(request.getName());
+        v.setRate(request.getRate());
+        v.setType(request.getType());
+        v.setDeductible(request.isDeductible());
+        v.setActive(request.isActive());
 
-        return repository.save(vatCode);
+        return mapper.toResponse(repository.save(v));
     }
 
     @Transactional
     public void delete(Long id) {
 
-        VatCode vatCode = getById(id);
+        VatCode v = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.VAT_CODE_NOT_FOUND)
+                );
 
-        vatCode.setActive(false);
-
-        repository.save(vatCode);
+        v.setDeleted(true);
+        repository.save(v);
     }
 
-    // =========================
-    // MAPPER
-    // =========================
+    @Transactional
+    public VatCodeResponse restore(Long id) {
 
-    private void map(
-            VatCodeCreateRequest request,
-            VatCode vatCode
-    ) {
+        VatCode v = repository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorMessage.VAT_CODE_NOT_FOUND)
+                );
 
-        vatCode.setCode(request.getCode());
-        vatCode.setName(request.getName());
-        vatCode.setRate(request.getRate());
-        vatCode.setType(request.getType());
-        vatCode.setDeductible(request.isDeductible());
-        vatCode.setActive(request.isActive());
+        v.setDeleted(false);
+        return mapper.toResponse(repository.save(v));
     }
 }
