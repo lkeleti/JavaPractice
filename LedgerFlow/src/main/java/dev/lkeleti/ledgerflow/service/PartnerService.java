@@ -6,6 +6,8 @@ import dev.lkeleti.ledgerflow.dto.response.PartnerResponse;
 import dev.lkeleti.ledgerflow.entity.GLAccount;
 import dev.lkeleti.ledgerflow.entity.Partner;
 import dev.lkeleti.ledgerflow.entity.PaymentMethod;
+import dev.lkeleti.ledgerflow.exception.ErrorMessage;
+import dev.lkeleti.ledgerflow.exception.NotFoundException;
 import dev.lkeleti.ledgerflow.mapper.PartnerMapper;
 import dev.lkeleti.ledgerflow.repository.GLAccountRepository;
 import dev.lkeleti.ledgerflow.repository.PartnerRepository;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +32,20 @@ public class PartnerService {
     public List<PartnerResponse> getAll() {
 
         return
-                partnerRepository.findAll()
+                partnerRepository.findAllByDeletedFalse()
                 .stream()
-                .filter(p -> !p.isDeleted())
                 .map(partnerMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PartnerResponse> getAllIncludingDeleted() {
+
+        return
+                partnerRepository.findAll()
+                        .stream()
+                        .map(partnerMapper::toResponse)
+                        .toList();
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +54,7 @@ public class PartnerService {
         return partnerRepository.findById(id)
                 .filter(p -> !p.isDeleted())
                 .map(partnerMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Partner not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.PARTNER_NOT_FOUND));
     }
 
     @Transactional
@@ -59,7 +71,7 @@ public class PartnerService {
     public PartnerResponse update(Long id, PartnerUpdateRequest request) {
 
         Partner partner = partnerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Partner not found")
+                () -> new NotFoundException(ErrorMessage.PARTNER_NOT_FOUND)
         );
 
         validateAndModify(request, partner);
@@ -71,7 +83,7 @@ public class PartnerService {
     public void delete(Long id) {
 
         Partner partner = partnerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Partner not found")
+                () -> new NotFoundException(ErrorMessage.PARTNER_NOT_FOUND)
         );
         partner.setDeleted(true);
         partnerRepository.save(partner);
@@ -81,7 +93,7 @@ public class PartnerService {
     public PartnerResponse restore(Long id) {
 
         Partner partner = partnerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Partner not found")
+                () -> new NotFoundException(ErrorMessage.PARTNER_NOT_FOUND)
         );
         partner.setDeleted(false);
         return partnerMapper.toResponse(partnerRepository.save(partner));
@@ -115,8 +127,7 @@ public class PartnerService {
             GLAccount account = glAccountRepository.findById(
                     request.getCustomerAccountId()
             ).orElseThrow(() ->
-                    new RuntimeException("Customer account not found"));
-
+                    new NotFoundException(ErrorMessage.CUSTOMER_ACCOUNT_NOT_FOUND));
             partner.setCustomerAccount(account);
         }
 
@@ -125,7 +136,7 @@ public class PartnerService {
             GLAccount account = glAccountRepository.findById(
                     request.getSupplierAccountId()
             ).orElseThrow(() ->
-                    new RuntimeException("Supplier account not found"));
+                    new NotFoundException(ErrorMessage.SUPPLIER_ACCOUNT_NOT_FOUND));
 
             partner.setSupplierAccount(account);
         }
@@ -136,7 +147,7 @@ public class PartnerService {
                     paymentMethodRepository.findById(
                             request.getPaymentMethodId()
                     ).orElseThrow(() ->
-                            new RuntimeException("Payment method not found"));
+                            new NotFoundException(ErrorMessage.PAYMENT_METHOD_NOT_FOUND));
 
             partner.setPaymentMethod(paymentMethod);
         }
@@ -146,9 +157,7 @@ public class PartnerService {
         partner.setSwift(request.getSwift());
 
         partner.setPaymentDeadlineDays(
-                request.getPaymentDeadlineDays() != null
-                        ? request.getPaymentDeadlineDays()
-                        : 0
+                Optional.ofNullable(request.getPaymentDeadlineDays()).orElse(0)
         );
 
         partner.setEmail(request.getEmail());
