@@ -3,6 +3,8 @@ package dev.lkeleti.ledgerflow.service;
 import dev.lkeleti.ledgerflow.entity.Allocation;
 import dev.lkeleti.ledgerflow.entity.Invoice;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceStatus;
+import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
+import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import dev.lkeleti.ledgerflow.repository.AllocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class InvoiceStatusService {
         if (cmp == 0) {
             return InvoiceStatus.KIFIZETETT;
         } else if (cmp > 0) {
-            throw new IllegalStateException("Túlfizetés történt: invoiceId=" + invoice.getId());
+            throw new BusinessValidationException(ErrorMessage.INVOICE_OVERPAID);
         } else if (paid.compareTo(BigDecimal.ZERO) > 0) {
             return InvoiceStatus.RESZBEN_FIZETETT;
         } else {

@@ -1,72 +1,109 @@
 package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.InvoiceCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.InvoiceFilterRequest;
+import dev.lkeleti.ledgerflow.dto.request.InvoiceUpdateRequest;
+import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.InvoiceResponse;
-import dev.lkeleti.ledgerflow.entity.Invoice;
-import dev.lkeleti.ledgerflow.entity.InvoiceVatSummary;
-import dev.lkeleti.ledgerflow.entity.Partner;
-import dev.lkeleti.ledgerflow.entity.VatCode;
-import dev.lkeleti.ledgerflow.repository.PartnerRepository;
-import dev.lkeleti.ledgerflow.repository.VatCodeRepository;
 import dev.lkeleti.ledgerflow.service.InvoiceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/invoices")
 @RequiredArgsConstructor
+@Tag(name = "Számlák", description = "Számlák rögzítése és módosítása")
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
-    private final PartnerRepository partnerRepository;
-    private final VatCodeRepository vatCodeRepository;
 
+    // ============================
+    // GET BY ID
+    // ============================
+
+    @Operation(
+            summary = "Számla lekérdezése ID alapján",
+            description = "Visszaadja a számla teljes adatait, ÁFA bontással."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sikeres lekérdezés",
+                    content = @Content(schema = @Schema(implementation = InvoiceResponse.class))),
+            @ApiResponse(responseCode = "404", description = "A számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @GetMapping("/{id}")
+    public InvoiceResponse getById(@PathVariable Long id) {
+        return invoiceService.getById(id);
+    }
+
+    // ============================
+    // LIST + FILTER + PAGING
+    // ============================
+
+    @Operation(
+            summary = "Számlák listázása",
+            description = "Szűrés, rendezés és lapozás támogatott. Alapértelmezett rendezés: issueDate ASC."
+    )
+    @ApiResponse(responseCode = "200", description = "Sikeres lekérdezés",
+            content = @Content(schema = @Schema(implementation = InvoiceResponse.class)))
+    @GetMapping
+    public Page<InvoiceResponse> list(
+            InvoiceFilterRequest filter,
+            @PageableDefault(sort = "issueDate", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return invoiceService.list(filter, pageable);
+    }
+
+    @Operation(
+            summary = "Új számla rögzítése",
+            description = "Új számla létrehozása, ÁFA bontással és automatikus könyveléssel."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "A számla sikeresen létrehozva",
+                    content = @Content(schema = @Schema(implementation = InvoiceResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "404", description = "Partner vagy ÁFA kód nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public InvoiceResponse create(
             @Valid @RequestBody InvoiceCreateRequest request
     ) {
+        return invoiceService.create(request);
+    }
 
-        Partner partner = partnerRepository.findById(request.getPartnerId())
-                .orElseThrow();
-
-        Invoice invoice = new Invoice();
-
-        invoice.setInvoiceNumber(request.getInvoiceNumber());
-        invoice.setIssueDate(request.getIssueDate());
-        invoice.setFulfillmentDate(request.getFulfillmentDate());
-        invoice.setDueDate(request.getPaymentDueDate());
-        invoice.setPartner(partner);
-        invoice.setType(request.getType());
-        invoice.setNetTotal(request.getNetTotal());
-        invoice.setGrossTotal(request.getGrossTotal());
-
-        invoice.setVatSummaries(new ArrayList<>());
-
-        request.getVatSummaries().forEach(v -> {
-
-            VatCode vatCode = vatCodeRepository.findById(v.getVatCodeId())
-                    .orElseThrow();
-
-            InvoiceVatSummary vs = new InvoiceVatSummary();
-
-            vs.setInvoice(invoice);
-            vs.setVatCode(vatCode);
-            vs.setNetAmount(v.getNetAmount());
-            vs.setVatAmount(v.getVatAmount());
-
-            invoice.getVatSummaries().add(vs);
-        });
-
-        Invoice saved = invoiceService.createInvoice(invoice);
-
-        InvoiceResponse response = new InvoiceResponse();
-        response.setId(saved.getId());
-        response.setInvoiceNumber(saved.getInvoiceNumber());
-        response.setStatus(saved.getStatus().name());
-
-        return response;
+    @Operation(
+            summary = "Számla módosítása",
+            description = "Meglévő számla adatainak módosítása, ÁFA bontással és újrakönyveléssel."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "A számla sikeresen módosítva",
+                    content = @Content(schema = @Schema(implementation = InvoiceResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Érvénytelen adatok a kérésben",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "404", description = "A számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @PutMapping("/{id}")
+    public InvoiceResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody InvoiceUpdateRequest request
+    ) {
+        request.setId(id);
+        return invoiceService.update(request);
     }
 }

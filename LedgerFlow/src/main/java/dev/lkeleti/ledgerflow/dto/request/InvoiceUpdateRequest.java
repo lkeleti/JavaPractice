@@ -13,7 +13,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class InvoiceCreateRequest {
+public class InvoiceUpdateRequest {
+
+    @NotNull(message = "A számla azonosító kötelező")
+    private Long id;
 
     @NotBlank(message = "A számlaszám kötelező")
     private String invoiceNumber;

@@ -2,6 +2,8 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.entity.*;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceType;
+import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
+import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import dev.lkeleti.ledgerflow.repository.AccountingConfigRepository;
 import dev.lkeleti.ledgerflow.repository.JournalEntryRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +29,11 @@ public class AccountingService {
 
         return configRepo.findTopByOrderByIdAsc()
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Accounting config not found"
-                        ));
+                        new BusinessValidationException(ErrorMessage.ACCOUNTING_CONFIG_NOT_FOUND)
+                );
     }
 
-        // =========================
+    // =========================
     // INVOICE
     // =========================
 
@@ -214,26 +215,25 @@ public class AccountingService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (debit.compareTo(credit) != 0) {
-            throw new IllegalStateException("Tartozik != Követel");
+            throw new BusinessValidationException(ErrorMessage.JOURNAL_NOT_BALANCED);
         }
     }
 
     private void validateVatSummary(Invoice invoice) {
 
         if (invoice.getVatSummaries() == null || invoice.getVatSummaries().isEmpty()) {
-            throw new IllegalStateException("Nincs ÁFA bontás");
+            throw new BusinessValidationException(ErrorMessage.INVOICE_VAT_SUMMARY_MISSING);
         }
 
         for (InvoiceVatSummary vs : invoice.getVatSummaries()) {
 
             if (vs.getNetAmount() == null || vs.getVatAmount() == null) {
-                throw new IllegalStateException("VatSummary hiányos");
+                throw new BusinessValidationException(ErrorMessage.INVOICE_VAT_SUMMARY_INCOMPLETE);
             }
 
-            // csak sanity check (nem kötelező)
             if (vs.getNetAmount().compareTo(BigDecimal.ZERO) < 0
                     || vs.getVatAmount().compareTo(BigDecimal.ZERO) < 0) {
-                throw new IllegalStateException("Negatív ÁFA adat");
+                throw new BusinessValidationException(ErrorMessage.INVOICE_VAT_NEGATIVE);
             }
         }
     }
@@ -253,28 +253,28 @@ public class AccountingService {
     private GLAccount getVatAccountForVatCode(VatCode vatCode) {
 
         if (vatCode == null || vatCode.getCode() == null) {
-            throw new IllegalStateException("VatCode hiányzik");
+            throw new BusinessValidationException(ErrorMessage.VAT_CODE_MISSING);
         }
 
         return switch (vatCode.getCode()) {
-            case "27%" -> getConfig().getVatPayableAccount();   // egyszerűsítve
+            case "27%" -> getConfig().getVatPayableAccount();
             case "5%" -> getConfig().getVatPayableAccount();
             case "0%" -> getConfig().getVatPayableAccount();
-            default -> throw new IllegalStateException("Ismeretlen ÁFA kulcs: " + vatCode.getCode());
+            default -> throw new BusinessValidationException(ErrorMessage.VAT_CODE_UNKNOWN);
         };
     }
 
     private GLAccount getVatDeductionAccountForVatCode(VatCode vatCode) {
 
         if (vatCode == null || vatCode.getCode() == null) {
-            throw new IllegalStateException("VatCode hiányzik");
+            throw new BusinessValidationException(ErrorMessage.VAT_CODE_MISSING);
         }
 
         return switch (vatCode.getCode()) {
             case "27%" -> getConfig().getVatReceivableAccount();
             case "5%" -> getConfig().getVatReceivableAccount();
             case "0%" -> getConfig().getVatReceivableAccount();
-            default -> throw new IllegalStateException("Ismeretlen ÁFA kulcs: " + vatCode.getCode());
+            default -> throw new BusinessValidationException(ErrorMessage.VAT_CODE_UNKNOWN);
         };
     }
 }
