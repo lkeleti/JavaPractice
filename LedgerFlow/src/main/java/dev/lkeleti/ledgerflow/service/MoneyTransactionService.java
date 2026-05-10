@@ -2,11 +2,10 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.AllocationRequest;
 import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionCreateRequest;
+import dev.lkeleti.ledgerflow.dto.response.CompanyResponse;
 import dev.lkeleti.ledgerflow.dto.response.MoneyTransactionResponse;
-import dev.lkeleti.ledgerflow.entity.Allocation;
-import dev.lkeleti.ledgerflow.entity.FinancialAccount;
-import dev.lkeleti.ledgerflow.entity.Invoice;
-import dev.lkeleti.ledgerflow.entity.MoneyTransaction;
+import dev.lkeleti.ledgerflow.entity.*;
+import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
 import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import dev.lkeleti.ledgerflow.exception.NotFoundException;
 import dev.lkeleti.ledgerflow.mapper.MoneyTransactionMapper;
@@ -19,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +34,18 @@ public class MoneyTransactionService {
     private final AccountingService accountingService;
     private final InvoiceStatusService statusService;
     private final MoneyTransactionMapper mapper;
+    private final CompanyService companyService;
 
     @Transactional
     public MoneyTransactionResponse create(MoneyTransactionCreateRequest request) {
+
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
+        // 1. Tranzakció dátuma lezárt időszakban?
+        if (request.getDate().isBefore(closed)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
 
         FinancialAccount fa = financialAccountRepository.findById(request.getFinancialAccountId())
                 .filter(FinancialAccount::isActive)
@@ -50,7 +59,6 @@ public class MoneyTransactionService {
         tx.setDescription(request.getDescription());
         tx.setDeleted(false);
 
-        // ALLOCATION-ÖK
         List<Allocation> allocations = new ArrayList<>();
 
         if (request.getAllocations() != null) {
@@ -58,6 +66,11 @@ public class MoneyTransactionService {
 
                 Invoice invoice = invoiceRepository.findById(ar.getInvoiceId())
                         .orElseThrow(() -> new NotFoundException(ErrorMessage.INVOICE_NOT_FOUND));
+
+                // 2. Allokált számla dátuma lezárt időszakban?
+                if (invoice.getIssueDate().isBefore(closed)) {
+                    throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+                }
 
                 Allocation allocation = new Allocation();
                 allocation.setMoneyTransaction(tx);
@@ -85,15 +98,6 @@ public class MoneyTransactionService {
         return mapper.toResponse(saved);
     }
 
-    @Transactional(readOnly = true)
-    public MoneyTransactionResponse get(Long id) {
-
-        MoneyTransaction tx = txRepository.findById(id)
-                .filter(t -> !t.isDeleted())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.MONEY_TRANSACTION_NOT_FOUND));
-
-        return mapper.toResponse(tx);
-    }
 
     @Transactional(readOnly = true)
     public List<MoneyTransactionResponse> getAll() {
@@ -115,8 +119,15 @@ public class MoneyTransactionService {
     @Transactional
     public void delete(Long id) {
 
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
         MoneyTransaction tx = txRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.MONEY_TRANSACTION_NOT_FOUND));
+
+        if (tx.getDate().isBefore(closed)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
 
         tx.setDeleted(true);
         tx.getAllocations().forEach(a -> a.setDeleted(true));
@@ -124,11 +135,19 @@ public class MoneyTransactionService {
         txRepository.save(tx);
     }
 
+
     @Transactional
     public MoneyTransactionResponse restore(Long id) {
 
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
         MoneyTransaction tx = txRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.MONEY_TRANSACTION_NOT_FOUND));
+
+        if (tx.getDate().isBefore(closed)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
 
         tx.setDeleted(false);
         tx.getAllocations().forEach(a -> a.setDeleted(false));

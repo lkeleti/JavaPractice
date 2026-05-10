@@ -48,6 +48,14 @@ public enum ErrorMessage {
     // ===== ACCOUNTING =====
     JOURNAL_NOT_BALANCED("JOURNAL_NOT_BALANCED", "A könyvelési tétel nem egyenlő (T ≠ K)"),
 
+    // ===== COMPANY =====
+    COMPANY_ALREADY_EXISTS("COMPANY_ALREADY_EXISTS", "Csak egy cég rögzíthető a rendszerben"),
+    COMPANY_NOT_FOUND("COMPANY_NOT_FOUND", "A cég adatai nem találhatók"),
+    ACCOUNTING_PERIOD_CLOSED("ACCOUNTING_PERIOD_CLOSED", "A könyvelési időszak lezárva, módosítás nem engedélyezett"),
+    ACCOUNTING_PERIOD_CANNOT_MOVE_BACK("ACCOUNTING_PERIOD_CANNOT_MOVE_BACK", "A könyvelési időszak nem állítható korábbi dátumra"),
+    ACCOUNTING_PERIOD_CANNOT_MOVE_FORWARD("ACCOUNTING_PERIOD_CANNOT_MOVE_FORWARD", "Újranyitáskor a könyvelési időszak nem tolható előre"),
+
+
     // ===== COMMON =====
     VALIDATION_ERROR("VALIDATION_ERROR", "Érvényességi hiba"),
     CONSTRAINT_VIOLATION("CONSTRAINT_VIOLATION", "Paraméter érvényességi hiba"),

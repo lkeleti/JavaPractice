@@ -1,5 +1,6 @@
 package dev.lkeleti.ledgerflow.service;
 
+import dev.lkeleti.ledgerflow.dto.response.CompanyResponse;
 import dev.lkeleti.ledgerflow.entity.*;
 import dev.lkeleti.ledgerflow.entity.enums.MatchType;
 import dev.lkeleti.ledgerflow.model.MatchingResult;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,17 @@ public class MatchingService {
 
     private final InvoiceRepository invoiceRepository;
     private final AllocationRepository allocationRepository;
+    private final CompanyService companyService;
 
     public MatchingResult match(BankStatementLine line) {
+
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
+        // 1. Banki sor dátuma lezárt időszakban?
+        if (line.getDate().isBefore(closed)) {
+            return new MatchingResult(MatchType.NONE, List.of(), BigDecimal.ZERO);
+        }
 
         String text = normalize(
                 (line.getPartnerNameRaw() == null ? "" : line.getPartnerNameRaw()) + " " +
@@ -66,7 +77,7 @@ public class MatchingService {
         if (subsets.size() == 1) {
             return new MatchingResult(
                     MatchType.AUTO,
-                    subsets.get(0),
+                    subsets.getFirst(),
                     BigDecimal.valueOf(0.95)
             );
         }
@@ -139,7 +150,7 @@ public class MatchingService {
         backtrack(invoices, target, index + 1,
                 current, sum.add(open), results);
 
-        current.remove(current.size() - 1);
+        current.removeLast();
 
         // exclude
         backtrack(invoices, target, index + 1,

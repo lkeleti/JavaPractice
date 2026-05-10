@@ -1,5 +1,6 @@
 package dev.lkeleti.ledgerflow.service;
 
+import dev.lkeleti.ledgerflow.dto.response.CompanyResponse;
 import dev.lkeleti.ledgerflow.entity.*;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceType;
 import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
@@ -20,6 +21,7 @@ public class AccountingService {
 
     private final JournalEntryRepository journalRepo;
     private final AccountingConfigRepository configRepo;
+    private final CompanyService companyService;
 
     // =========================
     // CONFIG
@@ -39,6 +41,12 @@ public class AccountingService {
 
     @Transactional
     public void postInvoice(Invoice invoice) {
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
+        if (invoice.getIssueDate().isBefore(closed)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
 
         validateVatSummary(invoice);
 
@@ -122,6 +130,13 @@ public class AccountingService {
 
     @Transactional
     public void postMoneyTransaction(MoneyTransaction tx) {
+
+        CompanyResponse company = companyService.get();
+        LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
+
+        if (tx.getDate().isBefore(closed)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
 
         for (Allocation allocation : tx.getAllocations()) {
 
