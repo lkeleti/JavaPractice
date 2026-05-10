@@ -2,6 +2,7 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.response.CompanyResponse;
 import dev.lkeleti.ledgerflow.entity.*;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceNature;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceType;
 import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
 import dev.lkeleti.ledgerflow.exception.ErrorMessage;
@@ -41,6 +42,7 @@ public class AccountingService {
 
     @Transactional
     public void postInvoice(Invoice invoice) {
+
         CompanyResponse company = companyService.get();
         LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
 
@@ -49,6 +51,11 @@ public class AccountingService {
         }
 
         validateVatSummary(invoice);
+
+        // STORNO esetén minden könyvelési összeg előjele megfordul
+        BigDecimal sign = invoice.getNature() == InvoiceNature.STORNO
+                ? BigDecimal.valueOf(-1)
+                : BigDecimal.ONE;
 
         JournalEntry je = createJournal(
                 invoice.getIssueDate(),
@@ -62,7 +69,7 @@ public class AccountingService {
             // T 311 (bruttó)
             addLine(je,
                     invoice.getPartner().getCustomerAccount(),
-                    invoice.getGrossTotal(),
+                    invoice.getGrossTotal().multiply(sign),
                     BigDecimal.ZERO
             );
 
@@ -70,7 +77,7 @@ public class AccountingService {
             addLine(je,
                     getRevenueAccount(),
                     BigDecimal.ZERO,
-                    invoice.getNetTotal()
+                    invoice.getNetTotal().multiply(sign)
             );
 
             // K 467 (ÁFA kulcsonként)
@@ -84,7 +91,7 @@ public class AccountingService {
                 addLine(je,
                         getVatAccountForVatCode(vs.getVatCode()),
                         BigDecimal.ZERO,
-                        vs.getVatAmount()
+                        vs.getVatAmount().multiply(sign)
                 );
             }
 
@@ -93,7 +100,7 @@ public class AccountingService {
             // T 51 (nettó)
             addLine(je,
                     getExpenseAccount(),
-                    invoice.getNetTotal(),
+                    invoice.getNetTotal().multiply(sign),
                     BigDecimal.ZERO
             );
 
@@ -107,7 +114,7 @@ public class AccountingService {
 
                 addLine(je,
                         getVatDeductionAccountForVatCode(vs.getVatCode()),
-                        vs.getVatAmount(),
+                        vs.getVatAmount().multiply(sign),
                         BigDecimal.ZERO
                 );
             }
@@ -116,13 +123,14 @@ public class AccountingService {
             addLine(je,
                     invoice.getPartner().getSupplierAccount(),
                     BigDecimal.ZERO,
-                    invoice.getGrossTotal()
+                    invoice.getGrossTotal().multiply(sign)
             );
         }
 
         validate(je);
         journalRepo.save(je);
     }
+
 
     // =========================
     // MONEY TRANSACTION

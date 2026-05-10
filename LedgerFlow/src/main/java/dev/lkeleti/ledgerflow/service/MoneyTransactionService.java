@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.lkeleti.ledgerflow.exception.ErrorMessage.MONEY_TRANSACTION_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class MoneyTransactionService {
@@ -109,6 +111,17 @@ public class MoneyTransactionService {
     }
 
     @Transactional(readOnly = true)
+    public MoneyTransactionResponse get(Long id) {
+        MoneyTransaction response = txRepository.findById(id)
+                .orElseThrow(
+                        ()-> new NotFoundException(MONEY_TRANSACTION_NOT_FOUND));
+        if (response.isDeleted()) {
+            throw new NotFoundException(MONEY_TRANSACTION_NOT_FOUND);
+        }
+        return mapper.toResponse(response);
+    }
+
+    @Transactional(readOnly = true)
     public List<MoneyTransactionResponse> getAllIncludingDeleted() {
         return txRepository.findAll()
                 .stream()
@@ -123,7 +136,7 @@ public class MoneyTransactionService {
         LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
 
         MoneyTransaction tx = txRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.MONEY_TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(MONEY_TRANSACTION_NOT_FOUND));
 
         if (tx.getDate().isBefore(closed)) {
             throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
@@ -143,7 +156,7 @@ public class MoneyTransactionService {
         LocalDate closed = company.getClosedAccountingPeriod().plusDays(1);
 
         MoneyTransaction tx = txRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.MONEY_TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(MONEY_TRANSACTION_NOT_FOUND));
 
         if (tx.getDate().isBefore(closed)) {
             throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);

@@ -34,5 +34,8 @@ public class InvoiceResponse {
 
     private List<InvoiceVatSummaryResponse> vatSummaries;
 
+    private Long originalInvoiceId;
+    private List<Long> relatedInvoiceIds;
+
     private LocalDateTime createdAt;
 }

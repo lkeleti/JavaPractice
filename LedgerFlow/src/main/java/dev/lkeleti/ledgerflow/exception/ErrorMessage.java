@@ -34,6 +34,10 @@ public enum ErrorMessage {
     INVOICE_VAT_NEGATIVE("INVOICE_VAT_NEGATIVE", "Negatív ÁFA adat nem megengedett"),
     INVOICE_OVERPAID("INVOICE_OVERPAID", "Túlfizetés történt"),
 
+    INVOICE_ALREADY_STORNO("INVOICE_ALREADY_STORNO", "A számla már sztornózva van"),
+    INVOICE_CANNOT_STORNO_CLOSED_PERIOD("INVOICE_CANNOT_STORNO_CLOSED_PERIOD", "A számla lezárt időszakban nem sztornózható"),
+    INVOICE_NATURE_INVALID_FOR_STORNO("INVOICE_NATURE_INVALID_FOR_STORNO", "Csak normál számla sztornózható"),
+
     // ===== PAYMENT METHOD =====
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "A fizetési mód nem található"),
     PAYMENT_METHOD_ALREADY_EXISTS("PAYMENT_METHOD_ALREADY_EXISTS", "A fizetési mód kódja már létezik"),

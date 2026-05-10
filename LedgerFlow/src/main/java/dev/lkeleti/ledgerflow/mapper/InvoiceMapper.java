@@ -138,6 +138,17 @@ public class InvoiceMapper {
 
         r.setVatSummaries(vatResponses);
 
+        r.setOriginalInvoiceId(
+                invoice.getOriginalInvoice() != null ? invoice.getOriginalInvoice().getId() : null
+        );
+
+        r.setRelatedInvoiceIds(
+                invoice.getRelatedInvoices()
+                        .stream()
+                        .map(Invoice::getId)
+                        .toList()
+        );
+
         r.setCreatedAt(invoice.getCreatedAt());
 
         return r;

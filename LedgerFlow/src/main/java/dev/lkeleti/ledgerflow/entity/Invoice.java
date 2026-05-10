@@ -67,6 +67,13 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     private List<InvoiceVatSummary> vatSummaries = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "original_invoice_id")
+    private Invoice originalInvoice;
+
+    @OneToMany(mappedBy = "originalInvoice")
+    private List<Invoice> relatedInvoices = new ArrayList<>();
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

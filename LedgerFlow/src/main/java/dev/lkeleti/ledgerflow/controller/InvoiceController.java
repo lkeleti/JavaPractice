@@ -2,6 +2,7 @@ package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.InvoiceCreateRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceFilterRequest;
+import dev.lkeleti.ledgerflow.dto.request.InvoiceStornoRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.InvoiceResponse;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -106,4 +109,31 @@ public class InvoiceController {
         request.setId(id);
         return invoiceService.update(request);
     }
+
+    @PostMapping("/{id}/storno")
+    @Operation(
+            summary = "Sztornó számla létrehozása",
+            description = "Létrehoz egy sztornó számlát az eredeti számla alapján.",
+            requestBody = @RequestBody(
+                    description = "A sztornó számla létrehozásához szükséges adatok.",
+                    required = true,
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvoiceStornoRequest.class))
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "A sztornó számla sikeresen létrehozva"),
+            @ApiResponse(responseCode = "400", description = "A számla nem sztornózható",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "404", description = "A számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @ResponseStatus(HttpStatus.CREATED)
+    public InvoiceResponse createStorno(
+            @PathVariable Long id,
+            @Valid @RequestBody InvoiceStornoRequest request
+    ) {
+        return invoiceService.createStorno(id, request);
+    }
+
 }
