@@ -37,6 +37,9 @@ public enum ErrorMessage {
     INVOICE_ALREADY_STORNO("INVOICE_ALREADY_STORNO", "A számla már sztornózva van"),
     INVOICE_CANNOT_STORNO_CLOSED_PERIOD("INVOICE_CANNOT_STORNO_CLOSED_PERIOD", "A számla lezárt időszakban nem sztornózható"),
     INVOICE_NATURE_INVALID_FOR_STORNO("INVOICE_NATURE_INVALID_FOR_STORNO", "Csak normál számla sztornózható"),
+    INVOICE_CANNOT_CORRECT_STORNO("INVOICE_CANNOT_CORRECT_STORNO", "Stornó számla nem helyesbíthető"),
+    INVOICE_CORRECTION_TOTALS_MISSING("INVOICE_CORRECTION_TOTALS_MISSING", "A helyesbítő számla nettó és bruttó különbözete kötelező"),
+
 
     // ===== PAYMENT METHOD =====
     PAYMENT_METHOD_NOT_FOUND("PAYMENT_METHOD_NOT_FOUND", "A fizetési mód nem található"),

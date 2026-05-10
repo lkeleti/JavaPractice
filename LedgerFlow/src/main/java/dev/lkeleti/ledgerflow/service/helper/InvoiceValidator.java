@@ -1,13 +1,17 @@
 package dev.lkeleti.ledgerflow.service.helper;
 
+import dev.lkeleti.ledgerflow.dto.request.InvoiceCorrectionRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceCreateRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceVatSummaryRequest;
+import dev.lkeleti.ledgerflow.entity.Invoice;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceCategory;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceNature;
 import dev.lkeleti.ledgerflow.exception.BusinessValidationException;
 import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -53,4 +57,40 @@ import java.util.List;
             }
         });
     }
+
+    public void validateStorno(Invoice original, LocalDate issueDate, LocalDate closedDate) {
+
+        if (original.getNature() == InvoiceNature.STORNO) {
+            throw new BusinessValidationException(ErrorMessage.INVOICE_ALREADY_STORNO);
+        }
+
+        if (issueDate.isBefore(closedDate)) {
+            throw new BusinessValidationException(ErrorMessage.INVOICE_CANNOT_STORNO_CLOSED_PERIOD);
+        }
+    }
+    public void validateCorrection(Invoice original, InvoiceCorrectionRequest request, LocalDate closedDate) {
+
+        if (original.getNature() == InvoiceNature.STORNO) {
+            throw new BusinessValidationException(ErrorMessage.INVOICE_CANNOT_CORRECT_STORNO);
+        }
+
+        if (request.getIssueDate().isBefore(closedDate)) {
+            throw new BusinessValidationException(ErrorMessage.ACCOUNTING_PERIOD_CLOSED);
+        }
+
+        if (request.getNetDifference() == null || request.getGrossDifference() == null) {
+            throw new BusinessValidationException(ErrorMessage.INVOICE_CORRECTION_TOTALS_MISSING);
+        }
+
+        if (request.getVatDifferences() == null || request.getVatDifferences().isEmpty()) {
+            throw new BusinessValidationException(ErrorMessage.INVOICE_VAT_SUMMARY_MISSING);
+        }
+
+        for (InvoiceCorrectionRequest.VatDifferenceItem v : request.getVatDifferences()) {
+            if (v.getNetAmount() == null || v.getVatAmount() == null) {
+                throw new BusinessValidationException(ErrorMessage.INVOICE_VAT_SUMMARY_INCOMPLETE);
+            }
+        }
+    }
+
 }

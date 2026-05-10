@@ -1,9 +1,6 @@
 package dev.lkeleti.ledgerflow.controller;
 
-import dev.lkeleti.ledgerflow.dto.request.InvoiceCreateRequest;
-import dev.lkeleti.ledgerflow.dto.request.InvoiceFilterRequest;
-import dev.lkeleti.ledgerflow.dto.request.InvoiceStornoRequest;
-import dev.lkeleti.ledgerflow.dto.request.InvoiceUpdateRequest;
+import dev.lkeleti.ledgerflow.dto.request.*;
 import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.InvoiceResponse;
 import dev.lkeleti.ledgerflow.service.InvoiceService;
@@ -40,7 +37,7 @@ public class InvoiceController {
             summary = "Számla lekérdezése ID alapján",
             description = "Visszaadja a számla teljes adatait, ÁFA bontással."
     )
-    @ApiResponses({
+    @ApiResponses(value ={
             @ApiResponse(responseCode = "200", description = "Sikeres lekérdezés",
                     content = @Content(schema = @Schema(implementation = InvoiceResponse.class))),
             @ApiResponse(responseCode = "404", description = "A számla nem található",
@@ -136,4 +133,24 @@ public class InvoiceController {
         return invoiceService.createStorno(id, request);
     }
 
+    @PostMapping("/{id}/correction")
+    @Operation(
+            summary = "Helyesbítő számla létrehozása",
+            description = "Különbözet alapú helyesbítő számla létrehozása az eredeti számla módosításához."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "A helyesbítő számla sikeresen létrehozva",
+                    content = @Content(schema = @Schema(implementation = InvoiceResponse.class))),
+            @ApiResponse(responseCode = "400", description = "A számla nem helyesbíthető vagy lezárt időszak",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "404", description = "A számla nem található",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @ResponseStatus(HttpStatus.CREATED)
+    public InvoiceResponse createCorrection(
+            @PathVariable Long id,
+            @Valid @RequestBody InvoiceCorrectionRequest request
+    ) {
+        return invoiceService.createCorrection(id, request);
+    }
 }

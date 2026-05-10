@@ -1,5 +1,6 @@
 package dev.lkeleti.ledgerflow.mapper;
 
+import dev.lkeleti.ledgerflow.dto.request.InvoiceCorrectionRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceCreateRequest;
 import dev.lkeleti.ledgerflow.dto.request.InvoiceUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.InvoiceResponse;
@@ -8,6 +9,7 @@ import dev.lkeleti.ledgerflow.entity.Invoice;
 import dev.lkeleti.ledgerflow.entity.InvoiceVatSummary;
 import dev.lkeleti.ledgerflow.entity.Partner;
 import dev.lkeleti.ledgerflow.entity.VatCode;
+import dev.lkeleti.ledgerflow.entity.enums.InvoiceNature;
 import dev.lkeleti.ledgerflow.entity.enums.InvoiceStatus;
 import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import dev.lkeleti.ledgerflow.exception.NotFoundException;
@@ -16,6 +18,7 @@ import dev.lkeleti.ledgerflow.repository.VatCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,4 +156,89 @@ public class InvoiceMapper {
 
         return r;
     }
+
+    public Invoice copyForStorno(Invoice original, LocalDate issueDate) {
+
+        Invoice invoice = new Invoice();
+
+        invoice.setInvoiceNumber(null);
+        invoice.setIssueDate(issueDate);
+        invoice.setFulfillmentDate(original.getFulfillmentDate());
+        invoice.setDueDate(original.getDueDate());
+        invoice.setPartner(original.getPartner());
+        invoice.setType(original.getType());
+        invoice.setCategory(original.getCategory());
+        invoice.setStatus(original.getStatus());
+        invoice.setElectronicInvoice(original.isElectronicInvoice());
+        invoice.setScannedFilePath(original.getScannedFilePath());
+        invoice.setScannedFileName(original.getScannedFileName());
+        invoice.setElectronicFilePath(original.getElectronicFilePath());
+        invoice.setElectronicFileName(original.getElectronicFileName());
+        invoice.setHashFilePath(original.getHashFilePath());
+        invoice.setHashFileName(original.getHashFileName());
+
+        invoice.setNature(InvoiceNature.STORNO);
+        invoice.setOriginalInvoice(original);
+
+        invoice.setNetTotal(original.getNetTotal());
+        invoice.setGrossTotal(original.getGrossTotal());
+
+        List<InvoiceVatSummary> vatSummaries = new ArrayList<>();
+        for (InvoiceVatSummary vat : original.getVatSummaries()) {
+            InvoiceVatSummary vs = new InvoiceVatSummary();
+            vs.setInvoice(invoice);
+            vs.setVatCode(vat.getVatCode());
+            vs.setNetAmount(vat.getNetAmount());
+            vs.setVatAmount(vat.getVatAmount());
+            vatSummaries.add(vs);
+        }
+        invoice.setVatSummaries(vatSummaries);
+
+        return invoice;
+    }
+
+    public Invoice copyForCorrection(Invoice original, InvoiceCorrectionRequest request) {
+
+        Invoice invoice = new Invoice();
+
+        invoice.setInvoiceNumber(null);
+        invoice.setIssueDate(request.getIssueDate());
+        invoice.setFulfillmentDate(original.getFulfillmentDate());
+        invoice.setDueDate(original.getDueDate());
+        invoice.setPartner(original.getPartner());
+        invoice.setType(original.getType());
+        invoice.setCategory(original.getCategory());
+        invoice.setStatus(original.getStatus());
+        invoice.setElectronicInvoice(original.isElectronicInvoice());
+        invoice.setScannedFilePath(original.getScannedFilePath());
+        invoice.setScannedFileName(original.getScannedFileName());
+        invoice.setElectronicFilePath(original.getElectronicFilePath());
+        invoice.setElectronicFileName(original.getElectronicFileName());
+        invoice.setHashFilePath(original.getHashFilePath());
+        invoice.setHashFileName(original.getHashFileName());
+
+        invoice.setNature(InvoiceNature.HELYESBITO);
+        invoice.setOriginalInvoice(original);
+
+        invoice.setNetTotal(request.getNetDifference());
+        invoice.setGrossTotal(request.getGrossDifference());
+
+        List<InvoiceVatSummary> vatSummaries = new ArrayList<>();
+        for (InvoiceCorrectionRequest.VatDifferenceItem v : request.getVatDifferences()) {
+
+            VatCode vatCode = vatCodeRepository.findById(v.getVatCodeId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.VAT_CODE_NOT_FOUND));
+
+            InvoiceVatSummary vs = new InvoiceVatSummary();
+            vs.setInvoice(invoice);
+            vs.setVatCode(vatCode);
+            vs.setNetAmount(v.getNetAmount());
+            vs.setVatAmount(v.getVatAmount());
+            vatSummaries.add(vs);
+        }
+        invoice.setVatSummaries(vatSummaries);
+
+        return invoice;
+    }
+
 }
