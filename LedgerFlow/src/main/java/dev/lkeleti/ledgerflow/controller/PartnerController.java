@@ -1,12 +1,12 @@
 package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.PartnerCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.PartnerFilterRequest;
 import dev.lkeleti.ledgerflow.dto.request.PartnerUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.PartnerResponse;
 import dev.lkeleti.ledgerflow.service.PartnerService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,10 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/partners")
@@ -27,48 +29,28 @@ import java.util.List;
 public class PartnerController {
 
     private final PartnerService partnerService;
-
     // ---------------------------------------------------------
     // GET ALL
     // ---------------------------------------------------------
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-            summary = "Összes partner lekérése",
-            description = "Visszaadja az összes aktív (nem törölt) partnert."
-    )
-
-    @ApiResponse(
-            responseCode = "200",
-            description = "Sikeres lekérés – PartnerResponse objektumok listája",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PartnerResponse.class))
-            )
-    )
-    public List<PartnerResponse> getAll() {
-        return partnerService.getAll();
-    }
-
-    // ---------------------------------------------------------
-// GET ALL INCLUDING DELETED
-// ---------------------------------------------------------
-    @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            summary = "Összes partner lekérése (töröltekkel együtt)",
-            description = "Visszaadja az összes partnert, beleértve a törölt (deleted = true) rekordokat is."
+            summary = "Partnerek listázása",
+            description = "Lapozható, rendezhető és szűrhető partnerlista. A szűrési mezők: name, taxNumber, deleted, privatePerson."
     )
     @ApiResponse(
             responseCode = "200",
-            description = "Sikeres lekérés – PartnerResponse objektumok listája",
+            description = "Sikeres lekérés – lapozott PartnerResponse lista",
             content = @Content(
                     mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = PartnerResponse.class))
+                    schema = @Schema(implementation = Page.class)
             )
     )
-    public List<PartnerResponse> getAllIncludingDeleted() {
-        return partnerService.getAllIncludingDeleted();
+    public Page<PartnerResponse> list(
+            @ParameterObject PartnerFilterRequest filter,
+            @ParameterObject Pageable pageable
+    ) {
+        return partnerService.list(filter, pageable);
     }
 
 

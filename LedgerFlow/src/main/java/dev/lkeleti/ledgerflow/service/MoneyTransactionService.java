@@ -2,6 +2,7 @@ package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.AllocationRequest;
 import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionFilterRequest;
 import dev.lkeleti.ledgerflow.dto.response.CompanyResponse;
 import dev.lkeleti.ledgerflow.dto.response.MoneyTransactionResponse;
 import dev.lkeleti.ledgerflow.entity.*;
@@ -13,8 +14,13 @@ import dev.lkeleti.ledgerflow.repository.FinancialAccountRepository;
 import dev.lkeleti.ledgerflow.repository.InvoiceRepository;
 import dev.lkeleti.ledgerflow.repository.MoneyTransactionRepository;
 import dev.lkeleti.ledgerflow.service.helper.AllocationValidator;
+import dev.lkeleti.ledgerflow.service.helper.MoneyTransactionSpecification;
 import dev.lkeleti.ledgerflow.service.helper.MoneyTransactionValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,13 +108,25 @@ public class MoneyTransactionService {
 
 
     @Transactional(readOnly = true)
-    public List<MoneyTransactionResponse> getAll() {
-        return txRepository.findAll()
-                .stream()
-                .filter(tx -> !tx.isDeleted())
-                .map(mapper::toResponse)
-                .toList();
+    public Page<MoneyTransactionResponse> list(MoneyTransactionFilterRequest filter, Pageable pageable) {
+
+        // alapértelmezett rendezés: date DESC
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "date")
+            );
+        }
+
+        Page<MoneyTransaction> page = txRepository.findAll(
+                MoneyTransactionSpecification.filter(filter),
+                pageable
+        );
+
+        return page.map(mapper::toResponse);
     }
+
 
     @Transactional(readOnly = true)
     public MoneyTransactionResponse get(Long id) {

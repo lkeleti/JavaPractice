@@ -1,6 +1,7 @@
 package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.MoneyTransactionFilterRequest;
 import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.MoneyTransactionResponse;
 import dev.lkeleti.ledgerflow.service.MoneyTransactionService;
@@ -13,6 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,19 +96,24 @@ public class MoneyTransactionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-            summary = "Összes aktív pénzügyi tranzakció lekérése",
-            description = "Visszaadja az összes aktív (nem törölt) pénzügyi tranzakciót."
+            summary = "Pénzmozgások listázása",
+            description = "Lapozható, rendezhető és szűrhető pénzmozgás lista. Szűrés dátumra, összegre, irányra, pénzügyi számlára, leírásra, törölt státuszra, valamint számlára és partnerre."
     )
     @ApiResponse(
             responseCode = "200",
-            description = "Sikeres lekérés",
+            description = "Sikeres lekérés – lapozott MoneyTransactionResponse lista",
             content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = MoneyTransactionResponse.class))
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Page.class)
             )
     )
-    public List<MoneyTransactionResponse> getAll() {
-        return service.getAll();
+    public Page<MoneyTransactionResponse> list(
+            @ParameterObject MoneyTransactionFilterRequest filter,
+            @ParameterObject Pageable pageable
+    ) {
+        return service.list(filter, pageable);
     }
+
 
     // ---------------------------------------------------------
     // GET ALL INCLUDING DELETED

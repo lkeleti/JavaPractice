@@ -1,6 +1,7 @@
 package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.GLAccountCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.GLAccountFilterRequest;
 import dev.lkeleti.ledgerflow.dto.request.GLAccountUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.GLAccountResponse;
 import dev.lkeleti.ledgerflow.entity.GLAccount;
@@ -9,11 +10,14 @@ import dev.lkeleti.ledgerflow.exception.ErrorMessage;
 import dev.lkeleti.ledgerflow.exception.NotFoundException;
 import dev.lkeleti.ledgerflow.mapper.GLAccountMapper;
 import dev.lkeleti.ledgerflow.repository.GLAccountRepository;
+import dev.lkeleti.ledgerflow.service.helper.GLAccountSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,21 +52,25 @@ public class GLAccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<GLAccountResponse> getAll() {
-        return repository.findAll()
-                .stream()
-                .filter(GLAccount::isActive)
-                .map(mapper::toResponse)
-                .toList();
+    public Page<GLAccountResponse> list(GLAccountFilterRequest filter, Pageable pageable) {
+
+        // alapértelmezett rendezés: number ASC
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.ASC, "number")
+            );
+        }
+
+        Page<GLAccount> page = repository.findAll(
+                GLAccountSpecification.filter(filter),
+                pageable
+        );
+
+        return page.map(mapper::toResponse);
     }
 
-    @Transactional(readOnly = true)
-    public List<GLAccountResponse> getAllIncludingDeleted() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
 
     @Transactional
     public GLAccountResponse update(Long id, GLAccountUpdateRequest request) {

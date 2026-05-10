@@ -1,6 +1,7 @@
 package dev.lkeleti.ledgerflow.service;
 
 import dev.lkeleti.ledgerflow.dto.request.PartnerCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.PartnerFilterRequest;
 import dev.lkeleti.ledgerflow.dto.request.PartnerUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.PartnerResponse;
 import dev.lkeleti.ledgerflow.entity.GLAccount;
@@ -12,11 +13,13 @@ import dev.lkeleti.ledgerflow.mapper.PartnerMapper;
 import dev.lkeleti.ledgerflow.repository.GLAccountRepository;
 import dev.lkeleti.ledgerflow.repository.PartnerRepository;
 import dev.lkeleti.ledgerflow.repository.PaymentMethodRepository;
+import dev.lkeleti.ledgerflow.service.helper.PartnerSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,24 +32,16 @@ public class PartnerService {
     private final PartnerMapper partnerMapper;
 
     @Transactional(readOnly = true)
-    public List<PartnerResponse> getAll() {
+    public Page<PartnerResponse> list(PartnerFilterRequest filter, Pageable pageable) {
 
-        return
-                partnerRepository.findAllByDeletedFalse()
-                .stream()
-                .map(partnerMapper::toResponse)
-                .toList();
+        Page<Partner> page = partnerRepository.findAll(
+                PartnerSpecification.filter(filter),
+                pageable
+        );
+
+        return page.map(partnerMapper::toResponse);
     }
 
-    @Transactional(readOnly = true)
-    public List<PartnerResponse> getAllIncludingDeleted() {
-
-        return
-                partnerRepository.findAll()
-                        .stream()
-                        .map(partnerMapper::toResponse)
-                        .toList();
-    }
 
     @Transactional(readOnly = true)
     public PartnerResponse getById(Long id) {

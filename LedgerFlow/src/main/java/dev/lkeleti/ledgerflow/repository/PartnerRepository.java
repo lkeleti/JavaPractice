@@ -2,9 +2,9 @@ package dev.lkeleti.ledgerflow.repository;
 
 import dev.lkeleti.ledgerflow.entity.Partner;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-
-public interface PartnerRepository extends JpaRepository<Partner, Long> {
-    List<Partner> findAllByDeletedFalse();
+public interface PartnerRepository
+        extends JpaRepository<Partner, Long>,
+        JpaSpecificationExecutor<Partner> {
 }

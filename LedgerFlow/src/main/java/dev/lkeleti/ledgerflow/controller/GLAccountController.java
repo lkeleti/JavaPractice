@@ -1,12 +1,12 @@
 package dev.lkeleti.ledgerflow.controller;
 
 import dev.lkeleti.ledgerflow.dto.request.GLAccountCreateRequest;
+import dev.lkeleti.ledgerflow.dto.request.GLAccountFilterRequest;
 import dev.lkeleti.ledgerflow.dto.request.GLAccountUpdateRequest;
 import dev.lkeleti.ledgerflow.dto.response.ApiError;
 import dev.lkeleti.ledgerflow.dto.response.GLAccountResponse;
 import dev.lkeleti.ledgerflow.service.GLAccountService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,10 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/gl-accounts")
@@ -93,39 +95,24 @@ public class GLAccountController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-            summary = "Összes aktív főkönyvi számla lekérése",
-            description = "Visszaadja az összes aktív (nem törölt) főkönyvi számlát."
+            summary = "Főkönyvi számlák listázása",
+            description = "Lapozható, rendezhető és szűrhető főkönyvi számla lista."
     )
     @ApiResponse(
             responseCode = "200",
-            description = "Sikeres lekérés",
+            description = "Sikeres lekérés – lapozott GLAccountResponse lista",
             content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = GLAccountResponse.class))
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Page.class)
             )
     )
-    public List<GLAccountResponse> getAll() {
-        return service.getAll();
+    public Page<GLAccountResponse> list(
+            @ParameterObject GLAccountFilterRequest filter,
+            @ParameterObject Pageable pageable
+    ) {
+        return service.list(filter, pageable);
     }
 
-    // ---------------------------------------------------------
-    // GET ALL INCLUDING DELETED
-    // ---------------------------------------------------------
-    @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(
-            summary = "Összes főkönyvi számla lekérése (töröltekkel együtt)",
-            description = "Visszaadja az összes főkönyvi számlát, beleértve a logikailag törölteket is."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Sikeres lekérés",
-            content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = GLAccountResponse.class))
-            )
-    )
-    public List<GLAccountResponse> getAllIncludingDeleted() {
-        return service.getAllIncludingDeleted();
-    }
 
     // ---------------------------------------------------------
     // UPDATE

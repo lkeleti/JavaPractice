@@ -12,10 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -52,19 +51,27 @@ public class InvoiceController {
     // LIST + FILTER + PAGING
     // ============================
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     @Operation(
             summary = "Számlák listázása",
-            description = "Szűrés, rendezés és lapozás támogatott. Alapértelmezett rendezés: issueDate ASC."
+            description = "Lapozható, rendezhető és minden mezőre szűrhető számlalista."
     )
-    @ApiResponse(responseCode = "200", description = "Sikeres lekérdezés",
-            content = @Content(schema = @Schema(implementation = InvoiceResponse.class)))
-    @GetMapping
+    @ApiResponse(
+            responseCode = "200",
+            description = "Sikeres lekérés – lapozott InvoiceResponse lista",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Page.class)
+            )
+    )
     public Page<InvoiceResponse> list(
-            InvoiceFilterRequest filter,
-            @PageableDefault(sort = "issueDate", direction = Sort.Direction.ASC) Pageable pageable
+            @ParameterObject InvoiceFilterRequest filter,
+            @ParameterObject Pageable pageable
     ) {
         return invoiceService.list(filter, pageable);
     }
+
 
     @Operation(
             summary = "Új számla rögzítése",
